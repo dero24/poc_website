@@ -1,205 +1,517 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>Morphic Web — Groq Personal Edition</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-  <style>
-    body {font-family:'Inter',sans-serif;background:radial-gradient(160% 130% at 50% 0%,#dbeafe 0%,#818cf8 100%);margin:0;padding:0;min-height:100vh;}
-    .container{max-width:690px;margin:45px auto 16px;background:#fff;border-radius:18px;box-shadow:0 10px 43px rgba(90,120,220,0.12);padding:44px 27px;}
-    .header{text-align:center;margin-bottom:18px;}
-    .logo{font-size:2.0em;color:#7b64e7;font-weight:900;}
-    .slogan{margin:10px auto 0;font-size:1.09em;opacity:.88;color:#524bb5;}
-    .setup-card {margin-bottom:16px;padding:18px 0;}
-    .api-input-group label{font-size:1.09em;font-weight:700;color:#7b64e7;display:block;margin-bottom:8px;}
-    .api-input-group input{font-size:1em;padding:10px;width:320px;max-width:100%;border:2px solid #e3eafe;border-radius:9px;outline:none;margin-bottom:7px;}
-    .api-input-group small{color:#697ea7;font-size:0.97em;margin-bottom:6px;display:block;}
-    .start-btn{padding:12px 48px;border-radius:11px;font-size:1.07em;font-weight:700;background:linear-gradient(101deg,#524bb5 0%,#a5b4fc 80%);color:#fff;border:none;cursor:pointer;}
-    .start-btn:hover{background:#7b64e7;}
-    .stats{display:flex;gap:11px;margin-bottom:8px;}
-    .stat-card{flex:1;background:linear-gradient(101deg,#7b64e7 0%,#a5b4fc 80%);color:white;border-radius:8px;text-align:center;padding:9px 0;font-weight:600;font-size:1em;}
-    .stat-card h3{margin:0;font-size:1.17em;}
-    .stat-card p{margin:2px 0 0;opacity:.78;}
-    .user-input-area{margin-bottom:8px;display:flex;gap:8px;}
-    .user-input-area textarea{width:100%;padding:11px 14px;border-radius:9px;min-height:44px;font-size:1em;border:2px solid #e0e3ee;transition:border .12s;}
-    .user-input-area textarea:focus{border-color:#7b64e7;}
-    .generate-btn{background:linear-gradient(99deg,#7b64e7 14%,#a5b4fc 100%);color:#fff;border:none;padding:12px 18px;border-radius:10px;font-size:1.07em;font-weight:700;cursor:pointer;}
-    .generate-btn:hover{background:#7462e5;}
-    .generated-content{margin-top:10px;padding:14px 10px;background:#f2f6fd;border-radius:8px;min-height:92px;}
-    .loading{text-align:center;padding:13px;color:#7b64e7;font-size:1.1em;}
-    .error-message{background:#f84a77;color:#fff;padding:8px 11px;border-radius:7px;margin-top:4px;}
-    .branding{text-align:center;font-size:.98em;color:#9493e2;margin-top:12px;}
-    .history-log{margin-top:9px;padding:4px;background:#f7f8fc;border-radius:7px;max-height:62px;overflow-y:auto;border:1.2px solid #e5e5fd;}
-    .history-item{padding:3.2px 9px 2.4px 8px;margin-bottom:2px;background:#fff;border-radius:4px;font-size:1em;border:1px solid #dfdbff;}
-    @media(max-width:800px){.container{max-width:98vw;padding:3vw 1vw;}.stats{flex-direction:column;gap:5px;}}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS AI - Next-Gen App Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --accent: #ec4899;
+            --dark: #1e293b;
+            --light: #f8fafc;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: var(--light);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .card-glass {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36);
+            border-radius: 16px;
+        }
+        
+        .prompt-input {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .prompt-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+        }
+        
+        .generate-btn {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+        
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
+        }
+        
+        .generate-btn:active {
+            transform: translateY(0);
+        }
+        
+        .loading-dots {
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .loading-dots span {
+            width: 8px;
+            height: 8px;
+            margin: 0 2px;
+            background-color: white;
+            border-radius: 50%;
+            display: inline-block;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        
+        .loading-dots span:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+        
+        .loading-dots span:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+        
+        @keyframes bounce {
+            0%, 80%, 100% { 
+                transform: scale(0);
+            }
+            40% { 
+                transform: scale(1);
+            }
+        }
+        
+        .app-preview {
+            transition: all 0.5s ease;
+            transform-style: preserve-3d;
+        }
+        
+        .flip {
+            transform: rotateY(180deg);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .typewriter {
+            overflow: hidden;
+            border-right: 2px solid var(--primary);
+            white-space: nowrap;
+            margin: 0 auto;
+            letter-spacing: 2px;
+            animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+        }
+        
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: var(--primary) }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 15px rgba(99, 102, 241, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+            }
+        }
+        
+        .neon-border {
+            position: relative;
+        }
+        
+        .neon-border::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 16px;
+            background: linear-gradient(45deg, var(--primary), var(--accent), var(--secondary), var(--primary));
+            background-size: 400%;
+            z-index: -1;
+            opacity: 0;
+            transition: 0.5s;
+        }
+        
+        .neon-border:hover::before {
+            opacity: 1;
+            animation: animate 8s linear infinite;
+        }
+        
+        @keyframes animate {
+            0% {
+                background-position: 0 0;
+            }
+            50% {
+                background-position: 300% 0;
+            }
+            100% {
+                background-position: 0 0;
+            }
+        }
+    </style>
 </head>
-<body>
-<div class="container">
-  <div class="header">
-    <div class="logo">Morphic Web</div>
-    <div class="slogan">Truly next-gen web app generator — powered by <b>YOUR Groq API key</b> for reliability, speed, and no “failed to fetch”!</div>
-  </div>
-  <div class="setup-card" id="setupCard">
-    <form onsubmit="event.preventDefault(); initializeExperience();">
-      <div class="api-input-group">
-        <label for="apiKey">Groq API Key</label>
-        <input type="password" id="apiKey" required autocomplete="off" placeholder="Paste your Groq API key">
-        <small>Get a free key from <a href="https://console.groq.com/" target="_blank">console.groq.com</a> – it’s never saved or sent anywhere except to Groq for your requests.</small>
-      </div>
-      <button type="submit" class="start-btn">🔓 Start Morphic Web</button>
-    </form>
-  </div>
-  <div style="display:none" class="interaction-zone" id="interactionZone">
-    <div class="stats">
-      <div class="stat-card"><h3 id="interactionCount">0</h3><p>Interactions</p></div>
-      <div class="stat-card"><h3 id="elementsCreated">0</h3><p>Elements Created</p></div>
-      <div class="stat-card"><h3 id="adaptations">0</h3><p>Adaptations</p></div>
-    </div>
-    <div class="user-input-area">
-    <textarea id="userIntent" placeholder="Describe an app, tool, dashboard, or creative experience... (e.g. 'A todo app with dark mode and drag sorting', 'Stock tracker with real-time charts', 'AI art gallery with filters')"></textarea>
-<button type="button" onclick="generateInterface()" class="generate-btn">✨ Generate</button>
-    </div>
-    <div class="generated-content" id="generatedContent">
-      <p style="color:#8cf;text-align:center;">Your created app will appear here.<br>All functionality is live & powered by Groq!</p>
-    </div>
-    <div class="history-log" id="historyLog">
-      <div class="history-item">Try these examples: "Pomodoro timer with sounds" • "Markdown editor with preview" • "Weather dashboard with maps"</div>
-    </div>
-  </div>
-  <div class="branding">MorphicWebOS &copy; 2025 | AI-Powered App Forge | Runs entirely in your browser</div>
-</div>
-<script>
-let groqKey="", interactionCount=0, elementsCreated=0, adaptations=0, conversationHistory=[];
-function updateStats() {
-  document.getElementById('interactionCount').textContent = interactionCount;
-  document.getElementById('elementsCreated').textContent = elementsCreated;
-  document.getElementById('adaptations').textContent = adaptations;
-}
-function logHistory(msg) {
-  const log = document.getElementById('historyLog'), item = document.createElement('div');
-  item.className = 'history-item'; item.textContent = `${new Date().toLocaleTimeString()} - ${msg}`;
-  log.appendChild(item); log.scrollTop = log.scrollHeight;
-}
-function initializeExperience() {
-  groqKey = document.getElementById('apiKey').value.trim();
-  if(!groqKey) { 
-    alert('Paste your Groq API key!'); 
-    return; 
-  }
-  
-  // Test the API key immediately
-  testGroqAPI().then(valid => {
-    if(valid) {
-      document.getElementById('setupCard').style.display="none";
-      document.getElementById('interactionZone').style.display="block";
-      logHistory('Groq AI session started');
-    } else {
-      alert('Invalid API key. Please check your key and try again.');
-    }
-  }).catch(error => {
-    alert(`API test failed: ${error.message}`);
-  });
-}
+<body class="min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="py-6 px-4 sm:px-6 lg:px-8">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center">
+                    <i class="fas fa-robot text-white text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold gradient-text">NEXUS AI</h1>
+            </div>
+            <nav class="hidden md:flex space-x-8">
+                <a href="#" class="text-gray-300 hover:text-white transition">Features</a>
+                <a href="#" class="text-gray-300 hover:text-white transition">Templates</a>
+                <a href="#" class="text-gray-300 hover:text-white transition">Docs</a>
+                <a href="#" class="text-gray-300 hover:text-white transition">Pricing</a>
+            </nav>
+            <button class="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg font-medium hover:opacity-90 transition">
+                Get Started
+            </button>
+        </div>
+    </header>
 
-async function testGroqAPI() {
-  try {
-    const response = await fetch('https://api.groq.com/openai/v1/models', {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${groqKey}`,
-        'Content-Type': 'application/json'
-      }
-    });
-    
-    if(!response.ok) {
-      throw new Error('API key rejected by Groq');
-    }
-    
-    const data = await response.json();
-    return Array.isArray(data.data) && data.data.length > 0;
-  } catch(error) {
-    console.error('API test error:', error);
-    return false;
-  }
-}
-async function generateInterface() {
-  const intent=document.getElementById('userIntent').value.trim();
-  const content=document.getElementById('generatedContent');
-  if(!intent){alert('Describe what to build!');return;}
-  content.innerHTML='<div class="loading">⚡️ Creating with Groq...</div>';
-  interactionCount++; updateStats();
-  const context = conversationHistory.length>0?`Past: ${conversationHistory.slice(-2).join(' | ')}`:'';
-  const prompt=`You are MorphicWeb, a world-class JavaScript/HTML/CSS app generator.
-Build: "${intent}"
-- Output only one <div id="mainAPP">...</div> as root, with <style> and <script>.
-- All controls must work; add event handlers in JS (not inline).
-- No markdown, code blocks, explanations. Just HTML/CSS/JS. If you fail, use <div class="error-message">.
-${context}`
-  try {
-    const html = await callGroqAPI(prompt);
-    parseAndInjectHTML(html,content);
-    conversationHistory.push(intent);
-    elementsCreated+=countElements(html); adaptations++;
-    updateStats(); logHistory(`✨ UI: "${intent.substring(0,44)}..."`);
-    document.getElementById('userIntent').value='';
-  } catch(e) {
-    content.innerHTML=`<div class='error-message'><b>Groq API error:</b> ${e.message}</div>`;
-    logHistory(`⚠️ ${e.message}`);
-  }
-}
-async function callGroqAPI(prompt) {
-  const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-    method: 'POST',
-    headers: {'Authorization': `Bearer ${groqKey}`,'Content-Type': 'application/json'},
-    body: JSON.stringify({
-      model: 'llama-3.3-70b-versatile',
-      max_tokens: 2048, temperature: 0.78,
-      messages: [{ role: "user", content: prompt }]
-    })
-  });
-  if(!resp.ok){
-    let errorMsg = "Unknown Groq API error";
-    try { const data = await resp.json(); errorMsg = data.error?.message || errorMsg; } catch {}
-    throw new Error(errorMsg);
-  }
-  const data = await resp.json();
-  let html = (data.choices && data.choices[0]?.message?.content) ? data.choices[0].message.content.trim() : "";
-  html = html.replace(/``````/g, '').trim();
-  if(!/<div/i.test(html)) throw new Error("AI did not generate usable HTML (try a different prompt!)");
-  return html;
-}
-function parseAndInjectHTML(raw, container) {
-  // First sanitize by removing script tags that might be dangerous
-  raw = raw.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, function(match) {
-    // Only allow scripts that don't contain certain patterns
-    return /(addEventListener|querySelector|classList|innerHTML|fetch|axios|XMLHttpRequest)/i.test(match) ? 
-      match : '';
-  });
-  let html=raw, style="", script="";
-  style = html.match(/<style[^>]*>([\s\S]*?)<\/style>/i)?.[1] || "";
-  script = html.match(/<script[^>]*>([\s\S]*?)<\/script>/i)?.[1] || "";
-  html = html.replace(/<style[^>]*>[\s\S]*?<\/style>/gi,"").replace(/<script[^>]*>[\s\S]*?<\/script>/gi,"");
-  container.innerHTML = html;
-  if(style) { let styleEl=document.createElement('style'); styleEl.textContent=style; container.appendChild(styleEl);}
-  if(script) { let scriptEl=document.createElement('script'); scriptEl.textContent=script; container.appendChild(scriptEl);}
-}
-function countElements(html) {
-  const div=document.createElement('div'); div.innerHTML=html;
-  return div.querySelectorAll('*').length;
-}
-// Add example prompts when clicking empty textarea
-document.addEventListener("DOMContentLoaded", ()=>{
-  document.getElementById('userIntent').addEventListener('focus', function() {
-    if(!this.value) {
-      this.placeholder = "e.g. 'Kanban board with color tags' or 'AI poem generator with voice output'";
-    }
-  });
-  document.getElementById('userIntent')?.addEventListener('keydown',(e)=>{
-    if(e.key==='Enter'&&e.ctrlKey)generateInterface();
-  });
-});
-</script>
-</body>
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl md:text-6xl font-bold mb-6 animate__animated animate__fadeIn">
+                Build <span class="gradient-text">AI-Powered Apps</span> in Seconds
+            </h2>
+            <p class="text-xl text-gray-300 max-w-3xl mx-auto animate__animated animate__fadeIn animate__delay-1s">
+                Describe your app idea and let our AI generate a fully functional application with integrated Groq API capabilities.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <!-- Prompt Section -->
+            <div class="card-glass p-8 animate__animated animate__fadeInLeft">
+                <div class="flex items-center mb-6">
+                    <div class="w-12 h-12 rounded-full bg-indigo-900 flex items-center justify-center mr-4">
+                        <i class="fas fa-lightbulb text-indigo-400 text-xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold">Describe Your App</h3>
+                </div>
+                
+                <div class="mb-6">
+                    <label for="app-purpose" class="block text-sm font-medium text-gray-300 mb-2">App Purpose</label>
+                    <select id="app-purpose" class="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="productivity">Productivity</option>
+                        <option value="entertainment">Entertainment</option>
+                        <option value="education">Education</option>
+                        <option value="business">Business</option>
+                        <option value="health">Health & Fitness</option>
+                        <option value="custom">Custom</option>
+                    </select>
+                </div>
+                
+                <div class="mb-6">
+                    <label for="app-prompt" class="block text-sm font-medium text-gray-300 mb-2">Detailed Description</label>
+                    <textarea id="app-prompt" rows="6" class="w-full px-4 py-3 prompt-input rounded-lg text-white placeholder-gray-400" placeholder="Describe your app in detail. Example: 'A chatbot that helps users learn Spanish through conversational practice and provides instant feedback on grammar...'"></textarea>
+                </div>
+                
+                <div class="mb-6">
+                    <label for="enhancements" class="block text-sm font-medium text-gray-300 mb-2">Enhancements (Optional)</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button class="enhance-btn px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm transition" data-enhance="optimize">Optimize Performance</button>
+                        <button class="enhance-btn px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm transition" data-enhance="security">Add Security</button>
+                        <button class="enhance-btn px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm transition" data-enhance="responsive">Make Responsive</button>
+                        <button class="enhance-btn px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm transition" data-enhance="groq">Add Groq API</button>
+                    </div>
+                </div>
+                
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <input id="include-groq" type="checkbox" class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500">
+                        <label for="include-groq" class="ml-2 text-sm text-gray-300">Include Groq API</label>
+                    </div>
+                    <button id="generate-btn" class="generate-btn px-6 py-3 rounded-lg font-medium text-white flex items-center">
+                        <span id="generate-text">Generate App</span>
+                        <span id="generate-icon" class="ml-2"><i class="fas fa-bolt"></i></span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Preview Section -->
+            <div class="card-glass p-8 animate__animated animate__fadeInRight">
+                <div class="flex items-center mb-6">
+                    <div class="w-12 h-12 rounded-full bg-purple-900 flex items-center justify-center mr-4">
+                        <i class="fas fa-eye text-purple-400 text-xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold">AI-Generated Preview</h3>
+                </div>
+                
+                <div id="preview-container" class="app-preview h-96 bg-slate-800 rounded-xl overflow-hidden relative">
+                    <!-- Initial state -->
+                    <div id="initial-preview" class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
+                        <div class="w-20 h-20 mb-6 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center pulse">
+                            <i class="fas fa-magic text-white text-3xl"></i>
+                        </div>
+                        <h4 class="text-xl font-bold mb-2">Your App Preview</h4>
+                        <p class="text-gray-400">Describe your app idea and click "Generate" to see a live preview of what our AI will create.</p>
+                    </div>
+                    
+                    <!-- Loading state -->
+                    <div id="loading-preview" class="absolute inset-0 hidden flex flex-col items-center justify-center p-6 text-center bg-slate-800">
+                        <div class="w-20 h-20 mb-6 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center animate-spin">
+                            <i class="fas fa-cog text-white text-3xl"></i>
+                        </div>
+                        <h4 class="text-xl font-bold mb-4">Generating Your App</h4>
+                        <div class="loading-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <p class="text-gray-400 mt-4">Enhancing your prompt and building your application...</p>
+                    </div>
+                    
+                    <!-- Generated preview -->
+                    <div id="generated-preview" class="absolute inset-0 hidden flex flex-col bg-white text-gray-800">
+                        <div class="border-b border-gray-200 p-4 flex justify-between items-center">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center mr-2">
+                                    <i class="fas fa-robot text-indigo-600 text-sm"></i>
+                                </div>
+                                <span class="font-medium">AI Generated App</span>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center">
+                                    <i class="fas fa-sync-alt text-gray-600 text-sm"></i>
+                                </button>
+                                <button class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center">
+                                    <i class="fas fa-expand text-gray-600 text-sm"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="app-content" class="flex-grow p-6 overflow-auto">
+                            <!-- App content will be injected here -->
+                        </div>
+                        <div class="border-t border-gray-200 p-4 flex justify-between items-center">
+                            <div class="text-sm text-gray-500">
+                                Powered by <span class="font-medium">NEXUS AI</span> and <span class="font-medium">Groq API</span>
+                            </div>
+                            <button id="view-code-btn" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-white text-sm font-medium">
+                                View Generated Code
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Code preview -->
+                    <div id="code-preview" class="absolute inset-0 hidden flex-col bg-gray-900 text-gray-300">
+                        <div class="border-b border-gray-700 p-4 flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fas fa-code text-indigo-400 mr-2"></i>
+                                <span class="font-medium">Generated Code</span>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button id="copy-code-btn" class="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-sm">
+                                    <i class="fas fa-copy mr-1"></i> Copy
+                                </button>
+                                <button id="back-to-app-btn" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 rounded text-sm">
+                                    <i class="fas fa-arrow-left mr-1"></i> Back to App
+                                </button>
+                            </div>
+                        </div>
+                        <pre id="code-content" class="flex-grow p-4 overflow-auto text-sm font-mono"></pre>
+                    </div>
+                </div>
+                
+                <div class="mt-6 flex justify-between items-center">
+                    <div class="text-sm text-gray-400">
+                        <span id="enhanced-prompt-label" class="hidden">Enhanced Prompt: </span>
+                        <span id="enhanced-prompt" class="font-medium"></span>
+                    </div>
+                    <button id="download-btn" class="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg text-white text-sm font-medium hidden">
+                        <i class="fas fa-download mr-2"></i> Download Code
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Features Section -->
+        <div class="mt-24">
+            <h3 class="text-3xl font-bold text-center mb-12">Why Choose <span class="gradient-text">NEXUS AI</span></h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="feature-card card-glass p-8 rounded-xl transition duration-300">
+                    <div class="w-14 h-14 rounded-full bg-indigo-900 flex items-center justify-center mb-6 mx-auto">
+                        <i class="fas fa-bolt text-indigo-400 text-2xl"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-center mb-3">Lightning Fast</h4>
+                    <p class="text-gray-300 text-center">Generate complete applications in seconds with our optimized AI pipeline and Groq API integration.</p>
+                </div>
+                
+                <div class="feature-card card-glass p-8 rounded-xl transition duration-300">
+                    <div class="w-14 h-14 rounded-full bg-purple-900 flex items-center justify-center mb-6 mx-auto">
+                        <i class="fas fa-shield-alt text-purple-400 text-2xl"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-center mb-3">Secure by Design</h4>
+                    <p class="text-gray-300 text-center">All generated code includes built-in security best practices and vulnerability protection.</p>
+                </div>
+                
+                <div class="feature-card card-glass p-8 rounded-xl transition duration-300">
+                    <div class="w-14 h-14 rounded-full bg-pink-900 flex items-center justify-center mb-6 mx-auto">
+                        <i class="fas fa-random text-pink-400 text-2xl"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-center mb-3">Smart Enhancements</h4>
+                    <p class="text-gray-300 text-center">Our AI automatically enhances your prompts with optimization suggestions before generation.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 py-12 px-4 sm:px-6 lg:px-8">
+        <div class="container mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h4 class="text-lg font-bold mb-4 gradient-text">NEXUS AI</h4>
+                    <p class="text-gray-400">The next generation AI app builder with integrated Groq API capabilities.</p>
+                </div>
+                <div>
+                    <h4 class="text-lg font-bold mb-4 text-white">Product</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Features</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Pricing</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Templates</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">API</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-bold mb-4 text-white">Resources</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Documentation</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Tutorials</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Blog</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Community</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-bold mb-4 text-white">Connect</h4>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center transition">
+                            <i class="fab fa-twitter text-gray-300"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center transition">
+                            <i class="fab fa-github text-gray-300"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center transition">
+                            <i class="fab fa-discord text-gray-300"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center transition">
+                            <i class="fab fa-linkedin-in text-gray-300"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-slate-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-500 text-sm">© 2023 NEXUS AI. All rights reserved.</p>
+                <div class="flex space-x-6 mt-4 md:mt-0">
+                    <a href="#" class="text-gray-500 hover:text-gray-300 text-sm transition">Privacy Policy</a>
+                    <a href="#" class="text-gray-500 hover:text-gray-300 text-sm transition">Terms of Service</a>
+                    <a href="#" class="text-gray-500 hover:text-gray-300 text-sm transition">Cookies</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const generateBtn = document.getElementById('generate-btn');
+            const generateText = document.getElementById('generate-text');
+            const generateIcon = document.getElementById('generate-icon');
+            const initialPreview = document.getElementById('initial-preview');
+            const loadingPreview = document.getElementById('loading-preview');
+            const generatedPreview = document.getElementById('generated-preview');
+            const codePreview = document.getElementById('code-preview');
+            const appContent = document.getElementById('app-content');
+            const codeContent = document.getElementById('code-content');
+            const viewCodeBtn = document.getElementById('view-code-btn');
+            const backToAppBtn = document.getElementById('back-to-app-btn');
+            const copyCodeBtn = document.getElementById('copy-code-btn');
+            const downloadBtn = document.getElementById('download-btn');
+            const enhancedPrompt = document.getElementById('enhanced-prompt');
+            const enhancedPromptLabel = document.getElementById('enhanced-prompt-label');
+            const previewContainer = document.getElementById('preview-container');
+            const appPrompt = document.getElementById('app-prompt');
+            const appPurpose = document.getElementById('app-purpose');
+            const includeGroq = document.getElementById('include-groq');
+            const enhanceBtns = document.querySelectorAll('.enhance-btn');
+            
+            // Sample app templates for different purposes
+            const appTemplates = {
+                productivity: {
+                    description: "A productivity app that helps users manage tasks, track time, and stay focused with AI-powered suggestions.",
+                    example: "Create a task management app with Pomodoro timer, habit tracking, and AI-generated productivity insights based on user behavior patterns."
+                },
+                entertainment: {
+                    description: "An entertainment app that provides personalized content recommendations and interactive experiences.",
+                    example: "Build a movie recommendation engine that suggests films based on mood, previous ratings, and integrates with streaming services."
+                },
+                education: {
+                    description: "An educational app that facilitates learning through interactive lessons and AI tutoring.",
+                    example: "Develop a language learning app with speech recognition, personalized lesson plans, and real-time grammar correction."
+                },
+                business: {
+                    description: "A business app that automates workflows, analyzes data, and enhances decision making.",
+                    example: "Create a sales dashboard that predicts revenue, analyzes customer data, and generates actionable insights with natural language explanations."
+                },
+                health: {
+                    description: "A health and fitness app that tracks activities, provides nutrition advice, and offers personalized workouts.",
+                    example: "Build a fitness coach app that creates customized workout plans, tracks progress with computer vision, and adjusts routines based on performance."
+                },
+                custom: {
+                    description: "A completely custom application tailored to your specific needs.",
+                    example: "Describe exactly what you need - our AI will handle the rest!"
+                }
+            };
+            
+            // Set example prompt based on selected purpose
+            appPurpose.addEventListener('change', function() {
+                const selectedPurpose = this.value;
+                appPrompt.placeholder = appTemplates[selectedPurpose].example;
+            });
+            
+            // Enhance prompt buttons
+            enhanceBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    this.classList.toggle('bg-indigo-600');
+                    this.classList.toggle('bg-slate-700');
+                    
+                    const icon = document.createElement('i');
+                    icon.className = 'fas fa-check
 </html>
