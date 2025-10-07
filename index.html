@@ -3,114 +3,141 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>Morphic Web — DeepSeek Free</title>
+  <title>Morphic Web — Groq Personal Edition</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
-    body {font-family:'Inter',sans-serif;background:radial-gradient(160% 130% at 50% 0%,#d2ebff 0%,#6fd6f5 100%);margin:0;padding:0;min-height:100vh;}
-    .container{max-width:640px;margin:40px auto 18px;background:#fff;border-radius:18px;box-shadow:0 10px 36px rgba(90,170,220,0.14);padding:38px 24px;}
-    .header{text-align:center;margin-bottom:22px;}
-    .logo{font-size:2.0em;color:#15a8db;font-weight:900;}
-    .slogan{margin:8px auto 0;font-size:1.13em;opacity:.88;color:#13a8c3;}
-    .stats{display:flex;gap:12px;margin-bottom:7px;}
-    .stat-card{flex:1;background:linear-gradient(101deg,#21add4 0%,#1be8e1 80%);color:white;border-radius:8px;text-align:center;padding:9px 0;font-weight:600;font-size:1.03em;}
-    .stat-card h3{margin:0;font-size:1.16em;}
-    .stat-card p{margin:1.5px 0 0;opacity:.8;}
-    .user-input-area{margin-bottom:9px;display:flex;gap:10px;}
-    .user-input-area textarea{width:100%;padding:10px 13px;border-radius:9px;min-height:45px;font-size:1em;border:2px solid #e0e3ee;transition:border .14s;}
-    .user-input-area textarea:focus{border-color:#36c9e7;}
-    .generate-btn{background:linear-gradient(109deg,#18b3dc 0%,#44e2e0 85%);color:#fff;border:none;padding:11px 14px;border-radius:9px;font-size:1em;font-weight:700;cursor:pointer;}
-    .generate-btn:hover{background:linear-gradient(109deg,#30d8c9 0%,#11acc4 85%);}
-    .generated-content{margin-top:11px;padding:14px 10px;background:#f2fdff;border-radius:8px;min-height:90px;}
-    .loading{text-align:center;padding:13px;color:#16b1ca;font-size:1.1em;}
-    .error-message{background:#f84a77;color:#fff;padding:9px 11px;border-radius:7px;margin-top:5px;}
-    .branding{text-align:center;font-size:.99em;color:#93b9e2;margin-top:16px;}
-    .history-log{margin-top:8px;padding:5px;background:#e0f8fc;border-radius:7px;max-height:66px;overflow-y:auto;border:1.2px solid #d1f3fc;font-size:0.99em;}
-    .history-item{padding:3px 9px 2.5px 8px;margin-bottom:2.5px;background:#fff;border-radius:5px;font-size:1em;border:1px solid #d9f0ff;}
-    @media(max-width:800px){.container{max-width:95vw;padding:3vw 1vw;}.stats{flex-direction:column;gap:5px;}}
+    body {font-family:'Inter',sans-serif;background:radial-gradient(160% 130% at 50% 0%,#dbeafe 0%,#818cf8 100%);margin:0;padding:0;min-height:100vh;}
+    .container{max-width:690px;margin:45px auto 16px;background:#fff;border-radius:18px;box-shadow:0 10px 43px rgba(90,120,220,0.12);padding:44px 27px;}
+    .header{text-align:center;margin-bottom:18px;}
+    .logo{font-size:2.0em;color:#7b64e7;font-weight:900;}
+    .slogan{margin:10px auto 0;font-size:1.09em;opacity:.88;color:#524bb5;}
+    .setup-card {margin-bottom:16px;padding:18px 0;}
+    .api-input-group label{font-size:1.09em;font-weight:700;color:#7b64e7;display:block;margin-bottom:8px;}
+    .api-input-group input{font-size:1em;padding:10px;width:320px;max-width:100%;border:2px solid #e3eafe;border-radius:9px;outline:none;margin-bottom:7px;}
+    .api-input-group small{color:#697ea7;font-size:0.97em;margin-bottom:6px;display:block;}
+    .start-btn{padding:12px 48px;border-radius:11px;font-size:1.07em;font-weight:700;background:linear-gradient(101deg,#524bb5 0%,#a5b4fc 80%);color:#fff;border:none;cursor:pointer;}
+    .start-btn:hover{background:#7b64e7;}
+    .stats{display:flex;gap:11px;margin-bottom:8px;}
+    .stat-card{flex:1;background:linear-gradient(101deg,#7b64e7 0%,#a5b4fc 80%);color:white;border-radius:8px;text-align:center;padding:9px 0;font-weight:600;font-size:1em;}
+    .stat-card h3{margin:0;font-size:1.17em;}
+    .stat-card p{margin:2px 0 0;opacity:.78;}
+    .user-input-area{margin-bottom:8px;display:flex;gap:8px;}
+    .user-input-area textarea{width:100%;padding:11px 14px;border-radius:9px;min-height:44px;font-size:1em;border:2px solid #e0e3ee;transition:border .12s;}
+    .user-input-area textarea:focus{border-color:#7b64e7;}
+    .generate-btn{background:linear-gradient(99deg,#7b64e7 14%,#a5b4fc 100%);color:#fff;border:none;padding:12px 18px;border-radius:10px;font-size:1.07em;font-weight:700;cursor:pointer;}
+    .generate-btn:hover{background:#7462e5;}
+    .generated-content{margin-top:10px;padding:14px 10px;background:#f2f6fd;border-radius:8px;min-height:92px;}
+    .loading{text-align:center;padding:13px;color:#7b64e7;font-size:1.1em;}
+    .error-message{background:#f84a77;color:#fff;padding:8px 11px;border-radius:7px;margin-top:4px;}
+    .branding{text-align:center;font-size:.98em;color:#9493e2;margin-top:12px;}
+    .history-log{margin-top:9px;padding:4px;background:#f7f8fc;border-radius:7px;max-height:62px;overflow-y:auto;border:1.2px solid #e5e5fd;}
+    .history-item{padding:3.2px 9px 2.4px 8px;margin-bottom:2px;background:#fff;border-radius:4px;font-size:1em;border:1px solid #dfdbff;}
+    @media(max-width:800px){.container{max-width:98vw;padding:3vw 1vw;}.stats{flex-direction:column;gap:5px;}}
   </style>
 </head>
 <body>
 <div class="container">
   <div class="header">
     <div class="logo">Morphic Web</div>
-    <div class="slogan">AI web app builder — <b>DeepSeek Free Edition</b> (OpenRouter, no key)<br><span style="color:#2776ae;font-size:.97em">Live, interactive, and usually works!<br>“Failed to fetch” = service is busy or endpoint changed.</span></div>
+    <div class="slogan">Truly next-gen web app generator — powered by <b>YOUR Groq API key</b> for reliability, speed, and no “failed to fetch”!</div>
   </div>
-  <div class="stats">
-    <div class="stat-card"><h3 id="interactionCount">0</h3><p>Interactions</p></div>
-    <div class="stat-card"><h3 id="elementsCreated">0</h3><p>Elements Created</p></div>
-    <div class="stat-card"><h3 id="adaptations">0</h3><p>Adaptations</p></div>
+  <div class="setup-card" id="setupCard">
+    <form onsubmit="event.preventDefault(); initializeExperience();">
+      <div class="api-input-group">
+        <label for="apiKey">Groq API Key</label>
+        <input type="password" id="apiKey" required autocomplete="off" placeholder="Paste your Groq API key">
+        <small>Get a free key from <a href="https://console.groq.com/" target="_blank">console.groq.com</a> – it’s never saved or sent anywhere except to Groq for your requests.</small>
+      </div>
+      <button type="submit" class="start-btn">🔓 Start Morphic Web</button>
+    </form>
   </div>
-  <div class="user-input-area">
-    <textarea id="userIntent" placeholder="Describe your web app—e.g. quiz game, dashboard, AI tool, music player..."></textarea>
-    <button type="button" onclick="generateInterface()" class="generate-btn">✨ Generate</button>
+  <div style="display:none" class="interaction-zone" id="interactionZone">
+    <div class="stats">
+      <div class="stat-card"><h3 id="interactionCount">0</h3><p>Interactions</p></div>
+      <div class="stat-card"><h3 id="elementsCreated">0</h3><p>Elements Created</p></div>
+      <div class="stat-card"><h3 id="adaptations">0</h3><p>Adaptations</p></div>
+    </div>
+    <div class="user-input-area">
+      <textarea id="userIntent" placeholder="Describe an app, tool, dashboard, or creative experience..."></textarea>
+      <button type="button" onclick="generateInterface()" class="generate-btn">✨ Generate</button>
+    </div>
+    <div class="generated-content" id="generatedContent">
+      <p style="color:#8cf;text-align:center;">Your created app will appear here.<br>All functionality is live & powered by Groq!</p>
+    </div>
+    <div class="history-log" id="historyLog"></div>
   </div>
-  <div class="generated-content" id="generatedContent">
-    <p style="color:#88a;text-align:center;">Your generated web app will appear here. Click, interact, remix as you wish.</p>
-  </div>
-  <div class="history-log" id="historyLog"><strong>History:</strong></div>
-  <div class="branding">Morphic Web &copy; 2025 | DeepSeek via OpenRouter</div>
+  <div class="branding">Morphic Web &copy; 2025 | Powered by Groq AI | Runs entirely in your browser</div>
 </div>
 <script>
-const OR_API = "https://openrouter.ai/api/v1/chat/completions";
-const OR_MODEL = "deepseek-coder:free"; // As of October 2025.
-
-let interactionCount=0, elementsCreated=0, adaptations=0, conversationHistory=[];
+let groqKey="", interactionCount=0, elementsCreated=0, adaptations=0, conversationHistory=[];
 function updateStats() {
-  document.getElementById('interactionCount').textContent=interactionCount;
-  document.getElementById('elementsCreated').textContent=elementsCreated;
-  document.getElementById('adaptations').textContent=adaptations;
+  document.getElementById('interactionCount').textContent = interactionCount;
+  document.getElementById('elementsCreated').textContent = elementsCreated;
+  document.getElementById('adaptations').textContent = adaptations;
 }
 function logHistory(msg) {
-  const log=document.getElementById('historyLog'),item=document.createElement('div');
-  item.className='history-item'; item.textContent=`${new Date().toLocaleTimeString()} - ${msg}`;
-  log.appendChild(item); log.scrollTop=log.scrollHeight;
+  const log = document.getElementById('historyLog'), item = document.createElement('div');
+  item.className = 'history-item'; item.textContent = `${new Date().toLocaleTimeString()} - ${msg}`;
+  log.appendChild(item); log.scrollTop = log.scrollHeight;
+}
+function initializeExperience() {
+  groqKey = document.getElementById('apiKey').value.trim();
+  if(!groqKey) { alert('Paste your Groq API key!'); return; }
+  document.getElementById('setupCard').style.display="none";
+  document.getElementById('interactionZone').style.display="block";
+  logHistory('Groq AI session started');
 }
 async function generateInterface() {
   const intent=document.getElementById('userIntent').value.trim();
   const content=document.getElementById('generatedContent');
-  if(!intent){alert('Describe what you want to build!');return;}
-  content.innerHTML='<div class="loading">⚡️ Generating with DeepSeek...</div>';
+  if(!intent){alert('Describe what to build!');return;}
+  content.innerHTML='<div class="loading">⚡️ Creating with Groq...</div>';
   interactionCount++; updateStats();
-  const context=conversationHistory.length>0?`Last: ${conversationHistory.slice(-2).join(', ')}`:'';
-  const prompt=`You are a fantastic JavaScript/HTML/CSS webapp generator named MorphicWeb. Build this: "${intent}"
-  1. Output only a single <div id="mainAPP">...</div> as root (all features inside!).
-  2. Include usable <style> and <script> blocks.
-  3. Make sure all buttons and controls work — wire up events in JS.
-  4. NEVER use markdown, code blocks, or explanations. Just output HTML+CSS+JS. If you fail, at least return a <div class="error-message">.
-  ${context}`;
+  const context = conversationHistory.length>0?`Past: ${conversationHistory.slice(-2).join(' | ')}`:'';
+  const prompt=`You are MorphicWeb, a world-class JavaScript/HTML/CSS app generator.
+Build: "${intent}"
+- Output only one <div id="mainAPP">...</div> as root, with <style> and <script>.
+- All controls must work; add event handlers in JS (not inline).
+- No markdown, code blocks, explanations. Just HTML/CSS/JS. If you fail, use <div class="error-message">.
+${context}`
   try {
-    const html = await callOpenRouter(prompt);
+    const html = await callGroqAPI(prompt);
     parseAndInjectHTML(html,content);
     conversationHistory.push(intent);
     elementsCreated+=countElements(html); adaptations++;
-    updateStats(); logHistory(`✨ App: "${intent.substring(0,44)}..."`);
+    updateStats(); logHistory(`✨ UI: "${intent.substring(0,44)}..."`);
     document.getElementById('userIntent').value='';
   } catch(e) {
-    content.innerHTML=`<div class='error-message'><b>Failed to connect to DeepSeek/OpenRouter.</b><br>They may be busy! Try again soon or with a new prompt.<br>${e.message}</div>`;
+    content.innerHTML=`<div class='error-message'><b>Groq API error:</b> ${e.message}</div>`;
     logHistory(`⚠️ ${e.message}`);
   }
 }
-async function callOpenRouter(prompt) {
-  const raw = await fetch(OR_API,{
-    method:"POST",
-    headers: {"Content-Type":"application/json","HTTP-Referer":"https://github.com/","X-Title":"MorphicWeb"},
+async function callGroqAPI(prompt) {
+  const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {'Authorization': `Bearer ${groqKey}`,'Content-Type': 'application/json'},
     body: JSON.stringify({
-      model: OR_MODEL, messages: [{role:"user", content:prompt}],
-      max_tokens: 1500, temperature: 0.78
+      model: 'llama-3.3-70b-versatile',
+      max_tokens: 2048, temperature: 0.78,
+      messages: [{ role: "user", content: prompt }]
     })
   });
-  if(!raw.ok) throw new Error("OpenRouter/DeepSeek not available ("+raw.status+")");
-  const data=await raw.json();
-  let text=(data.choices&&data.choices[0]?.message?.content)?data.choices[0].message.content.trim():"";
-  text=text.replace(/``````/g,'').trim();
-  if(!/<div/i.test(text)) throw new Error("AI did not give usable app code.");
-  return text;
+  if(!resp.ok){
+    let errorMsg = "Unknown Groq API error";
+    try { const data = await resp.json(); errorMsg = data.error?.message || errorMsg; } catch {}
+    throw new Error(errorMsg);
+  }
+  const data = await resp.json();
+  let html = (data.choices && data.choices[0]?.message?.content) ? data.choices[0].message.content.trim() : "";
+  html = html.replace(/``````/g, '').trim();
+  if(!/<div/i.test(html)) throw new Error("AI did not generate usable HTML (try a different prompt!)");
+  return html;
 }
 function parseAndInjectHTML(raw, container) {
   let html=raw, style="", script="";
   style = html.match(/<style[^>]*>([\s\S]*?)<\/style>/i)?.[1] || "";
   script = html.match(/<script[^>]*>([\s\S]*?)<\/script>/i)?.[1] || "";
-  html = html.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "").replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "");
+  html = html.replace(/<style[^>]*>[\s\S]*?<\/style>/gi,"").replace(/<script[^>]*>[\s\S]*?<\/script>/gi,"");
   container.innerHTML = html;
   if(style) { let styleEl=document.createElement('style'); styleEl.textContent=style; container.appendChild(styleEl);}
   if(script) { let scriptEl=document.createElement('script'); scriptEl.textContent=script; container.appendChild(scriptEl);}
@@ -120,7 +147,9 @@ function countElements(html) {
   return div.querySelectorAll('*').length;
 }
 document.addEventListener("DOMContentLoaded", ()=>{
-  document.getElementById('userIntent')?.addEventListener('keydown',(e)=>{if(e.key==='Enter'&&e.ctrlKey)generateInterface();});
+  document.getElementById('userIntent')?.addEventListener('keydown',(e)=>{
+    if(e.key==='Enter'&&e.ctrlKey)generateInterface();
+  });
 });
 </script>
 </body>
