@@ -3,75 +3,57 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>Morphic Web – Ultimate AI UI Experience</title>
+  <title>Morphic Web — DeepSeek Free</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
-    body { font-family:'Inter',Segoe UI,sans-serif;
-      background:radial-gradient(160% 130% at 50% 0%,#7f9cf5 0%,#6772e5 100%);
-      min-height:100vh;margin:0;padding:0;color:#222}
-    .container {max-width:700px;margin:44px auto; background:white; border-radius:18px; box-shadow:0 12px 44px rgba(87,120,238,.13); padding:52px 36px 40px;}
-    .header {text-align:center;margin-bottom:22px;}
-    .logo {font-size:2.1em;color:#5055d5;font-weight:900;}
-    .slogan {margin:9px auto 0;font-size:1.10em;opacity:.86;color:#51518c;}
-    .interaction-zone {margin-top:7px;}
-    .stats {display:flex; gap:17px;}
-    .stat-card {flex:1;background:linear-gradient(101deg,#5055d5 0%,#7f9cf5 80%);color:white;border-radius:8px;text-align:center;padding:10px 0 7px 0;font-weight:600;font-size:1.02em;}
-    .stat-card h3 {margin:0;font-size:1.2em;}
-    .stat-card p {margin:1px 0 0;opacity:.7;}
-    .user-input-area {margin-bottom:9px;display:flex;gap:10px;}
-    .user-input-area textarea {
-      width:100%;padding:11px 10px;border-radius:8px;min-height:48px;font-size:1.03em;
-      border:1.8px solid #e0e3ee;font-family:'Inter',sans-serif;transition:border .14s;
-    }
-    .user-input-area textarea:focus {border-color:#6772e5;}
-    .generate-btn {
-      background:linear-gradient(101deg,#6772e5 0%,#7f9cf5 85%);
-      color:#fff;border:none;padding:12px 15px;border-radius:8px;font-size:1.05em;font-weight:700;cursor:pointer;
-      box-shadow:0 1.2px 9px rgba(87,119,238,.09);
-    }
-    .generate-btn:hover {background:linear-gradient(101deg,#6a78e0 0%,#8598f8 90%);}
-    .generated-content {
-      margin-top:9px;padding:14px 13px;background:#f7f7fc;border-radius:9px;min-height:90px;
-      border:1.2px solid #ecebfd;box-shadow:0 2px 10px rgba(178,193,240,0.03);transition:background .14s;word-break:break-word;
-    }
-    .loading {text-align:center;padding:16px;color:#7f9cf5;font-size:1.10em;}
-    .error-message {background:#ff4444;color:#fff;padding:9px 13px;border-radius:8px;margin-top:5px;}
-    .history-log {margin-top:9px;padding:5px;background:#f7f8fc;border-radius:8px;max-height:70px;overflow-y:auto;border:1.2px solid #ecebfd;font-size:0.98em;}
-    .history-item {padding:3.5px 7px 3px 8px;margin-bottom:3px;background:#fff;border-radius:5px;font-size:1em;border:1px solid #f1f3fa;}
-    .branding {text-align:center;font-size:0.92em;color:#abb3ca;margin-top:10px;}
-    @media(max-width:800px){.container{max-width:98vw;padding:3vw 1vw;}.stats{flex-direction:column;gap:5px;}}
+    body {font-family:'Inter',sans-serif;background:radial-gradient(160% 130% at 50% 0%,#d2ebff 0%,#6fd6f5 100%);margin:0;padding:0;min-height:100vh;}
+    .container{max-width:640px;margin:40px auto 18px;background:#fff;border-radius:18px;box-shadow:0 10px 36px rgba(90,170,220,0.14);padding:38px 24px;}
+    .header{text-align:center;margin-bottom:22px;}
+    .logo{font-size:2.0em;color:#15a8db;font-weight:900;}
+    .slogan{margin:8px auto 0;font-size:1.13em;opacity:.88;color:#13a8c3;}
+    .stats{display:flex;gap:12px;margin-bottom:7px;}
+    .stat-card{flex:1;background:linear-gradient(101deg,#21add4 0%,#1be8e1 80%);color:white;border-radius:8px;text-align:center;padding:9px 0;font-weight:600;font-size:1.03em;}
+    .stat-card h3{margin:0;font-size:1.16em;}
+    .stat-card p{margin:1.5px 0 0;opacity:.8;}
+    .user-input-area{margin-bottom:9px;display:flex;gap:10px;}
+    .user-input-area textarea{width:100%;padding:10px 13px;border-radius:9px;min-height:45px;font-size:1em;border:2px solid #e0e3ee;transition:border .14s;}
+    .user-input-area textarea:focus{border-color:#36c9e7;}
+    .generate-btn{background:linear-gradient(109deg,#18b3dc 0%,#44e2e0 85%);color:#fff;border:none;padding:11px 14px;border-radius:9px;font-size:1em;font-weight:700;cursor:pointer;}
+    .generate-btn:hover{background:linear-gradient(109deg,#30d8c9 0%,#11acc4 85%);}
+    .generated-content{margin-top:11px;padding:14px 10px;background:#f2fdff;border-radius:8px;min-height:90px;}
+    .loading{text-align:center;padding:13px;color:#16b1ca;font-size:1.1em;}
+    .error-message{background:#f84a77;color:#fff;padding:9px 11px;border-radius:7px;margin-top:5px;}
+    .branding{text-align:center;font-size:.99em;color:#93b9e2;margin-top:16px;}
+    .history-log{margin-top:8px;padding:5px;background:#e0f8fc;border-radius:7px;max-height:66px;overflow-y:auto;border:1.2px solid #d1f3fc;font-size:0.99em;}
+    .history-item{padding:3px 9px 2.5px 8px;margin-bottom:2.5px;background:#fff;border-radius:5px;font-size:1em;border:1px solid #d9f0ff;}
+    @media(max-width:800px){.container{max-width:95vw;padding:3vw 1vw;}.stats{flex-direction:column;gap:5px;}}
   </style>
 </head>
 <body>
 <div class="container">
   <div class="header">
     <div class="logo">Morphic Web</div>
-    <div class="slogan"><b>The Ultimate Browser AI App Experience.</b>
-      <br>No keys. No backend. Always creative.
-      <br>If the AI is busy, fallback error will be fun and clear!
-      <br><span style="font-size:0.97em;opacity:0.82">Enter any prompt. Try “quiz game”, “productivity dashboard”, “chat app”, “calculator” or “amazingly creative tool”.</span>
-    </div>
+    <div class="slogan">AI web app builder — <b>DeepSeek Free Edition</b> (OpenRouter, no key)<br><span style="color:#2776ae;font-size:.97em">Live, interactive, and usually works!<br>“Failed to fetch” = service is busy or endpoint changed.</span></div>
   </div>
-  <div class="interaction-zone" id="interactionZone">
-    <div class="stats">
-      <div class="stat-card"><h3 id="interactionCount">0</h3><p>Interactions</p></div>
-      <div class="stat-card"><h3 id="elementsCreated">0</h3><p>Elements Created</p></div>
-      <div class="stat-card"><h3 id="adaptations">0</h3><p>Adaptations</p></div>
-    </div>
-    <div class="user-input-area">
-      <textarea id="userIntent" placeholder="Describe your dream app, tool, dashboard, game, creative idea..."></textarea>
-      <button type="button" onclick="generateInterface()" class="generate-btn">✨ Generate</button>
-    </div>
-    <div class="generated-content" id="generatedContent">
-      <p style="color:#aaa;text-align:center;">Your generated app appears here. Everything should look and work great... or give a fun fallback error if the AI is busy!</p>
-    </div>
-    <div class="history-log" id="historyLog"><strong>History:</strong></div>
+  <div class="stats">
+    <div class="stat-card"><h3 id="interactionCount">0</h3><p>Interactions</p></div>
+    <div class="stat-card"><h3 id="elementsCreated">0</h3><p>Elements Created</p></div>
+    <div class="stat-card"><h3 id="adaptations">0</h3><p>Adaptations</p></div>
   </div>
-  <div class="branding">Morphic Web &copy; 2025 | Powered by HuggingFace H4 AI</div>
+  <div class="user-input-area">
+    <textarea id="userIntent" placeholder="Describe your web app—e.g. quiz game, dashboard, AI tool, music player..."></textarea>
+    <button type="button" onclick="generateInterface()" class="generate-btn">✨ Generate</button>
+  </div>
+  <div class="generated-content" id="generatedContent">
+    <p style="color:#88a;text-align:center;">Your generated web app will appear here. Click, interact, remix as you wish.</p>
+  </div>
+  <div class="history-log" id="historyLog"><strong>History:</strong></div>
+  <div class="branding">Morphic Web &copy; 2025 | DeepSeek via OpenRouter</div>
 </div>
 <script>
-// Use a CORS-enabled public HuggingFace endpoint.
-const HF_API = "https://hf.space/embed/HuggingFaceH4/zephyr-7b-beta/+/api/predict";
+const OR_API = "https://openrouter.ai/api/v1/chat/completions";
+const OR_MODEL = "deepseek-coder:free"; // As of October 2025.
+
 let interactionCount=0, elementsCreated=0, adaptations=0, conversationHistory=[];
 function updateStats() {
   document.getElementById('interactionCount').textContent=interactionCount;
@@ -86,43 +68,43 @@ function logHistory(msg) {
 async function generateInterface() {
   const intent=document.getElementById('userIntent').value.trim();
   const content=document.getElementById('generatedContent');
-  if(!intent){alert('Describe your dream creation!');return;}
-  content.innerHTML='<div class="loading">⚡️ Creating...</div>';
+  if(!intent){alert('Describe what you want to build!');return;}
+  content.innerHTML='<div class="loading">⚡️ Generating with DeepSeek...</div>';
   interactionCount++; updateStats();
   const context=conversationHistory.length>0?`Last: ${conversationHistory.slice(-2).join(', ')}`:'';
-  const prompt=`You are MorphicWeb, a top AI web app generator. Build this: "${intent}" for the user.
-1. HTML, CSS, and JavaScript for a working, modern, interactive app.
-2. Any necessary scripts in a <script> block at end.
-3. All UI should be beautiful, with working controls, fun icons, demo data.
-4. Output usable HTML with <div> <style> <script> blocks, no markdown/explanations.
-Show friendly error with nice style if needed.
-${context}`;
+  const prompt=`You are a fantastic JavaScript/HTML/CSS webapp generator named MorphicWeb. Build this: "${intent}"
+  1. Output only a single <div id="mainAPP">...</div> as root (all features inside!).
+  2. Include usable <style> and <script> blocks.
+  3. Make sure all buttons and controls work — wire up events in JS.
+  4. NEVER use markdown, code blocks, or explanations. Just output HTML+CSS+JS. If you fail, at least return a <div class="error-message">.
+  ${context}`;
   try {
-    const html=await callHF(prompt);
+    const html = await callOpenRouter(prompt);
     parseAndInjectHTML(html,content);
     conversationHistory.push(intent);
     elementsCreated+=countElements(html); adaptations++;
     updateStats(); logHistory(`✨ App: "${intent.substring(0,44)}..."`);
     document.getElementById('userIntent').value='';
   } catch(e) {
-    content.innerHTML=`<div class='error-message'><b>Oops!</b> Failed to reach the AI.<br>Try again soon, or try another prompt.<br>This platform is always improving!</div>`;
+    content.innerHTML=`<div class='error-message'><b>Failed to connect to DeepSeek/OpenRouter.</b><br>They may be busy! Try again soon or with a new prompt.<br>${e.message}</div>`;
     logHistory(`⚠️ ${e.message}`);
   }
 }
-async function callHF(prompt) {
-  try {
-    const response=await fetch(HF_API, {
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({data:[prompt]})
-    });
-    if(!response.ok) throw new Error("AI API unreachable or rate-limited");
-    const data=await response.json();
-    let text = Array.isArray(data.data) ? data.data[0] : (data.data || data.output || "");
-    text=text.replace(/``````/g,'').trim();
-    if(!/<div/i.test(text)) throw new Error("AI responded, but app code was missing. Try a different prompt.");
-    return text;
-  } catch(e) {throw e;}
+async function callOpenRouter(prompt) {
+  const raw = await fetch(OR_API,{
+    method:"POST",
+    headers: {"Content-Type":"application/json","HTTP-Referer":"https://github.com/","X-Title":"MorphicWeb"},
+    body: JSON.stringify({
+      model: OR_MODEL, messages: [{role:"user", content:prompt}],
+      max_tokens: 1500, temperature: 0.78
+    })
+  });
+  if(!raw.ok) throw new Error("OpenRouter/DeepSeek not available ("+raw.status+")");
+  const data=await raw.json();
+  let text=(data.choices&&data.choices[0]?.message?.content)?data.choices[0].message.content.trim():"";
+  text=text.replace(/``````/g,'').trim();
+  if(!/<div/i.test(text)) throw new Error("AI did not give usable app code.");
+  return text;
 }
 function parseAndInjectHTML(raw, container) {
   let html=raw, style="", script="";
@@ -138,9 +120,7 @@ function countElements(html) {
   return div.querySelectorAll('*').length;
 }
 document.addEventListener("DOMContentLoaded", ()=>{
-  document.getElementById('userIntent')?.addEventListener('keydown',(e)=>{
-    if(e.key==='Enter'&&e.ctrlKey)generateInterface();
-  });
+  document.getElementById('userIntent')?.addEventListener('keydown',(e)=>{if(e.key==='Enter'&&e.ctrlKey)generateInterface();});
 });
 </script>
 </body>
