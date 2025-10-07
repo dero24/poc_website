@@ -3,92 +3,54 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>Morphic Web – Next-Gen AI SuperApp</title>
+  <title>Morphic Web – Ultimate AI UI Experience</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --brand1: #6772e5;
-      --brand2: #7f9cf5;
-      --surface: #fff;
-      --surface-dark: #181a20;
-      --glass: rgba(245,248,255,0.48);
-      --glass-dark: rgba(30,36,44,0.58);
-      --shadow: rgba(84,90,139,0.16);
-    }
-    html {min-height:100vh;}
-    body {font-family:'Inter',Segoe UI,sans-serif;background:radial-gradient(160% 130% at 50% 0%,var(--brand2) 0%,var(--brand1) 100%);min-height:100vh;margin:0;padding:0;color:#1d2332;transition:background 0.6s;}
-    .darkmode {background:radial-gradient(170% 100% at 50% 0%,#2b324b 0%,#222838 100%);}
-    .container {max-width:900px;margin:52px auto 38px;background:var(--surface);border-radius:30px;box-shadow:0 18px 92px var(--shadow),0 1.7px 7px var(--shadow);padding:56px 50px 44px 50px;backdrop-filter:blur(0.8px);}
-    .darkmode .container {background:var(--glass-dark);color:#e5e7ef;}
-    .header {text-align:center;margin-bottom:32px;}
-    .logo {font-size:2.5em;color:var(--brand1);font-weight:900;letter-spacing:-.09em;text-shadow:0 3px 22px var(--brand2);}
-    .slogan {margin:14px auto 0;font-size:1.15em;opacity:.82;color:#5151a5;}
-    .darkmode .slogan {color:#bbc3ee;}
-    .dashboard {margin-bottom:33px;}
-    .nav-tabs {display:flex;gap:7px;justify-content:flex-start;}
-    .nav-tab {
-      background:linear-gradient(100deg,var(--brand1) 0%,var(--brand2) 100%);
-      box-shadow:0 1px 7px var(--shadow);
-      color:#fff;padding:10px 25px;border-radius:12px;cursor:pointer;font-weight:700;
-      font-size:1.09em;letter-spacing:.04em;margin-bottom:8px;border:none;
-      transition:font-size .2s,background .2s;
-    }
-    .nav-tab.active {background:#fff;color:var(--brand1);font-size:1.17em;border:2.7px solid var(--brand1);}
-    .darkmode .nav-tab {background:#222838;}
-    .darkmode .nav-tab.active {background:#181a20;}
-    .nav-tab:not(.active):hover {background:linear-gradient(99deg,#757de5 30%,#bccbfe 100%);color:#222;}
-    .stats {display:flex;gap:17px;margin:14px 0;}
-    .stat-card {
-      flex:1;background:linear-gradient(101deg,var(--brand2) 0%,var(--brand1) 85%);
-      color:#fff;border-radius:10px;text-align:center;padding:11px 7px 7px;font-size:1.1em;box-shadow:0 1.7px 11px var(--shadow);
-    }
-    .stat-card h3 {margin:0;font-size:1.34em;}
-    .stat-card p {margin:2px 0 0;opacity:.8;}
-    .user-input-area {margin-bottom:13px;display:flex;gap:12px;}
+    body { font-family:'Inter',Segoe UI,sans-serif;
+      background:radial-gradient(160% 130% at 50% 0%,#7f9cf5 0%,#6772e5 100%);
+      min-height:100vh;margin:0;padding:0;color:#222}
+    .container {max-width:700px;margin:44px auto; background:white; border-radius:18px; box-shadow:0 12px 44px rgba(87,120,238,.13); padding:52px 36px 40px;}
+    .header {text-align:center;margin-bottom:22px;}
+    .logo {font-size:2.1em;color:#5055d5;font-weight:900;}
+    .slogan {margin:9px auto 0;font-size:1.10em;opacity:.86;color:#51518c;}
+    .interaction-zone {margin-top:7px;}
+    .stats {display:flex; gap:17px;}
+    .stat-card {flex:1;background:linear-gradient(101deg,#5055d5 0%,#7f9cf5 80%);color:white;border-radius:8px;text-align:center;padding:10px 0 7px 0;font-weight:600;font-size:1.02em;}
+    .stat-card h3 {margin:0;font-size:1.2em;}
+    .stat-card p {margin:1px 0 0;opacity:.7;}
+    .user-input-area {margin-bottom:9px;display:flex;gap:10px;}
     .user-input-area textarea {
-      width:100%;padding:15px 18px;border-radius:14px;min-height:66px;font-size:1.11em;
-      border:2px solid #e0e3ee;font-family:'Inter',sans-serif;transition:border .22s;background:rgba(245,248,255,0.72);
+      width:100%;padding:11px 10px;border-radius:8px;min-height:48px;font-size:1.03em;
+      border:1.8px solid #e0e3ee;font-family:'Inter',sans-serif;transition:border .14s;
     }
-    .darkmode .user-input-area textarea {background:#181a20;color:#def;}
-    .user-input-area textarea:focus {border-color:var(--brand1);}
+    .user-input-area textarea:focus {border-color:#6772e5;}
     .generate-btn {
-      background:linear-gradient(101deg,var(--brand1) 0%,var(--brand2) 80%);
-      color:#fff;border:none;padding:15px 28px;border-radius:14px;font-size:1.16em;font-weight:800;cursor:pointer;box-shadow:0 1.8px 12px var(--shadow);
-      letter-spacing:.03em;
+      background:linear-gradient(101deg,#6772e5 0%,#7f9cf5 85%);
+      color:#fff;border:none;padding:12px 15px;border-radius:8px;font-size:1.05em;font-weight:700;cursor:pointer;
+      box-shadow:0 1.2px 9px rgba(87,119,238,.09);
     }
-    .generate-btn:hover {background:linear-gradient(101deg,#5461eb 0%,#bbcbfe 90%);}
+    .generate-btn:hover {background:linear-gradient(101deg,#6a78e0 0%,#8598f8 90%);}
     .generated-content {
-      margin-top:17px;padding:21px 21px 23px 21px;background:var(--glass);border-radius:16px;min-height:160px;
-      border:2px solid #e4eafb;box-shadow:0 2px 17px var(--shadow);transition:background .22s;}
-    .darkmode .generated-content {background:var(--glass-dark);}
-    .loading {text-align:center;padding:28px;color:var(--brand2);font-size:1.13em;}
-    .error-message {background:#ff484f;color:#fff;padding:11px 18px;border-radius:10px;margin-top:11px;font-weight:700;letter-spacing:.02em;}
-    .history-log {margin:15px 1px 7px 0;padding:13px 6px 6px 14px;background:#f7f8fc;border-radius:10px;max-height:90px;overflow-y:auto;border:1.6px solid #ecebfd;font-size:0.99em;}
-    .darkmode .history-log {background:#181a20;}
-    .history-item {padding:6px 12px;margin-bottom:4.5px;background:#fff;border-radius:6px;font-size:1.01em;border:1.2px solid #f1f3fa;box-shadow:0 1px 5px rgba(178,193,240,0.09);}
-    .darkmode .history-item {background:#25273a;border-color:#3b3d51;}
-    .branding {text-align:center;font-size:1em;color:#bbc3ee;margin-top:33px;}
-    .settings-bar {display:flex;gap:13px;align-items:center;justify-content:flex-end;font-size:1.12em;margin-bottom:14px;color:var(--brand1);}
-    .settings-btn {background:transparent;border:none;color:inherit;padding:4px 10px;font-weight:700;font-size:1.18em;cursor:pointer;letter-spacing:.07em;opacity:.8;}
-    .settings-btn:hover {color:#5055d5;}
-    @media (max-width:970px){.container{max-width:99vw;padding:4vw 2vw;}.stats{flex-direction:column;gap:11px;}}
+      margin-top:9px;padding:14px 13px;background:#f7f7fc;border-radius:9px;min-height:90px;
+      border:1.2px solid #ecebfd;box-shadow:0 2px 10px rgba(178,193,240,0.03);transition:background .14s;word-break:break-word;
+    }
+    .loading {text-align:center;padding:16px;color:#7f9cf5;font-size:1.10em;}
+    .error-message {background:#ff4444;color:#fff;padding:9px 13px;border-radius:8px;margin-top:5px;}
+    .history-log {margin-top:9px;padding:5px;background:#f7f8fc;border-radius:8px;max-height:70px;overflow-y:auto;border:1.2px solid #ecebfd;font-size:0.98em;}
+    .history-item {padding:3.5px 7px 3px 8px;margin-bottom:3px;background:#fff;border-radius:5px;font-size:1em;border:1px solid #f1f3fa;}
+    .branding {text-align:center;font-size:0.92em;color:#abb3ca;margin-top:10px;}
+    @media(max-width:800px){.container{max-width:98vw;padding:3vw 1vw;}.stats{flex-direction:column;gap:5px;}}
   </style>
 </head>
 <body>
-<div class="container" id="containerRoot">
-  <div class="settings-bar">
-    <button class="settings-btn" onclick="toggleDarkMode()" id="darkModeBtn">🌙 Dark mode</button>
-    <button class="settings-btn" onclick="aboutBox()">ℹ️ About</button>
-  </div>
+<div class="container">
   <div class="header">
     <div class="logo">Morphic Web</div>
-    <div class="slogan">
-      <b>The true next generation AI superapp builder.</b><br>
-      Gorgeous, creative, persistent, interactive, multi-app—and alive.
+    <div class="slogan"><b>The Ultimate Browser AI App Experience.</b>
+      <br>No keys. No backend. Always creative.
+      <br>If the AI is busy, fallback error will be fun and clear!
+      <br><span style="font-size:0.97em;opacity:0.82">Enter any prompt. Try “quiz game”, “productivity dashboard”, “chat app”, “calculator” or “amazingly creative tool”.</span>
     </div>
-  </div>
-  <div class="dashboard">
-    <div class="nav-tabs" id="appTabs"></div>
   </div>
   <div class="interaction-zone" id="interactionZone">
     <div class="stats">
@@ -97,19 +59,20 @@
       <div class="stat-card"><h3 id="adaptations">0</h3><p>Adaptations</p></div>
     </div>
     <div class="user-input-area">
-      <textarea id="userIntent" placeholder="Describe your app, dashboard, or creative experience (e.g., 'team productivity tool', 'music + chat', 'AI assistant', 'game')"></textarea>
+      <textarea id="userIntent" placeholder="Describe your dream app, tool, dashboard, game, creative idea..."></textarea>
       <button type="button" onclick="generateInterface()" class="generate-btn">✨ Generate</button>
     </div>
-    <div class="generated-content" id="generatedContent"></div>
-    <div class="history-log" id="historyLog"><strong>App History:</strong></div>
+    <div class="generated-content" id="generatedContent">
+      <p style="color:#aaa;text-align:center;">Your generated app appears here. Everything should look and work great... or give a fun fallback error if the AI is busy!</p>
+    </div>
+    <div class="history-log" id="historyLog"><strong>History:</strong></div>
   </div>
   <div class="branding">Morphic Web &copy; 2025 | Powered by HuggingFace H4 AI</div>
 </div>
 <script>
-// --- Serverless CORS-enabled AI model for browser-only (October 2025)
+// Use a CORS-enabled public HuggingFace endpoint.
 const HF_API = "https://hf.space/embed/HuggingFaceH4/zephyr-7b-beta/+/api/predict";
-let interactionCount=0, elementsCreated=0, adaptations=0, appHistory=[], currentApp=0, darkMode=false;
-// --- UTILITIES ---
+let interactionCount=0, elementsCreated=0, adaptations=0, conversationHistory=[];
 function updateStats() {
   document.getElementById('interactionCount').textContent=interactionCount;
   document.getElementById('elementsCreated').textContent=elementsCreated;
@@ -117,84 +80,49 @@ function updateStats() {
 }
 function logHistory(msg) {
   const log=document.getElementById('historyLog'),item=document.createElement('div');
-  item.className='history-item';
-  item.textContent=`${new Date().toLocaleTimeString()} - ${msg}`;
+  item.className='history-item'; item.textContent=`${new Date().toLocaleTimeString()} - ${msg}`;
   log.appendChild(item); log.scrollTop=log.scrollHeight;
 }
-function toggleDarkMode() {
-  darkMode = !darkMode;
-  document.body.className = darkMode ? 'darkmode' : '';
-  document.getElementById('darkModeBtn').textContent = darkMode ? "🌞 Light mode" : "🌙 Dark mode";
-}
-// --- NEXT-GEN LOGIC/INTERACTION ---
 async function generateInterface() {
   const intent=document.getElementById('userIntent').value.trim();
   const content=document.getElementById('generatedContent');
-  if(!intent){alert('Describe what you want to build: tools, dashboards, games, creative apps!');return;}
-  content.innerHTML='<div class="loading">⚡️ Generating your web app...</div>';
+  if(!intent){alert('Describe your dream creation!');return;}
+  content.innerHTML='<div class="loading">⚡️ Creating...</div>';
   interactionCount++; updateStats();
-  const context = appHistory.length>0 ? `Previous apps: ${appHistory.map(app=>app.prompt).slice(-2).join(' | ')}` : '';
-  const prompt=`You are a world-class full-stack web engineer + designer. Build this app for a user, making everything beautifully interactive and persistent.
-Requirements:
-- HTML and CSS (immediately usable, modern SaaS style, glassmorphism, gradients).
-- All interactive features must work: inputs, buttons, forms, drag/drop, etc.
-- Any logic is implemented with <script> at end. Every main event triggers JS functions, wired by IDs and selectors—never inline.
-- Must all be wrapped in a single <div id="appBody">.
-- Provide a clear header, real sample/demo data, fun details/icons.
-- Only HTML, <style>, <script>. No markdown, code fencing, or explanations.
-- If an error, display with <div class="error-message">.
-${context}
-User request: "${intent}"`;
+  const context=conversationHistory.length>0?`Last: ${conversationHistory.slice(-2).join(', ')}`:'';
+  const prompt=`You are MorphicWeb, a top AI web app generator. Build this: "${intent}" for the user.
+1. HTML, CSS, and JavaScript for a working, modern, interactive app.
+2. Any necessary scripts in a <script> block at end.
+3. All UI should be beautiful, with working controls, fun icons, demo data.
+4. Output usable HTML with <div> <style> <script> blocks, no markdown/explanations.
+Show friendly error with nice style if needed.
+${context}`;
   try {
-    const html = await callAI(prompt);
-    storeApp(intent, html);
-    switchApp(appHistory.length-1, true);
-    logHistory(`✨ App created: "${intent.substring(0,48)}..."`);
+    const html=await callHF(prompt);
+    parseAndInjectHTML(html,content);
+    conversationHistory.push(intent);
+    elementsCreated+=countElements(html); adaptations++;
+    updateStats(); logHistory(`✨ App: "${intent.substring(0,44)}..."`);
     document.getElementById('userIntent').value='';
   } catch(e) {
-    content.innerHTML=`<div class="error-message">Error: ${e.message}</div>`;
-    logHistory(`⚠️ Error: ${e.message}`);
+    content.innerHTML=`<div class='error-message'><b>Oops!</b> Failed to reach the AI.<br>Try again soon, or try another prompt.<br>This platform is always improving!</div>`;
+    logHistory(`⚠️ ${e.message}`);
   }
 }
-// --- AI CALL/PARSING ---
-async function callAI(prompt) {
-  const response=await fetch(HF_API, {
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({data:[prompt]})
-  });
-  if(!response.ok) throw new Error("AI API unreachable or rate-limited");
-  const data=await response.json();
-  let text = Array.isArray(data.data) ? data.data[0] : (data.data || data.output || "");
-  text = text.replace(/``````/g,'').trim();
-  if(!/<div/i.test(text)) throw new Error("No usable app returned—try changing your prompt.");
-  return text;
-}
-function storeApp(prompt, html) {
-  appHistory.push({prompt, html});
-  currentApp = appHistory.length-1;
-  renderTabs();
-}
-function switchApp(idx, force=false) {
-  if(idx<0 || idx>=appHistory.length) return;
-  currentApp=idx;
-  const app=appHistory[idx];
-  parseAndInjectHTML(app.html, document.getElementById('generatedContent'));
-  renderTabs();
-  if(force) logHistory(`🔄 Switched to app: "${app.prompt.substring(0,42)}"`);
-}
-function renderTabs() {
-  const tabs=document.getElementById('appTabs');
-  tabs.innerHTML='';
-  appHistory.forEach((app,i)=>{
-    const btn=document.createElement('button');
-    btn.className='nav-tab'+(i===currentApp?' active':'');
-    btn.textContent=(i+1)+'. '+(app.prompt.length>26?app.prompt.substring(0,26)+'…':app.prompt);
-    btn.onclick=()=>switchApp(i,true);
-    tabs.appendChild(btn);
-  });
-  if(appHistory.length>0) tabs.style.display='flex';
-  else tabs.style.display='none';
+async function callHF(prompt) {
+  try {
+    const response=await fetch(HF_API, {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({data:[prompt]})
+    });
+    if(!response.ok) throw new Error("AI API unreachable or rate-limited");
+    const data=await response.json();
+    let text = Array.isArray(data.data) ? data.data[0] : (data.data || data.output || "");
+    text=text.replace(/``````/g,'').trim();
+    if(!/<div/i.test(text)) throw new Error("AI responded, but app code was missing. Try a different prompt.");
+    return text;
+  } catch(e) {throw e;}
 }
 function parseAndInjectHTML(raw, container) {
   let html=raw, style="", script="";
@@ -205,15 +133,15 @@ function parseAndInjectHTML(raw, container) {
   if(style) { let styleEl=document.createElement('style'); styleEl.textContent=style; container.appendChild(styleEl);}
   if(script) { let scriptEl=document.createElement('script'); scriptEl.textContent=script; container.appendChild(scriptEl);}
 }
+function countElements(html) {
+  const div=document.createElement('div'); div.innerHTML=html;
+  return div.querySelectorAll('*').length;
+}
 document.addEventListener("DOMContentLoaded", ()=>{
   document.getElementById('userIntent')?.addEventListener('keydown',(e)=>{
     if(e.key==='Enter'&&e.ctrlKey)generateInterface();
   });
-  renderTabs();
 });
-function aboutBox() {
-  alert("💎 Morphic Web: Build, switch, and remix next-gen AI-powered apps in seconds!\n- Try making dashboards, games, tools, chats, or multi-feature platforms\n- Use dark mode for stunning glassmorphism\n- Your apps live until you refresh\n- Powered by HuggingFace Zephyr");
-}
 </script>
 </body>
 </html>
