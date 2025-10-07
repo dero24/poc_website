@@ -1,177 +1,252 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Morphic Web - Living Internet (Groq Powered)</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh; padding: 20px; transition: all 0.5s ease;
-        }
-        .container { max-width: 1200px; margin: 0 auto; }
-        .header { text-align: center; color: white; margin-bottom: 30px; }
-        .header h1 { font-size: 3em; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
-        .header p { font-size: 1.2em; opacity: 0.9; }
-        .setup-card { background: white; border-radius: 20px; padding: 30px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
-        .interaction-zone { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
-        .user-input-area textarea { width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 10px; min-height: 100px; resize: vertical; }
-        .generated-content { margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 10px; min-height: 200px; }
-        .loading { text-align: center; padding: 40px; color: #667eea; }
-        .error-message { background: #ff4444; color: white; padding: 15px; border-radius: 10px; margin-top: 10px; }
-        .stats { display: flex; gap: 20px; margin-top: 20px; flex-wrap: wrap; }
-        .stat-card { flex: 1; min-width: 150px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; text-align: center; }
-        .stat-card h3 { font-size: 2em; margin-bottom: 5px; }
-        .history-log { margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 10px; max-height: 200px; overflow-y: auto; }
-        .history-item { padding: 8px; margin-bottom: 5px; background: white; border-radius: 5px; font-size: 0.9em; }
-        button { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 15px 30px; border-radius: 10px; font-size: 1.1em; cursor: pointer; font-weight: 600; }
-        .api-input-group input { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px; }
-        .api-input-group small { display: block; margin-top: 5px; color: #666; }
-        .api-input-group a { color: #667eea; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Morphic Web – Next-Gen Groq AI UI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin:0;padding:0;
+      background:radial-gradient(150% 150% at 50% 0%,#7f9cf5 0%,#6772e5 100%);
+      min-height:100vh;
+      font-family:'Inter',Segoe UI,sans-serif;
+      -webkit-font-smoothing:antialiased; color:#222;
+    }
+    .container {
+      max-width:690px; margin:42px auto 0;
+      background:#fff;
+      border-radius:24px;
+      box-shadow:0 8px 40px rgba(84,90,139,0.10),0 1.5px 5px rgba(84,90,139,0.05);
+      padding:44px 38px 38px 38px;
+    }
+    .header {text-align:center; margin-bottom:32px;}
+    .logo {font-size:2.4em; color:#5055d5; font-weight:900; letter-spacing:-.08em;}
+    .slogan {
+      margin:11px auto 0; font-size:1.19em; opacity:.82;
+      color:#51515c;
+      max-width:430px;
+    }
+    .setup-card {
+      margin-bottom:18px;
+      display:flex; flex-direction:column; align-items:center;
+    }
+    .api-input-group input {
+      width:270px; padding:12px 11px;border:2px solid #e0e3ee;border-radius:13px;
+      font-size:1em; margin-right:7px; margin-bottom:8px; transition:border .22s;
+    }
+    .api-input-group input:focus {border-color:#5055d5;}
+    .api-input-group label {font-weight:700;font-size:1.05em; color:#5055d5;}
+    .api-input-group small {
+      display:block;margin-top:-2px;color:#999;font-size:0.98em;margin-bottom:7px;
+    }
+    .start-btn {
+      padding:14px 62px; border-radius:13px; letter-spacing:.03em;
+      font-size:1.14em; font-weight:700;
+      background:linear-gradient(99deg,#6772e5 0%, #7f9cf5 85%);
+      color:#fff; border:none; box-shadow:0 2px 15px rgba(87,120,238,.08);
+      margin-top:2px; cursor:pointer; transition:box-shadow .18s,background .18s;
+    }
+    .start-btn:hover {box-shadow:0 4px 22px rgba(87,120,238,.21);}
+    .interaction-zone {margin-top:18px;}
+    .stats {display:flex; gap:18px; margin-bottom:13px;}
+    .stat-card {
+      flex:1;background:linear-gradient(99deg,#5055d5 0%,#7f9cf5 80%);
+      color:white;border-radius:10px;text-align:center;
+      padding:12px 4px; font-size:1.08em;font-weight:600;letter-spacing:.01em;
+      box-shadow:0 2px 16px rgba(87,120,238,.15);
+    }
+    .stat-card h3 {margin:0; font-size:1.46em;}
+    .stat-card p {margin:2px 0 0; opacity:.76;font-size:.98em;}
+    .user-input-area {
+      margin-bottom:13px; display:flex;gap:10px;align-items:flex-end;
+    }
+    .user-input-area textarea {
+      width:100%;padding:14px 13px;border-radius:11px;min-height:60px;font-size:1.07em;
+      border:2px solid #e0e3ee; font-family:'Inter',Segoe UI,sans-serif; transition:border .2s;
+      margin-right:0;
+    }
+    .user-input-area textarea:focus {border-color:#6772e5;}
+    .generate-btn {
+      background:linear-gradient(99deg,#6772e5 0%,#7f9cf5 80%);
+      color:#fff; border:none;padding:13px 19px;border-radius:11px;font-size:1.14em;font-weight:700;cursor:pointer;
+      letter-spacing:.02em; box-shadow:0 2px 10px rgba(87,119,238,.12); margin-bottom:2px;
+    }
+    .generate-btn:hover {background:linear-gradient(99deg,#6a78e0 0%,#8598f8 90%);}
+    .generated-content {
+      margin-top:13px; padding:20px 17px;
+      background:#f7f8fc;border-radius:11px;min-height:110px;border:1.5px solid #ecebfd;
+      transition:background .28s;
+      box-shadow:0 2px 14px rgba(180,193,248,0.03);
+    }
+    .loading {
+      text-align:center; padding:30px;
+      color:#7f9cf5;
+      font-size:1.14em; letter-spacing:.03em;
+      animation:pulse .96s cubic-bezier(.4,0,.2,1) infinite alternate;
+    }
+    @keyframes pulse {to{color:#5055d5;}}
+    .error-message {
+      background:#ff4444; color:#fff; padding:15px 17px;border-radius:10px;margin-top:7px;font-weight:600;letter-spacing:.02em;
+      box-shadow:0 2px 11px rgba(244,53,89,0.10);
+    }
+    .history-log {
+      margin-top:16px;padding:10px;background:#f7f8fc;border-radius:8px;max-height:140px;overflow-y:auto;border:1px solid #ecebfd;
+      font-size:0.99em;
+    }
+    .history-item {
+      padding:6px;margin-bottom:5px;background:white;border-radius:5px;font-size:1em;
+      border:1px solid #f1f3fa; box-shadow:0 1px 5px rgba(180,193,248,0.11);
+    }
+    .branding {text-align:center;font-size:0.97em;color:#abb3ca;margin-top:30px; opacity:.84;}
+    @media(max-width:768px){.container{max-width:97vw;padding:2vw 3vw;}.stats{flex-direction:column;gap:13px;}}
+  </style>
 </head>
 <body>
-<div class="container">
+  <div class="container">
     <div class="header">
-        <h1>🌊 Morphic Web</h1>
-        <p>Living Internet Experience - Now powered by Groq's lightning-fast free AI!</p>
+      <div class="logo">Morphic Web</div>
+      <div class="slogan">
+        <b>Next-generation adaptive AI web platform.</b><br>
+        Enter your Groq API key for live Llama-3.3-70b UI generation. Every prompt builds a rich, interactive experience. <span style="color:#7f9cf5;">No backend required.</span>
+      </div>
     </div>
     <div class="setup-card" id="setupCard">
-        <h2>🚀 Get Your Free Groq API Key</h2>
-        <p>Groq offers completely free AI with no credit card required!</p>
+      <form onsubmit="event.preventDefault(); initializeExperience();">
         <div class="api-input-group">
-            <label>Free Groq API Key</label>
-            <input type="password" id="apiKey" placeholder="Get yours at console.groq.com"/>
-            <small>1. Go to <a href="https://console.groq.com" target="_blank">console.groq.com</a><br>
-            2. Sign up for free (no credit card)<br>
-            3. Go to API Keys and create one</small>
+          <label for="apiKey">Groq API Key</label>
+          <input type="password" id="apiKey" autocomplete="off" required placeholder="Paste your Groq API key here">
+          <small>
+            <a href="https://console.groq.com" target="_blank" style="color:#6772e5;">Get yours free at console.groq.com</a>
+          </small>
         </div>
-        <button onclick="initializeExperience()">🎨 Start Experience</button>
+        <button type="submit" class="start-btn">🔓 Start</button>
+      </form>
     </div>
     <div class="interaction-zone" id="interactionZone" style="display:none;">
-        <h2>💬 Your Adaptive Interface</h2>
-        <div class="stats">
-            <div class="stat-card"><h3 id="interactionCount">0</h3><p>Interactions</p></div>
-            <div class="stat-card"><h3 id="elementsCreated">0</h3><p>Elements Created</p></div>
-            <div class="stat-card"><h3 id="adaptations">0</h3><p>Adaptations</p></div>
-        </div>
-        <div class="user-input-area">
-            <textarea id="userIntent" placeholder="What would you like to do? (e.g., 'help me learn coding', 'create a music player', 'build a calculator')..."></textarea>
-            <button onclick="generateInterface()" style="margin-top: 10px;">✨ Generate Interface</button>
-        </div>
-        <div class="generated-content" id="generatedContent">
-            <p style="color: #999; text-align: center;">Your dynamically generated interface will appear here...</p>
-        </div>
-        <div class="history-log" id="historyLog"><strong>History:</strong></div>
+      <div class="stats">
+        <div class="stat-card"><h3 id="interactionCount">0</h3><p>Interactions</p></div>
+        <div class="stat-card"><h3 id="elementsCreated">0</h3><p>Elements Created</p></div>
+        <div class="stat-card"><h3 id="adaptations">0</h3><p>Adaptations</p></div>
+      </div>
+      <div class="user-input-area">
+        <textarea id="userIntent" placeholder="Describe any interactive web tool or experience (e.g., 'Professional dashboard', 'Quiz game', 'AI music player')"></textarea>
+        <button type="button" onclick="generateInterface()" class="generate-btn">🚀 Generate</button>
+      </div>
+      <div class="generated-content" id="generatedContent">
+        <p style="color:#aaa;text-align:center;">Your AI-powered interface will appear here. Click any button or element generated to morph again!</p>
+      </div>
+      <div class="history-log" id="historyLog"><strong>Interaction History:</strong></div>
     </div>
-</div>
-<script>
-    let apiKey = '', interactionCount = 0, elementsCreated = 0, adaptations = 0, conversationHistory = [];
-    
-    function initializeExperience() {
-        apiKey = document.getElementById('apiKey').value.trim();
-        if (!apiKey) { alert('Please enter your Groq API key'); return; }
-        document.getElementById('setupCard').style.display = 'none';
-        document.getElementById('interactionZone').style.display = 'block';
-        logHistory('🎉 Groq-powered experience initialized');
-        setTimeout(generateWelcomeInterface, 500);
-    }
-    
-    async function generateWelcomeInterface() {
-        const content = document.getElementById('generatedContent');
-        content.innerHTML = '<div class="loading">Generating welcome interface...</div>';
-        try {
-            const html = await callGroqAPI("Create a beautiful welcome interface with 4 interactive cards for exploring different topics like music, learning, creativity, and productivity. Use vibrant CSS gradients and modern design. Return only HTML with inline styles, no explanations.");
-            content.innerHTML = html;
-            elementsCreated += 4; updateStats(); attachDynamicListeners();
-            logHistory('👋 Welcome interface generated');
-        } catch (error) {
-            content.innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
-        }
-    }
-    
-    async function generateInterface() {
-        const intent = document.getElementById('userIntent').value.trim();
-        if (!intent) { alert('Please tell me what you want!'); return; }
-        const content = document.getElementById('generatedContent');
-        content.innerHTML = '<div class="loading">Morphing interface...</div>';
-        interactionCount++; updateStats();
-        
-        const context = conversationHistory.length > 0 ? `Previous: ${conversationHistory.slice(-2).join(', ')}` : '';
-        const prompt = `Create an interactive HTML interface for: "${intent}" ${context}
-        Requirements: Modern design with gradients, interactive elements, data-action attributes for buttons, inline CSS only.
-        Return ONLY HTML, no explanations or code blocks.`;
-        
-        try {
-            const html = await callGroqAPI(prompt);
-            content.innerHTML = html;
-            conversationHistory.push(intent);
-            elementsCreated += countElements(html); adaptations++;
-            updateStats(); attachDynamicListeners();
-            logHistory(`🎨 Interface: ${intent.substring(0, 40)}...`);
-            document.getElementById('userIntent').value = '';
-        } catch (error) {
-            content.innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
-        }
-    }
-    
-    async function callGroqAPI(prompt) {
-        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                messages: [{ role: 'user', content: prompt }],
-                model: 'llama-3.3-70b-versatile', // Free model
-                max_tokens: 2048, temperature: 0.8
-            })
-        });
-        
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error?.message || `HTTP ${response.status}`);
-        }
-        
-        const data = await response.json();
-        if (!data.choices?.[0]?.message?.content) {
-            throw new Error('No response content from Groq');
-        }
-        
-        let html = data.choices[0].message.content.trim();
-        html = html.replace(/``````/g, '');
-        return html;
-    }
-    
-    function attachDynamicListeners() {
-        document.querySelectorAll('[data-action]').forEach(el => {
-            el.addEventListener('click', async (e) => {
-                e.preventDefault();
-                document.getElementById('userIntent').value = el.getAttribute('data-action');
-                await generateInterface();
-            });
-        });
-    }
-    
-    function countElements(html) {
-        const div = document.createElement('div');
-        div.innerHTML = html;
-        return div.querySelectorAll('*').length;
-    }
-    
+    <div class="branding"><span style="font-weight:600;">Morphic Web &copy; 2025</span> &mdash; Powered by <a href="https://groq.com/" target="_blank" style="color:#7f9cf5;">Groq AI</a></div>
+  </div>
+  <script>
+    let apiKey;
+    let interactionCount=0, elementsCreated=0, adaptations=0, conversationHistory=[];
     function updateStats() {
-        document.getElementById('interactionCount').textContent = interactionCount;
-        document.getElementById('elementsCreated').textContent = elementsCreated;
-        document.getElementById('adaptations').textContent = adaptations;
+      document.getElementById('interactionCount').textContent=interactionCount;
+      document.getElementById('elementsCreated').textContent=elementsCreated;
+      document.getElementById('adaptations').textContent=adaptations;
     }
-    
     function logHistory(msg) {
-        const log = document.getElementById('historyLog');
-        const item = document.createElement('div');
-        item.className = 'history-item';
-        item.textContent = `${new Date().toLocaleTimeString()} - ${msg}`;
-        log.appendChild(item);
-        log.scrollTop = log.scrollHeight;
+      const log=document.getElementById('historyLog'),item=document.createElement('div');
+      item.className='history-item';
+      item.textContent=`${new Date().toLocaleTimeString()} - ${msg}`;
+      log.appendChild(item); log.scrollTop=log.scrollHeight;
     }
-</script>
+    function initializeExperience() {
+      apiKey = document.getElementById('apiKey').value.trim();
+      if(!apiKey){alert('Please paste your Groq API key!');return;}
+      document.getElementById('setupCard').style.display="none";
+      document.getElementById('interactionZone').style.display="block";
+      logHistory('🎉 Groq-powered UI initialized');
+      setTimeout(generateWelcomeInterface,350);
+    }
+    async function generateWelcomeInterface() {
+      const content=document.getElementById('generatedContent');
+      content.innerHTML='<div class="loading">Crafting your personalized welcome experience...</div>';
+      try {
+        const html = await callGroqAPI(`
+          Create an elegant, interactive HTML5 welcome dashboard with cards for these features: Analytics, Automation, Music Discovery, Personal Tasks.
+          Each card must be styled with modern CSS gradients, have a call-to-action with data-action attribute, icon, and a short blurb. Use a central layout, clean heading, and output fully usable HTML/CSS—no markdown, code blocks, or explanations. Everything inside a single <div id="container">.
+        `);
+        content.innerHTML=html;
+        elementsCreated+=4; updateStats();
+        attachDynamicListeners();
+        logHistory('🏁 Welcome interface generated');
+      } catch(e) {
+        content.innerHTML=`<div class="error-message">Error: ${e.message}</div>`;
+      }
+    }
+    async function generateInterface() {
+      const intent=document.getElementById('userIntent').value.trim();
+      const content=document.getElementById('generatedContent');
+      if(!intent){alert('Describe your idea in detail!');return;}
+      content.innerHTML='<div class="loading">Morphing UI to your vision...</div>';
+      interactionCount++; updateStats();
+      const context=conversationHistory.length>0?`Previous: ${conversationHistory.slice(-2).join(', ')}`:'';
+      const optimizedPrompt = `
+        You are a world-class SaaS UI designer, specializing in HTML5 dashboards and interactive web experiences. Fulfill this request: "${intent}".
+        - Use a single root <div id="container">.
+        - Use professional, clean layout with modern CSS gradients, icons, button shadows, and at least two interactive widgets.
+        - All action elements must have a data-action attribute.
+        - Populate example/demo data for realism.
+        - Output ONLY a complete HTML/CSS UI—no markdown or explanations.
+        - Show friendly error <div class="error-message"> on problems.
+        ${context}
+      `;
+      try {
+        const html = await callGroqAPI(optimizedPrompt);
+        content.innerHTML=html;
+        conversationHistory.push(intent);
+        elementsCreated+=countElements(html); adaptations++;
+        updateStats(); attachDynamicListeners();
+        logHistory('✨ Generated: '+intent.substring(0,43)+'...');
+        document.getElementById('userIntent').value='';
+      } catch(e) {
+        content.innerHTML=`<div class="error-message">Error: ${e.message}</div>`;
+        logHistory(`⚠️ ${e.message}`);
+      }
+    }
+    async function callGroqAPI(prompt) {
+      if(!apiKey) throw new Error("No Groq API key set");
+      const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${apiKey}`,'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [{ role: "user", content: prompt }],
+          model: "llama-3.3-70b-versatile", max_tokens: 2048, temperature: 0.76
+        })
+      });
+      if(!resp.ok){
+        let errorMsg = "API error";
+        try { const data = await resp.json(); errorMsg = data.error?.message || errorMsg; } catch {}
+        throw new Error(errorMsg);
+      }
+      const data = await resp.json();
+      let html = (data.choices && data.choices[0]?.message?.content) ? data.choices[0].message.content.trim() : "";
+      html = html.replace(/``````/g, '').trim();
+      if(!/<div/i.test(html)) throw new Error("AI response did not contain usable HTML (try a different prompt!)");
+      return html;
+    }
+    function attachDynamicListeners() {
+      document.querySelectorAll('[data-action]').forEach(el=>{
+        el.addEventListener('click', async (e)=>{
+          e.preventDefault();
+          document.getElementById('userIntent').value = el.getAttribute('data-action');
+          await generateInterface();
+        });
+      });
+    }
+    function countElements(html) {
+      const div=document.createElement('div'); div.innerHTML=html;
+      return div.querySelectorAll('*').length;
+    }
+    document.addEventListener("DOMContentLoaded", ()=>{
+      document.getElementById('userIntent')?.addEventListener('keydown',(e)=>{
+        if(e.key==='Enter'&&e.ctrlKey)generateInterface();
+      });
+    });
+  </script>
 </body>
 </html>
