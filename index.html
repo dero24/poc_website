@@ -158,9 +158,13 @@ body {
   </div>
   <div class="branding">Morphic Web &copy; 2026 | Always Responsive</div>
 </div>
-<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script>
+    // Ensure window.React is available for JSX compilation
+    window.React = React;
+  </script>
 <script>
 let groqKey="", interactionCount=0, elementsCreated=0, adaptations=0, conversationHistory=[];
 function updateStats() {
@@ -266,13 +270,22 @@ ${context}`;
 }
 function ensureResponsive() {
   const reactRoot = document.getElementById('react-root');
-  if (!reactRoot.firstChild) return;
+  if (!reactRoot) return;
   
   // Ensure root element has responsive styling
-  if (!reactRoot.style.maxWidth) reactRoot.style.maxWidth = '100%';
-  if (!reactRoot.style.boxSizing) reactRoot.style.boxSizing = 'border-box';
+  reactRoot.style.maxWidth = '100%';
+  reactRoot.style.boxSizing = 'border-box';
+  reactRoot.style.width = '100%';
   
-  // Additional checks can be added for React-specific responsiveness
+  // Check for overflow issues
+  const walker = document.createTreeWalker(reactRoot, NodeFilter.SHOW_ELEMENT);
+  while(walker.nextNode()) {
+    const node = walker.currentNode;
+    node.style.boxSizing = 'border-box';
+    if (node.scrollWidth > node.clientWidth) {
+      node.style.overflowX = 'auto';
+    }
+  }
 }
 async function callGroqAPI(prompt) {
   const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -296,34 +309,48 @@ async function callGroqAPI(prompt) {
   return html;
 }
 function parseAndInjectHTML(raw, container) {
-  const reactRoot = document.getElementById('react-root');
-  reactRoot.innerHTML = ''; // Clear previous app
-  
   try {
-    // Extract just the component code (remove any markdown or explanations)
+    // Ensure react-root exists
+    let reactRoot = document.getElementById('react-root');
+    if (!reactRoot) {
+      reactRoot = document.createElement('div');
+      reactRoot.id = 'react-root';
+      container.appendChild(reactRoot);
+    }
+    
+    // Clear previous app
+    ReactDOM.unmountComponentAtNode(reactRoot);
+    
+    // Extract component code
     let componentCode = raw.trim();
     componentCode = componentCode.replace(/```(jsx|javascript)?/g, '').trim();
     
-    // Transpile and execute the React code
+    // Transpile React code
     const transpiledCode = Babel.transform(componentCode, {
       presets: ['react'],
       filename: 'generated-component.js'
     }).code;
     
-    // Create a new script element with the transpiled code
+    // Create and execute script
     const script = document.createElement('script');
     script.type = 'text/babel';
     script.text = transpiledCode;
     
-    // Execute the component
+    // Use modern React 18 root API
+    const root = ReactDOM.createRoot(reactRoot);
+    
+    script.onload = function() {
+      if (window.AppComponent) {
+        root.render(React.createElement(window.AppComponent));
+      } else {
+        throw new Error("Component not properly exported");
+      }
+    };
+    
     container.innerHTML = '';
     container.appendChild(reactRoot);
-    container.appendChild(script);
+    document.body.appendChild(script);
     
-    // If component exports properly, render it
-    if (window.AppComponent) {
-      ReactDOM.render(React.createElement(window.AppComponent), reactRoot);
-    }
   } catch (e) {
     container.innerHTML = `<div class='error-message'><b>React Error:</b> ${e.message}</div>`;
     logHistory(`⚠️ React Error: ${e.message}`);
