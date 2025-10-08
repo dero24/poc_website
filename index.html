@@ -1,1088 +1,343 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover" />
-  <title>Morphic Web — Build Anything Instantly</title>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap"
-    rel="stylesheet"
-  />
-  <link
-    href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
-    rel="stylesheet"
-  />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+  <title>Morphic Web — Always Fits Screen</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
-    html,
-    body {
-      height: 100%;
-      overflow-x: hidden;
-      margin: 0;
-      padding: 0;
+    #react-root {
+      width: 100%;
+      min-height: 100px;
     }
-    body {
-      font-family: "Inter", sans-serif;
+    html, body { 
+      height: 100%; 
+      overflow-x: hidden; /* Never allow horizontal scroll on main page */
+    }
+body {
+      font-family: 'Inter', sans-serif;
       background: linear-gradient(122deg, #2435f7 0%, #9e7cea 85%);
       min-height: 100vh;
       background-attachment: fixed;
       color: #182042;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
+      margin: 0; padding: 0;
+    }
+    .container {
+      max-width: 100vw; /* Never exceed viewport width */
+      width: 95%;
+      max-width: 700px;
+      margin: 32px auto 20px;
+      background: rgba(255,255,255,0.90);
+      border-radius: 22px;
+      box-shadow: 0 12px 36px 0 rgba(60,50,200,0.13);
       padding: 20px;
-    }
-    /* Splash page */
-    #splashPage {
-      max-width: 420px;
-      width: 100%;
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 20px;
-      box-shadow: 0 14px 48px rgba(60, 50, 200, 0.17);
-      padding: 24px 28px 32px;
-      box-sizing: border-box;
-      text-align: center;
-    }
-    #splashPage h1 {
-      font-size: 2.5em;
-      font-weight: 900;
-      margin-bottom: 12px;
-      color: #5857f8;
-      text-shadow: 0 0 18px #dbeafe;
-    }
-    #splashPage p {
-      font-size: 1.1em;
-      color: #6778c2;
-      margin-bottom: 24px;
-    }
-    #apiKeyInput {
-      width: 100%;
-      font-size: 1.1em;
-      padding: 14px;
-      border-radius: 14px;
-      border: 2.5px solid #7e76ff;
-      outline-offset: 2px;
-      outline-color: transparent;
-      transition: outline-color 0.2s ease;
-      box-sizing: border-box;
-    }
-    #apiKeyInput:focus {
-      outline-color: #b9a5ff;
-    }
-    #startBtn {
-      margin-top: 24px;
-      padding: 16px;
-      font-size: 1.25em;
-      font-weight: 700;
-      border-radius: 14px;
-      border: none;
-      cursor: pointer;
-      width: 100%;
-      background: linear-gradient(122deg, #7e76ff 0%, #c085ff 85%);
-      color: white;
-      box-shadow: 0 10px 30px rgba(126, 118, 255, 0.4);
-      transition: all 0.2s ease;
-    }
-    #startBtn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      box-shadow: none;
-      transform: none;
-    }
-    #startBtn:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 14px 40px rgba(126, 118, 255, 0.6);
-    }
-    .errorMessage {
-      margin-top: 16px;
-      color: #f87171;
-      font-weight: 700;
-      display: none;
-    }
-
-    /* Main app container */
-    #appContainer {
-      display: none;
-      max-width: 100vw;
-      width: 700px;
-      background: rgba(255, 255, 255, 0.92);
-      border-radius: 24px;
-      box-shadow: 0 14px 48px rgba(60, 50, 200, 0.17);
-      padding: 24px 28px 32px;
-      box-sizing: border-box;
-    }
-    .header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .logo {
-      font-size: 2.4em;
-      color: #5857f8;
-      font-weight: 900;
-      text-shadow: 0 0 18px #dbeafe;
-    }
-    .slogan {
-      font-size: 1.15em;
-      opacity: 0.88;
-      color: #4f40b5;
-      margin-top: 8px;
-    }
-    .prompt-area {
-      margin-bottom: 16px;
-    }
-    .prompt-area label {
-      font-size: 1.1em;
-      font-weight: 700;
-      color: #7b64e7;
-      display: block;
-      margin-bottom: 8px;
-    }
-    #userIntent {
-      font-size: 1.1em;
-      padding: 14px;
-      width: 100%;
-      box-sizing: border-box;
-      border: 2.1px solid #e3eafe;
-      border-radius: 14px;
-      outline: none;
-      font-family: "Inter", sans-serif;
-      resize: vertical;
-      min-height: 88px;
-    }
-    #userIntent:focus {
-      border-color: #7f76ff;
-    }
-    #generateBtn {
-      width: 100%;
-      padding: 18px;
-      font-size: 1.25em;
-      background: linear-gradient(122deg, #7e76ff 0%, #c085ff 85%);
-      color: white;
-      border: none;
-      border-radius: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 6px 20px rgba(126, 118, 255, 0.3);
-      transition: all 0.2s ease;
+      backdrop-filter: blur(9px);
       position: relative;
+      box-sizing: border-box;
     }
-    #generateBtn:disabled {
-      cursor: not-allowed;
-      opacity: 0.6;
-      box-shadow: none;
-      transform: none;
-    }
-    #generateBtn:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 30px rgba(126, 118, 255, 0.55);
-    }
-    #statusZone {
-      margin-top: 14px;
-      font-size: 1.05em;
-      min-height: 30px;
-      text-align: center;
-      color: #6e6bb5;
-    }
-    #statusZone.generating {
-      color: #ff8800;
-      font-weight: 600;
-    }
-    #statusZone.complete {
-      color: #22c55e;
-      font-weight: 600;
-    }
-    #statusZone.error {
-      color: #ef4444;
-      font-weight: 600;
-    }
-    #resultContainer {
-      margin-top: 20px;
-      max-height: 480px;
-      overflow: auto;
-      border-radius: 16px;
-      background: rgba(245, 250, 255, 0.94);
-      border: 1px solid #d9dbf1;
-      padding: 14px 12px 20px 12px;
+    
+    /* CRITICAL: Force all generated content to stay within bounds */
+    .generated-content {
+      margin-top: 12px;
+      padding: 14px 10px 20px 10px;
+      background: rgba(245,250,255,0.94);
+      border-radius: 10px;
+      min-height: 78px;
+      
+      /* These are the key responsive fixes */
+      max-width: 100%;
+      overflow-x: auto;
+      overflow-y: auto;
       box-sizing: border-box;
       word-wrap: break-word;
-      max-width: 100%;
+      
+      /* Force all child content to respect boundaries */
     }
-    /* Preserve max width on all children */
-    #resultContainer * {
+    
+    /* FORCE all generated apps to be responsive */
+    .generated-content * {
       max-width: 100% !important;
       box-sizing: border-box !important;
     }
-
-    /* Download & Code View Buttons */
-    #downloadArea {
-      margin-top: 18px;
-      display: flex;
-      gap: 14px;
-      justify-content: center;
-      flex-wrap: wrap;
-      display: none;
+    
+    /* Specific fixes for common AI-generated elements that break layout */
+    .generated-content div,
+    .generated-content #mainAPP,
+    .generated-content .mainAPP {
+      max-width: 100% !important;
+      overflow-x: auto !important;
+      word-wrap: break-word !important;
+      box-sizing: border-box !important;
     }
-    #downloadArea button {
-      padding: 10px 22px;
-      font-size: 1em;
-      font-weight: 600;
-      border-radius: 12px;
-      border: 2px solid #7e76ff;
-      background: white;
-      color: #7e76ff;
-      cursor: pointer;
-      transition: all 0.2s ease;
+    
+    .generated-content input,
+    .generated-content textarea,
+    .generated-content button,
+    .generated-content table {
+      max-width: 100% !important;
+      box-sizing: border-box !important;
     }
-    #downloadArea button:hover {
-      background: #7e76ff;
-      color: white;
-      transform: translateY(-2px);
+    
+    .generated-content table {
+      width: 100% !important;
+      table-layout: fixed !important;
     }
-    .code-display {
-      background: #2d2d2d;
-      color: #f8f8f2;
-      padding: 18px;
-      border-radius: 12px;
-      overflow-x: auto;
-      margin-top: 20px;
-      font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
-      font-size: 14px;
-      line-height: 1.55;
-      max-height: 360px;
-      display: none;
-      white-space: pre-wrap;
-      word-break: break-word;
+    
+    /* Rest of your existing styles */
+    .header {text-align:center;margin-bottom:22px;}
+    .logo {font-size:2.1em;color:#5857f8;font-weight:900; text-shadow:0 0 12px #dbeafe;}
+    .slogan {font-size:1.11em;opacity:.88;color:#4f40b5;margin:11px auto 0;text-align:center;}
+    .setup-card, .interaction-zone {margin-bottom:16px;}
+    .api-input-group label{font-size:1.07em;font-weight:700;color:#7b64e7;display:block;margin-bottom:7px;}
+    .api-input-group input{
+      font-size:1.07em;padding:12px;width:95%;max-width:340px;border:2.1px solid #e3eafe;
+      border-radius:11px;outline:none;margin-bottom:6px; background:rgba(255,255,255,0.6);
+      box-shadow:0 2px 9px #b6bffb12 inset;
     }
-    /* Chat Panel */
-    #chatPanel {
-      position: fixed;
-      bottom: 0;
-      right: 22px;
-      width: 420px;
-      max-width: calc(100vw - 40px);
-      background: white;
-      border-radius: 16px 16px 0 0;
-      box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15);
-      transform: translateY(calc(100% - 50px));
-      transition: transform 0.3s ease;
-      z-index: 1000;
-      display: flex;
-      flex-direction: column;
-      max-height: 70vh;
+    .api-input-group small{color:#6b7fa7;font-size:0.97em;margin-bottom:7px;display:block;}
+    .start-btn {padding:12px 46px;border-radius:10px;font-size:1.07em;font-weight:700;background:linear-gradient(101deg,#524bb5 0%,#a5b4fc 80%);color:#fff;border:none;cursor:pointer;}
+    .start-btn:hover{background:#7b64e7;}
+    .stats {display:flex;gap:13px;margin-bottom:9px;flex-wrap:wrap;}
+    .stat-card {flex:1;min-width:120px;padding:8px 3px;background:linear-gradient(91deg,#8bb2fe 10%,#add2fb 90%);color:#4027ba;border-radius:9px;text-align:center;font-weight:800;box-shadow:0 2px 7px #0001;}
+    .stat-card h3{margin:0;font-size:1.15em;}
+    .stat-card p{margin:2px 0 0;opacity:.81;font-size:.97em;}
+    .user-input-area{margin-bottom:8px;display:flex;gap:9px;flex-wrap:wrap;}
+    .user-input-area textarea {
+      flex:1;min-width:250px;padding:13px 16px;border-radius:11px;min-height:50px;font-size:1.07em;
+      border:2.1px solid #dadcff;background:#fbfbff;box-shadow:0 1.2px 9px #a9aaff10 inset;
+      font-weight:600;letter-spacing:.01em;resize:vertical;
     }
-    #chatPanel.expanded {
-      transform: translateY(0);
-    }
-    .chat-header {
-      padding: 12px 16px;
-      background: linear-gradient(122deg, #7e76ff 0%, #c085ff 85%);
-      color: white;
-      font-weight: 700;
-      font-size: 1.1em;
-      cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-radius: 16px 16px 0 0;
-      user-select: none;
-    }
-    .chat-toggle-icon {
-      font-size: 1.2em;
-      transition: transform 0.3s ease;
-    }
-    #chatPanel.expanded .chat-toggle-icon {
-      transform: rotate(180deg);
-    }
-    #chatMessages {
-      flex: 1;
-      overflow-y: auto;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      background: #f8fafc;
-    }
-    .chat-message {
-      padding: 10px 14px;
-      border-radius: 12px;
-      max-width: 85%;
-      font-size: 0.95em;
-      line-height: 1.5;
-      word-wrap: break-word;
-      animation: fadeIn 0.3s ease;
-    }
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    .chat-message.user {
-      background: linear-gradient(122deg, #7e76ff 0%, #c085ff 85%);
-      color: white;
-      align-self: flex-end;
-      border-bottom-right-radius: 4px;
-    }
-    .chat-message.assistant {
-      background: white;
-      color: #1a202c;
-      align-self: flex-start;
-      border-bottom-left-radius: 4px;
-      border: 1px solid #e2e8f0;
-    }
-    .chat-message.system {
-      background: #fef3c7;
-      color: #92400e;
-      align-self: center;
-      font-size: 0.85em;
-      border-radius: 20px;
-      padding: 6px 12px;
-    }
-    .chat-input-container {
-      padding: 12px;
-      background: white;
-      border-top: 1px solid #e2e8f0;
-      display: flex;
-      gap: 8px;
-    }
-    #chatInput {
-      flex: 1;
-      padding: 10px 14px;
-      border: 2px solid #e3eafe;
-      border-radius: 8px;
-      font-family: "Inter", sans-serif;
-      font-size: 0.95em;
-      resize: none;
-      min-height: 40px;
-      max-height: 100px;
-      outline: none;
-    }
-    #chatInput:focus {
-      border-color: #7f76ff;
-    }
-    #chatSendBtn {
-      padding: 10px 18px;
-      background: linear-gradient(122deg, #7e76ff 0%, #c085ff 85%);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: all 0.2s ease;
-      font-size: 0.95em;
-    }
-    #chatSendBtn:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(112, 80, 255, 0.4);
-    }
-    #chatSendBtn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-    /* Spinner */
-    .spinner {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-top-color: white;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-    /* Version History Panel */
-    #historyPanel {
-      margin-top: 24px;
-      background: rgba(245, 250, 255, 0.94);
-      border-radius: 12px;
-      padding: 16px;
-      max-height: 400px;
-      overflow-y: auto;
-    }
-    .history-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-    .history-title {
-      font-size: 1.2em;
-      font-weight: 700;
-      color: #7b64e7;
-    }
-    #clearHistoryBtn {
-      padding: 6px 12px;
-      background: rgba(239, 68, 68, 0.1);
-      color: #ef4444;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.85em;
-      font-weight: 600;
-      transition: all 0.2s ease;
-    }
-    #clearHistoryBtn:hover {
-      background: rgba(239, 68, 68, 0.2);
-    }
-    .history-item {
-      background: white;
-      border: 2px solid #e3eafe;
-      border-radius: 8px;
-      padding: 12px;
-      margin-bottom: 8px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      position: relative;
-    }
-    .history-item:hover {
-      border-color: #7e76ff;
-      transform: translateX(4px);
-      box-shadow: 0 2px 8px rgba(112, 80, 255, 0.2);
-    }
-    .history-item-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 6px;
-    }
-    .history-item-prompt {
-      font-weight: 600;
-      color: #1a202c;
-      font-size: 0.95em;
-      flex: 1;
-      word-wrap: break-word;
-      padding-right: 8px;
-      user-select:none;
-    }
-    .history-item-time {
-      font-size: 0.8em;
-      color: #94a3b8;
-      white-space: nowrap;
-    }
-    .history-item-preview {
-      font-size: 0.85em;
-      color: #64748b;
-      margin-bottom: 8px;
-      max-height: 60px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      user-select:none;
-    }
-    .history-item-actions {
-      display: flex;
-      gap: 6px;
-      justify-content: flex-end;
-      user-select:none;
-    }
-    .history-action-btn {
-      padding: 4px 10px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 0.8em;
-      font-weight: 600;
-      transition: all 0.2s ease;
-    }
-    .history-load-btn {
-      background: rgba(102, 126, 234, 0.1);
-      color: #667eea;
-    }
-    .history-load-btn:hover {
-      background: rgba(102, 126, 234, 0.2);
-    }
-    .history-delete-btn {
-      background: rgba(239, 68, 68, 0.1);
-      color: #ef4444;
-    }
-    .history-delete-btn:hover {
-      background: rgba(239, 68, 68, 0.2);
-    }
-    .history-version-badge {
-      display: inline-block;
-      background: linear-gradient(122deg, #7e76ff 0%, #c085ff 85%);
-      color: white;
-      padding: 2px 8px;
-      border-radius: 12px;
-      font-size: 0.75em;
-      font-weight: 700;
-      margin-left: 6px;
-      user-select:none;
-    }
-    .history-empty {
-      text-align: center;
-      color: #94a3b8;
-      padding: 40px 20px;
-      font-size: 0.95em;
-      user-select:none;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      #chatPanel {
-        right: 10px;
-        width: calc(100vw - 20px);
-      }
-      #appContainer, #splashPage {
-        width: 100vw;
-        margin: 10px 0;
-        border-radius: 0;
-        box-shadow: none;
-      }
+    .user-input-area textarea:focus {border-color:#7b64e7;}
+    .generate-btn {background:linear-gradient(89deg,#6267eb 12%,#4ee5fd 95%);color:white;border:none;padding:11px 17px;border-radius:11px;font-size:1.1em;font-weight:900;cursor:pointer;}
+    .generate-btn:hover {background:#5ec6fb;}
+    .loading{text-align:center;padding:10px;color:#7b64e7;font-size:1.11em;}
+    .error-message{background:#f84a77;color:#fff;padding:9px 13px;border-radius:7px;margin-top:7px;}
+    .branding{text-align:center;font-size:.94em;color:#7476af;margin-top:16px;}
+    .history-log{margin-top:9px;padding:6px 8px;background:#f7f8fc;border-radius:8px;max-height:65px;overflow-y:auto;border:1.2px solid #e5e5fd;}
+    .history-item{padding:4px 9px 3px 8px;margin-bottom:3px;background:#fff9;border-radius:5px;font-size:1em;border:1px solid #dfdbff;}
+    
+    @media(max-width:900px){
+      .container{width:98%;padding:15px;}
+      .stats{flex-direction:column;gap:4px;}
+      .user-input-area{flex-direction:column;}
+      .user-input-area textarea{min-width:100%;}
     }
   </style>
 </head>
 <body>
-  <!-- Splash Page with API Key Input -->
-  <section id="splashPage" role="region" aria-label="API Key Entry">
-    <h1>Morphic Web</h1>
-    <p>Build anything instantly — apps, games, tools & more</p>
-    <input
-      type="password"
-      id="apiKeyInput"
-      placeholder="Enter your Groq API Key"
-      autocomplete="off"
-      required
-      spellcheck="false"
-      aria-label="Groq API Key input"
-    />
-    <button id="startBtn" disabled aria-disabled="true">Start Creating</button>
-    <p class="errorMessage" id="apiErrorMsg" role="alert" aria-live="assertive"></p>
-    <small
-      >Get a free key from
-      <a href="https://console.groq.com/" target="_blank" rel="noopener noreferrer"
-        >console.groq.com</a
-      ></small
-    >
-  </section>
-
-  <!-- Main App Container -->
-  <section id="appContainer" role="main" aria-hidden="true" style="display:none;">
-    <div class="header">
-      <div class="logo">✨ Morphic Web</div>
-      <div class="slogan">Build Anything Instantly — Fun, Fast, Iterative</div>
-    </div>
-
-    <div class="prompt-area">
-      <label for="userIntent">What would you like to create?</label>
-      <textarea
-        id="userIntent"
-        placeholder="e.g., a tic-tac-toe game, calculator, drawing app, timer, interactive story..."
-        spellcheck="false"
-      ></textarea>
-    </div>
-
-    <button id="generateBtn" aria-live="polite" aria-busy="false">Create Now</button>
-    <div id="statusZone" role="status" aria-live="polite" aria-atomic="true"></div>
-
-    <div id="resultContainer" aria-live="polite" aria-atomic="true"></div>
-
-    <div id="downloadArea" style="display:none;">
-      <button id="downloadBtn">⬇️ Download HTML</button>
-      <button id="openBtn">🔗 Open in New Tab</button>
-      <button id="viewCodeBtn" aria-pressed="false">📝 View Code</button>
-    </div>
-
-    <pre id="codeDisplay" class="code-display" style="display:none;"><code id="codeContent" class="language-html"></code></pre>
-
-    <!-- Version History Panel -->
-    <div id="historyPanel" aria-label="Version History">
-      <div class="history-header">
-        <div class="history-title">📚 Version History</div>
-        <button id="clearHistoryBtn">Clear All</button>
+<div class="container">
+  <div class="header">
+    <div class="logo">Morphic Web</div>
+    <div class="slogan">Responsive AI Apps - Always fits your screen perfectly!</div>
+  </div>
+  <div class="setup-card" id="setupCard">
+    <form onsubmit="event.preventDefault(); initializeExperience();">
+      <div class="api-input-group">
+        <label for="apiKey">Groq API Key</label>
+        <input type="password" id="apiKey" required autocomplete="off" placeholder="Paste your Groq API key">
+        <small>Get a free key from <a href="https://console.groq.com/" target="_blank">console.groq.com</a></small>
       </div>
-      <div id="historyList"></div>
+      <button type="submit" class="start-btn">🔓 Start Morphic Web</button>
+    </form>
+  </div>
+  <div style="display:none" class="interaction-zone" id="interactionZone">
+    <div class="stats">
+      <div class="stat-card"><h3 id="interactionCount">0</h3><p>Interactions</p></div>
+      <div class="stat-card"><h3 id="elementsCreated">0</h3><p>Elements Created</p></div>
+      <div class="stat-card"><h3 id="adaptations">0</h3><p>Adaptations</p></div>
     </div>
-  </section>
-
-  <!-- Chat Refinement Panel -->
-  <section id="chatPanel" aria-label="Chat refinement panel" style="display:none;">
-    <div
-      class="chat-header"
-      tabindex="0"
-      role="button"
-      aria-expanded="false"
-      aria-controls="chatMessages"
-      >💬 Refine Your Creation<span class="chat-toggle-icon">▼</span></div
-    >
-
-    <div id="chatMessages" class="chat-messages" aria-live="polite" aria-atomic="true">
-      <div class="chat-message system">
-        💡 Create something first, then ask me to iterate! Try commands like "make it purple", "add sound effects", or "make it harder".
-      </div>
+    <div class="user-input-area">
+      <textarea id="userIntent" placeholder="Describe your app: game, dashboard, AI tool, etc. Everything will fit perfectly on your screen!"></textarea>
+      <button type="button" onclick="generateInterface()" class="generate-btn">✨ Generate</button>
     </div>
-
-    <div class="chat-input-container">
-      <textarea
-        id="chatInput"
-        placeholder="Describe changes you want..."
-        spellcheck="false"
-        aria-label="Chat message input"
-      ></textarea>
-      <button id="chatSendBtn">Send</button>
+    <div class="generated-content" id="generatedContent">
+      <div id="react-root"></div>
+      <p style="color:#68a;text-align:center;">Your responsive React app will appear here!</p>
     </div>
-  </section>
+<div class="history-log" id="historyLog"></div>
+  </div>
+  <div class="branding">Morphic Web &copy; 2026 | Always Responsive</div>
+</div>
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script>
+let groqKey="", interactionCount=0, elementsCreated=0, adaptations=0, conversationHistory=[];
+function updateStats() {
+  document.getElementById('interactionCount').textContent = interactionCount;
+  document.getElementById('elementsCreated').textContent = elementsCreated;
+  document.getElementById('adaptations').textContent = adaptations;
+}
+function logHistory(msg) {
+  const log = document.getElementById('historyLog'), item = document.createElement('div');
+  item.className = 'history-item'; item.textContent = `${new Date().toLocaleTimeString()} - ${msg}`;
+  log.appendChild(item); log.scrollTop = log.scrollHeight;
+}
+function initializeExperience() {
+  groqKey = document.getElementById('apiKey').value.trim();
+  if(!groqKey) { alert('Paste your Groq API key!'); return; }
+  window.groqKey = groqKey;
+  document.getElementById('setupCard').style.display="none";
+  document.getElementById('interactionZone').style.display="block";
+  logHistory('Responsive session started');
+}
+async function generateInterface() {
+  const intent=document.getElementById('userIntent').value.trim();
+  const content=document.getElementById('generatedContent');
+  if(!intent){alert('Describe what to build!');return;}
+  content.innerHTML='<div class="loading">⚡️ Creating responsive app...</div>';
+  interactionCount++; updateStats();
+  let wantsAI = /(ai|assistant|chatbot|groq|language model|llm)/i.test(intent);
+  let aiInstructions = wantsAI
+    ? `If user wants AI features, use window.groqKey for Groq API calls to https://api.groq.com/openai/v1/chat/completions - never prompt for key again.`
+    : '';
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+  const reactSetup = `
+// IMPORTANT: Use React hooks for state management
+// Must include these imports at top:
+import React, { useState, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 
-  <script>
-    (() => {
-      // DOM references
-      const splashPage = document.getElementById("splashPage");
-      const apiKeyInput = document.getElementById("apiKeyInput");
-      const startBtn = document.getElementById("startBtn");
-      const apiErrorMsg = document.getElementById("apiErrorMsg");
+// Component must be exported as default
+// Use functional components with hooks
+// Example structure:
+function App() {
+  const [state, setState] = useState(initialValue);
+  
+  useEffect(() => {
+    // Side effects here
+  }, [dependencies]);
 
-      const appContainer = document.getElementById("appContainer");
-      const userIntent = document.getElementById("userIntent");
-      const generateBtn = document.getElementById("generateBtn");
-      const statusZone = document.getElementById("statusZone");
-      const resultContainer = document.getElementById("resultContainer");
-      const downloadArea = document.getElementById("downloadArea");
-      const downloadBtn = document.getElementById("downloadBtn");
-      const openBtn = document.getElementById("openBtn");
-      const viewCodeBtn = document.getElementById("viewCodeBtn");
-      const codeDisplay = document.getElementById("codeDisplay");
-      const codeContent = document.getElementById("codeContent");
+  return (
+    <div style={{maxWidth: '100%', boxSizing: 'border-box'}}>
+      {/* Responsive JSX here */}
+    </div>
+  );
+}
+`;
+const context = conversationHistory.length>0?`Past: ${conversationHistory.slice(-2).join(' | ')}`:'';
+  const prompt=`You are MorphicWeb, expert responsive web app generator.
+User wants: "${intent}"
 
-      const historyPanel = document.getElementById("historyPanel");
-      const historyList = document.getElementById("historyList");
-      const clearHistoryBtn = document.getElementById("clearHistoryBtn");
+CRITICAL REACT REQUIREMENTS:
+- MUST output React functional component code (JSX)
+- Use useState/useEffect hooks for state management
+- Component must be exported as default
+- Include all necessary React imports
+- Wrap all string props in {}
+- Use style={{}} for inline styles
+- Must be mobile-first responsive
+${reactSetup}
 
-      const chatPanel = document.getElementById("chatPanel");
-      const chatHeader = chatPanel.querySelector(".chat-header");
-      const chatMessages = document.getElementById("chatMessages");
-      const chatInput = document.getElementById("chatInput");
-      const chatSendBtn = document.getElementById("chatSendBtn");
+RESPONSIVE REQUIREMENTS:
+- ALL CSS must use: max-width: 100%, box-sizing: border-box
+- NEVER use fixed pixel widths over 300px
+- ALL containers must use: width: 100%, max-width: 500px
+- Use flexbox with flex-wrap: wrap for layouts
+- Mobile-first: make it work on 320px width screens
+- All inputs/buttons: width: 100%, max-width: reasonable size
+- Use padding in % or vw units when possible
+- Tables: width: 100%, table-layout: fixed
+Output format:
+- Valid React component code only (no HTML)
+- Must include imports (React, useState, useEffect)
+- Must export default the component
+- Use modern React practices (hooks)
+- Include responsive styles in JSX
+- ${aiInstructions}
+- NO markdown, code blocks, or explanations
+- Test that it works on mobile screens
+${context}`;
 
-      // State
-      let apiKey = "";
-      let currentHTML = "";
-      let chatHistory = [];
-      let versionHistory = [];
-      let currentVersionId = null;
-
-      // Enable Start when API key entered
-      apiKeyInput.addEventListener("input", () => {
-        apiErrorMsg.style.display = "none";
-        startBtn.disabled = apiKeyInput.value.trim().length === 0;
-      });
-
-      // Start App Handler
-      startBtn.addEventListener("click", () => {
-        apiKey = apiKeyInput.value.trim();
-        if (!apiKey) {
-          apiErrorMsg.textContent = "Please enter a valid API key.";
-          apiErrorMsg.style.display = "block";
-          return;
-        }
-        splashPage.style.display = "none";
-        appContainer.style.display = "block";
-        chatPanel.style.display = "flex";
-        userIntent.focus();
-      });
-
-      // Generate app code
-      generateBtn.addEventListener("click", generateInterface);
-
-      async function generateInterface() {
-        const prompt = userIntent.value.trim();
-        if (!prompt) {
-          alert("⚠️ Please describe what you want to create.");
-          return;
-        }
-        if (!apiKey) {
-          alert("⚠️ API Key missing.");
-          return;
-        }
-        generateBtn.disabled = true;
-        generateBtn.setAttribute("aria-busy", "true");
-        generateBtn.innerHTML = `<span class="spinner"></span> Creating...`;
-        statusZone.className = "status-zone generating";
-        statusZone.textContent = "🚀 Building your app...";
-        resultContainer.innerHTML = "";
-        downloadArea.style.display = "none";
-        codeDisplay.style.display = "none";
-        chatMessages.innerHTML = `<div class="chat-message system">💡 Create something first, then ask me to iterate! Try commands like "make it purple", "add sound effects", or "make it harder".</div>`;
-        chatHistory = [];
-
-        try {
-          const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${apiKey}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              model: "llama-3.1-70b-versatile",
-              messages: [
-                {
-                  role: "system",
-                  content:
-                    "You are an expert creative developer. Generate complete, self-contained HTML apps, games, tools, or interactive experiences with HTML, CSS, and JavaScript inline. Keep them beautiful, accessible, and functional. Return ONLY the full HTML code.",
-                },
-                { role: "user", content: prompt },
-              ],
-              temperature: 0.8,
-              max_tokens: 8000,
-              stream: true,
-            }),
-          });
-          if (!response.ok) throw new Error(`API error: ${response.status}`);
-
-          const reader = response.body.getReader();
-          const decoder = new TextDecoder();
-          let accumulated = "";
-
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            const chunk = decoder.decode(value);
-            const lines = chunk.split("
-").filter((l) => l.trim() !== "");
-            for (const line of lines) {
-              if (line.startsWith("data: ")) {
-                const data = line.slice(6);
-                if (data === "[DONE]") break;
-                try {
-                  const parsed = JSON.parse(data);
-                  const content = parsed.choices[0]?.delta?.content || "";
-                  accumulated += content;
-                } catch {}
-              }
-            }
-          }
-          const html = extractHTMLFromResponse(accumulated);
-          if (!html) throw new Error("Invalid or no HTML generated");
-          currentHTML = html;
-          showGeneratedHTML(html);
-          saveVersion(prompt, html);
-          statusZone.className = "status-zone complete";
-          statusZone.textContent = "✅ Created! Use chat panel below to iterate.";
-          downloadArea.style.display = "flex";
-          generateBtn.disabled = false;
-          generateBtn.removeAttribute("aria-busy");
-          generateBtn.textContent = "Create Now";
-          // Auto-expand chat if collapsed
-          if (!chatPanel.classList.contains("expanded")) chatPanel.classList.add("expanded");
-        } catch (error) {
-          statusZone.className = "status-zone error";
-          statusZone.textContent = `❌ Error: ${error.message}`;
-          generateBtn.disabled = false;
-          generateBtn.removeAttribute("aria-busy");
-          generateBtn.textContent = "Create Now";
-        }
-      }
-
-      // Show generated HTML in result container parsing styles/scripts
-      function showGeneratedHTML(html) {
-        // Sanitize and parse style/script tags
-        let style = "";
-        let script = "";
-        try {
-          style = html.match(/<style[^>]*>([sS]*?)</style>/i)?.[1] || "";
-          script = html.match(/<script[^>]*>([sS]*?)</script>/i)?.[1] || "";
-        } catch {}
-        const cleaned = html
-          .replace(/<style[^>]*>[sS]*?</style>/gi, "")
-          .replace(/<script[^>]*>[sS]*?</script>/gi, "");
-        resultContainer.innerHTML = cleaned;
-        if (style) {
-          const styleEl = document.createElement("style");
-          styleEl.textContent = style;
-          resultContainer.appendChild(styleEl);
-        }
-        if (script) {
-          const scriptEl = document.createElement("script");
-          scriptEl.textContent = script;
-          resultContainer.appendChild(scriptEl);
-        }
-        // Hide code view on new creation
-        codeDisplay.style.display = "none";
-      }
-
-      // Extract HTML from AI response text/code block
-      function extractHTMLFromResponse(text) {
-        const match = text.match(/``````/);
-        if (match) return match[1].trim();
-        if (text.includes("<!DOCTYPE html>") || text.includes("<html")) return text.trim();
-        return null;
-      }
-
-      // Download current HTML as file
-      downloadBtn.addEventListener("click", () => {
-        if (!currentHTML) return alert("No HTML to download.");
-        const blob = new Blob([currentHTML], { type: "text/html" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "morphic-creation.html";
-        a.click();
-        URL.revokeObjectURL(url);
-      });
-
-      // Open current HTML in new tab
-      openBtn.addEventListener("click", () => {
-        if (!currentHTML) return alert("No HTML to open.");
-        const blob = new Blob([currentHTML], { type: "text/html" });
-        const url = URL.createObjectURL(blob);
-        window.open(url, "_blank");
-      });
-
-      // Toggle code view display
-      viewCodeBtn.addEventListener("click", () => {
-        if (!currentHTML) return alert("No HTML generated yet.");
-        if (codeDisplay.style.display === "none") {
-          codeContent.textContent = currentHTML;
-          Prism.highlightElement(codeContent);
-          codeDisplay.style.display = "block";
-          viewCodeBtn.setAttribute("aria-pressed", "true");
-        } else {
-          codeDisplay.style.display = "none";
-          viewCodeBtn.setAttribute("aria-pressed", "false");
-        }
-      });
-
-      // ===== Version History Logic =====
-      // Load history on startup
-      function loadHistory() {
-        try {
-          const saved = localStorage.getItem("morphicVersionHistory");
-          if (saved) {
-            versionHistory = JSON.parse(saved);
-            renderHistory();
-          }
-        } catch {}
-      }
-      loadHistory();
-
-      // Save new version
-      function saveVersion(prompt, html) {
-        const version = {
-          id: Date.now(),
-          prompt,
-          html,
-          timestamp: new Date().toLocaleString(),
-          preview: previewText(html),
-        };
-        versionHistory.unshift(version);
-        if (versionHistory.length > 20) versionHistory = versionHistory.slice(0, 20);
-        saveHistoryToLocalStorage();
-        currentVersionId = version.id;
-        renderHistory();
-      }
-
-      // Render version history list
-      function renderHistory() {
-        if (versionHistory.length === 0) {
-          historyList.innerHTML =
-            '<p class="history-empty">🎨 No creations yet. Start by creating something!</p>';
-          return;
-        }
-        historyList.innerHTML = versionHistory
-          .map(
-            (v) => `
-          <div class="history-item" data-id="${v.id}">
-            <div class="history-item-header">
-              <div class="history-item-prompt">${escapeHtml(
-                v.prompt
-              )}${v.id === currentVersionId ? '<span class="history-version-badge">Current</span>' : ""}</div>
-              <div class="history-item-time">${v.timestamp}</div>
-            </div>
-            <div class="history-item-preview">${escapeHtml(v.preview)}</div>
-            <div class="history-item-actions">
-              <button class="history-action-btn history-load-btn" aria-label="Load version">Load</button>
-              <button class="history-action-btn history-delete-btn" aria-label="Delete version">Delete</button>
-            </div>
-          </div>
-        `
-          )
-          .join("");
-        // Attach event listeners to load/delete buttons
-        historyList.querySelectorAll(".history-load-btn").forEach((btn) =>
-          btn.addEventListener("click", (e) => {
-            e.stopPropagation();
-            const id = +btn.closest(".history-item").dataset.id;
-            loadVersion(id);
-          })
-        );
-        historyList.querySelectorAll(".history-delete-btn").forEach((btn) =>
-          btn.addEventListener("click", (e) => {
-            e.stopPropagation();
-            const id = +btn.closest(".history-item").dataset.id;
-            deleteVersion(id);
-          })
-        );
-      }
-
-      // Load a version by id
-      function loadVersion(id) {
-        const version = versionHistory.find((v) => v.id === id);
-        if (!version) return;
-        currentHTML = version.html;
-        currentVersionId = id;
-        showGeneratedHTML(currentHTML);
-        userIntent.value = version.prompt;
-        statusZone.className = "status-zone complete";
-        statusZone.textContent = "✅ Loaded version from history";
-        downloadArea.style.display = "flex";
-        codeDisplay.style.display = "none";
-        renderHistory();
-        addChatSystemMessage("✨ Loaded previous version. You can keep iterating.");
-      }
-
-      // Delete a version by id
-      function deleteVersion(id) {
-        if (!confirm("Are you sure you want to delete this version?")) return;
-        versionHistory = versionHistory.filter((v) => v.id !== id);
-        saveHistoryToLocalStorage();
-        renderHistory();
-      }
-
-      // Clear entire history
-      clearHistoryBtn.addEventListener("click", () => {
-        if (!confirm("Clear all version history? This cannot be undone.")) return;
-        versionHistory = [];
-        saveHistoryToLocalStorage();
-        renderHistory();
-      });
-
-      // Save history array to localStorage
-      function saveHistoryToLocalStorage() {
-        try {
-          localStorage.setItem("morphicVersionHistory", JSON.stringify(versionHistory));
-        } catch {}
-      }
-
-      // Generate preview text from HTML snippet
-      function previewText(html) {
-        const div = document.createElement("div");
-        div.innerHTML = html;
-        const text = div.textContent || div.innerText || "";
-        return text.slice(0, 120) + (text.length > 120 ? "..." : "");
-      }
-
-      // ===== Chat Panel Logic =====
-      chatHeader.addEventListener("click", toggleChatPanel);
-
-      function toggleChatPanel() {
-        if (chatPanel.style.display === "none" || !chatPanel.classList.contains("expanded")) {
-          chatPanel.style.display = "flex";
-          chatPanel.classList.add("expanded");
-          chatInput.focus();
-          chatHeader.setAttribute("aria-expanded", "true");
-        } else {
-          chatPanel.classList.remove("expanded");
-          chatHeader.setAttribute("aria-expanded", "false");
-        }
-      }
-
-      chatSendBtn.addEventListener("click", sendChatMessage);
-      chatInput.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" && !e.shiftKey) {
-          e.preventDefault();
-          sendChatMessage();
-        }
-      });
-
-      async function sendChatMessage() {
-        const msg = chatInput.value.trim();
-        if (!msg) return;
-        if (!currentHTML) {
-          alert("Please create something before refining it.");
-          return;
-        }
-        addChatMessage(msg, "user");
-        chatInput.value = "";
-        chatSendBtn.disabled = true;
-        chatSendBtn.innerHTML = `<span class="spinner"></span>`;
-
-        try {
-          // Compose messages
-          const messages = [
-            {
-              role: "system",
-              content: `You are an interactive creative coding assistant. Here is the current code:
-
-${currentHTML}
-
-Make the user's requested changes and return ONLY the full updated HTML code with embedded CSS and JS. No explanations.`,
-            },
-            ...chatHistory,
-            { role: "user", content: msg },
-          ];
-
-          const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${apiKey}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              model: "llama-3.1-70b-versatile",
-              messages,
-              temperature: 0.7,
-              max_tokens: 8000,
-              stream: false,
-            }),
-          });
-
-          if (!response.ok) throw new Error(`API error: ${response.status}`);
-
-          const data = await response.json();
-          const assistantResp = data.choices[0].message.content;
-          const updatedHtml = extractHTMLFromResponse(assistantResp);
-
-          if (!updatedHtml) throw new Error("Could not parse updated HTML");
-
-          currentHTML = updatedHtml;
-          showGeneratedHTML(currentHTML);
-          // Save to version history including refinement
-          saveVersion(`${userIntent.value.trim()} → ${msg}`, currentHTML);
-
-          addChatMessage("✅ Changes applied! Keep iterating!", "assistant");
-
-          chatHistory.push({ role: "user", content: msg });
-          chatHistory.push({ role: "assistant", content: assistantResp });
-        } catch (error) {
-          addChatMessage(`❌ Error: ${error.message}`, "assistant");
-        }
-
-        chatSendBtn.disabled = false;
-        chatSendBtn.textContent = "Send";
-      }
-
-      function addChatMessage(text, sender) {
-        const div = document.createElement("div");
-        div.className = "chat-message " + sender;
-        div.textContent = text;
-        chatMessages.appendChild(div);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-      }
-      function addChatSystemMessage(text) {
-        const div = document.createElement("div");
-        div.className = "chat-message system";
-        div.textContent = text;
-        chatMessages.appendChild(div);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-      }
-
-      // ===== Utility Functions =====
-      function escapeHtml(text) {
-        const div = document.createElement("div");
-        div.textContent = text;
-        return div.innerHTML;
-      }
-    })();
-  </script>
+  try {
+    const html = await callGroqAPI(prompt);
+    parseAndInjectHTML(html,content);
+    // Ensure generated content is responsive
+    ensureResponsive();
+    setTimeout(()=>content.scrollIntoView({behavior:'smooth',block:'center'}), 100);
+    conversationHistory.push(intent);
+    elementsCreated+=countElements(html); adaptations++;
+    updateStats(); logHistory(`✨ Responsive app: "${intent.substring(0,45)}..."`);
+    document.getElementById('userIntent').value='';
+  } catch(e) {
+    content.innerHTML=`<div class='error-message'><b>Groq error:</b> ${e.message}</div>`;
+    logHistory(`⚠️ ${e.message}`);
+  }
+}
+function ensureResponsive() {
+  const reactRoot = document.getElementById('react-root');
+  if (!reactRoot.firstChild) return;
+  
+  // Ensure root element has responsive styling
+  if (!reactRoot.style.maxWidth) reactRoot.style.maxWidth = '100%';
+  if (!reactRoot.style.boxSizing) reactRoot.style.boxSizing = 'border-box';
+  
+  // Additional checks can be added for React-specific responsiveness
+}
+async function callGroqAPI(prompt) {
+  const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {'Authorization': `Bearer ${groqKey}`,'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      max_tokens: 2048, temperature: 0.74,
+      messages: [{ role: "user", content: prompt }]
+    })
+  });
+  if(!resp.ok){
+    let errorMsg = "Groq API error";
+    try { const data = await resp.json(); errorMsg = data.error?.message || errorMsg; } catch {}
+    throw new Error(errorMsg);
+  }
+  const data = await resp.json();
+  let html = (data.choices && data.choices[0]?.message?.content) ? data.choices[0].message.content.trim() : "";
+  html = html.replace(/``````/g,'').trim();
+  if(!/<div/i.test(html)) throw new Error("No usable HTML generated");
+  return html;
+}
+function parseAndInjectHTML(raw, container) {
+  const reactRoot = document.getElementById('react-root');
+  reactRoot.innerHTML = ''; // Clear previous app
+  
+  try {
+    // Extract just the component code (remove any markdown or explanations)
+    let componentCode = raw.trim();
+    componentCode = componentCode.replace(/```(jsx|javascript)?/g, '').trim();
+    
+    // Transpile and execute the React code
+    const transpiledCode = Babel.transform(componentCode, {
+      presets: ['react'],
+      filename: 'generated-component.js'
+    }).code;
+    
+    // Create a new script element with the transpiled code
+    const script = document.createElement('script');
+    script.type = 'text/babel';
+    script.text = transpiledCode;
+    
+    // Execute the component
+    container.innerHTML = '';
+    container.appendChild(reactRoot);
+    container.appendChild(script);
+    
+    // If component exports properly, render it
+    if (window.AppComponent) {
+      ReactDOM.render(React.createElement(window.AppComponent), reactRoot);
+    }
+  } catch (e) {
+    container.innerHTML = `<div class='error-message'><b>React Error:</b> ${e.message}</div>`;
+    logHistory(`⚠️ React Error: ${e.message}`);
+  }
+}
+function countElements(html) {
+  const div=document.createElement('div'); div.innerHTML=html;
+  return div.querySelectorAll('*').length;
+}
+document.addEventListener("DOMContentLoaded", ()=>{
+  document.getElementById('userIntent')?.addEventListener('keydown',(e)=>{
+    if(e.key==='Enter'&&e.ctrlKey)generateInterface();
+  });
+});
+</script>
 </body>
 </html>
