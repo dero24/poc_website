@@ -389,18 +389,19 @@
   <div id="app"></div>
 
   <script type="text/babel">
-    const { useState, useEffect, useMemo, memo } = React;
+    const { useState, useRef, memo } = React;
 
     // Main App Component
     const AppBuilder = memo(() => {
       const [prompt, setPrompt] = useState('');
-      const [apiKey, setApiKey] = useState(localStorage.getItem('groq_api_key') || '');
+      const [apiKey, setApiKey] = useState('');
       const [generatedContent, setGeneratedContent] = useState('');
       const [isLoading, setIsLoading] = useState(false);
       const [error, setError] = useState('');
+      const contentOutputRef = useRef(null);
 
-      // System prompt for Groq API - using regular string to avoid template literal issues
-      const SYSTEM_PROMPT = 'You are an expert web developer that creates interactive web applications. You MUST respond with ONLY valid HTML code that can be inserted directly into a webpage using innerHTML.
+      // System prompt for Groq API
+      const SYSTEM_PROMPT = `You are an expert web developer that creates interactive web applications. You MUST respond with ONLY valid HTML code that can be inserted directly into a webpage using innerHTML.
 
 CRITICAL RULES:
 1. Return ONLY HTML code - no explanations, no markdown, no code blocks
@@ -438,14 +439,31 @@ EXAMPLE React Counter App:
   root.render(<CounterApp />);
 <\\/script>
 
-Remember: Escape ALL </script> tags as <\\/script>!';
+Remember: Escape ALL </script> tags as <\\/script>!`;
 
-      // Save API key to localStorage
-      useEffect(() => {
-        if (apiKey) {
-          localStorage.setItem('groq_api_key', apiKey);
-        }
-      }, [apiKey]);
+      // Process and execute scripts in generated content
+      const executeScripts = (html) => {
+        if (!contentOutputRef.current) return;
+        
+        // Clear previous content
+        contentOutputRef.current.innerHTML = html;
+        
+        // Find and execute scripts
+        const scripts = contentOutputRef.current.querySelectorAll('script');
+        scripts.forEach(oldScript => {
+          const newScript = document.createElement('script');
+          newScript.type = oldScript.type || 'text/javascript';
+          
+          if (oldScript.src) {
+            newScript.src = oldScript.src;
+          } else {
+            newScript.textContent = oldScript.textContent;
+          }
+          
+          document.head.appendChild(newScript);
+          document.head.removeChild(newScript);
+        });
+      };
 
       // Call Groq API
       const callGroqAPI = async (userPrompt) => {
@@ -503,6 +521,9 @@ Remember: Escape ALL </script> tags as <\\/script>!';
         try {
           const htmlCode = await callGroqAPI(prompt);
           setGeneratedContent(htmlCode);
+          setTimeout(() => {
+            executeScripts(htmlCode);
+          }, 100);
         } catch (err) {
           setError(err.message || 'Failed to generate app. Please try again.');
           console.error('Error:', err);
@@ -511,21 +532,12 @@ Remember: Escape ALL </script> tags as <\\/script>!';
         }
       };
 
-      useEffect(() => {
-        if (generatedContent) {
-          // Execute any scripts in the generated content
-          const contentDiv = document.getElementById('content-output');
-          if (contentDiv) {
-            const scripts = contentDiv.querySelectorAll('script');
-            scripts.forEach(script => {
-              const newScript = document.createElement('script');
-              if (script.type) newScript.type = script.type;
-              newScript.textContent = script.textContent;
-              document.body.appendChild(newScript);
-            });
-          }
+      // Handle Ctrl+Enter in textarea
+      const handleKeyPress = (e) => {
+        if (e.key === 'Enter' && e.ctrlKey) {
+          handleGenerate();
         }
-      }, [generatedContent]);
+      };
 
       return (
         <div className="container">
@@ -551,7 +563,7 @@ Remember: Escape ALL </script> tags as <\\/script>!';
             <textarea
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && e.ctrlKey && handleGenerate()}
+              onKeyDown={handleKeyPress}
               placeholder="Describe your app... Examples: 'interactive counter', 'todo list with checkboxes', 'color picker', 'calculator', 'quiz app', etc."
               disabled={isLoading}
             />
@@ -570,9 +582,11 @@ Remember: Escape ALL </script> tags as <\\/script>!';
             </div>
           )}
           
-          {generatedContent && !isLoading && (
-            <div className="generated-content" id="content-output" dangerouslySetInnerHTML={{ __html: generatedContent }} />
-          )}
+          <div 
+            ref={contentOutputRef}
+            className="generated-content" 
+            style={{display: generatedContent && !isLoading ? 'block' : 'none'}}
+          />
         </div>
       );
     });
