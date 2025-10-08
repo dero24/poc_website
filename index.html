@@ -6,51 +6,30 @@
   <title>Morphic Web — Always Fits Screen</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
-    #react-root {
-      width: 100%;
-      min-height: 100px;
-    }
-    html, body { 
-      height: 100%; 
-      overflow-x: hidden;
-    }
-    body {
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(122deg, #2435f7 0%, #9e7cea 85%);
-      min-height: 100vh;
-      background-attachment: fixed;
-      color: #182042;
-      margin: 0; padding: 0;
-    }
-    .container {
-      max-width: 100vw;
-      width: 95%;
-      max-width: 700px;
-      margin: 32px auto 20px;
-      background: rgba(255,255,255,0.90);
-      border-radius: 22px;
-      box-shadow: 0 12px 36px 0 rgba(60,50,200,0.13);
-      padding: 20px;
-      backdrop-filter: blur(9px);
-      position: relative;
-      box-sizing: border-box;
-    }
-    .generated-content { margin-top: 12px; padding: 14px 10px 20px 10px; background: rgba(245,250,255,0.94); border-radius: 10px; min-height: 78px; max-width: 100%; overflow-x: auto; overflow-y: auto; box-sizing: border-box; word-wrap: break-word; }
+    #react-root { width: 100%; min-height: 100px; }
+    html, body { height: 100%; overflow-x: hidden; }
+    body { font-family: 'Inter', sans-serif; background: linear-gradient(122deg, #2435f7 0%, #9e7cea 85%);
+      min-height: 100vh; background-attachment: fixed; color: #182042; margin: 0; padding: 0; }
+    .container { max-width: 100vw; width: 95%; max-width: 700px; margin: 32px auto 20px;
+      background: rgba(255,255,255,0.90); border-radius: 22px; box-shadow: 0 12px 36px 0 rgba(60,50,200,0.13);
+      padding: 20px; backdrop-filter: blur(9px); position: relative; box-sizing: border-box; }
+    .generated-content { margin-top: 12px; padding: 14px 10px 20px 10px; background: rgba(245,250,255,0.94);
+      border-radius: 10px; min-height: 78px; max-width: 100%; overflow-x: auto; overflow-y: auto;
+      box-sizing: border-box; word-wrap: break-word; }
     .generated-content * { max-width: 100% !important; box-sizing: border-box !important; }
-    .generated-content div,
-    .generated-content #mainAPP,
-    .generated-content .mainAPP { max-width: 100% !important; overflow-x: auto !important; word-wrap: break-word !important; box-sizing: border-box !important;}
-    .generated-content input,
-    .generated-content textarea,
-    .generated-content button,
-    .generated-content table { max-width: 100% !important; box-sizing: border-box !important; }
+    .generated-content div, .generated-content #mainAPP, .generated-content .mainAPP {
+      max-width: 100% !important; overflow-x: auto !important; word-wrap: break-word !important; box-sizing: border-box !important;}
+    .generated-content input, .generated-content textarea, .generated-content button, .generated-content table {
+      max-width: 100% !important; box-sizing: border-box !important; }
     .generated-content table { width: 100% !important; table-layout: fixed !important; }
     .header {text-align:center;margin-bottom:22px;}
     .logo {font-size:2.1em;color:#5857f8;font-weight:900; text-shadow:0 0 12px #dbeafe;}
     .slogan {font-size:1.11em;opacity:.88;color:#4f40b5;margin:11px auto 0;text-align:center;}
     .setup-card, .interaction-zone {margin-bottom:16px;}
     .api-input-group label{font-size:1.07em;font-weight:700;color:#7b64e7;display:block;margin-bottom:7px;}
-    .api-input-group input{font-size:1.07em;padding:12px;width:95%;max-width:340px;border:2.1px solid #e3eafe; border-radius:11px;outline:none;margin-bottom:6px; background:rgba(255,255,255,0.6); box-shadow:0 2px 9px #b6bffb12 inset;}
+    .api-input-group input{font-size:1.07em;padding:12px;width:95%;max-width:340px;border:2.1px solid #e3eafe;
+      border-radius:11px;outline:none;margin-bottom:6px; background:rgba(255,255,255,0.6);
+      box-shadow:0 2px 9px #b6bffb12 inset;}
     .api-input-group small{color:#6b7fa7;font-size:0.97em;margin-bottom:7px;display:block;}
     .start-btn {padding:12px 46px;border-radius:10px;font-size:1.07em;font-weight:700;background:linear-gradient(101deg,#524bb5 0%,#a5b4fc 80%);color:#fff;border:none;cursor:pointer;}
     .start-btn:hover{background:#7b64e7;}
@@ -59,14 +38,17 @@
     .stat-card h3{margin:0;font-size:1.15em;}
     .stat-card p{margin:2px 0 0;opacity:.81;font-size:.97em;}
     .user-input-area{margin-bottom:8px;display:flex;gap:9px;flex-wrap:wrap;}
-    .user-input-area textarea { flex:1;min-width:250px;padding:13px 16px;border-radius:11px;min-height:50px;font-size:1.07em; border:2.1px solid #dadcff;background:#fbfbff;box-shadow:0 1.2px 9px #a9aaff10 inset; font-weight:600;letter-spacing:.01em;resize:vertical;}
+    .user-input-area textarea {flex:1;min-width:250px;padding:13px 16px;border-radius:11px;min-height:50px;font-size:1.07em;
+      border:2.1px solid #dadcff;background:#fbfbff;box-shadow:0 1.2px 9px #a9aaff10 inset;
+      font-weight:600;letter-spacing:.01em;resize:vertical;}
     .user-input-area textarea:focus {border-color:#7b64e7;}
     .generate-btn {background:linear-gradient(89deg,#6267eb 12%,#4ee5fd 95%);color:white;border:none;padding:11px 17px;border-radius:11px;font-size:1.1em;font-weight:900;cursor:pointer;}
     .generate-btn:hover {background:#5ec6fb;}
     .loading{text-align:center;padding:10px;color:#7b64e7;font-size:1.11em;}
     .error-message{background:#f84a77;color:#fff;padding:9px 13px;border-radius:7px;margin-top:7px;}
     .branding{text-align:center;font-size:.94em;color:#7476af;margin-top:16px;}
-    .history-log{margin-top:9px;padding:6px 8px;background:#f7f8fc;border-radius:8px;max-height:65px;overflow-y:auto;border:1.2px solid #e5e5fd;}
+    .history-log{margin-top:9px;padding:6px 8px;background:#f7f8fc;border-radius:8px;max-height:65px;overflow-y:auto;
+      border:1.2px solid #e5e5fd;}
     .history-item{padding:4px 9px 3px 8px;margin-bottom:3px;background:#fff9;border-radius:5px;font-size:1em;border:1px solid #dfdbff;}
     @media(max-width:900px){
       .container{width:98%;padding:15px;}
@@ -83,7 +65,7 @@
     <div class="slogan">Responsive AI Apps - Always fits your screen perfectly!</div>
   </div>
   <div class="setup-card" id="setupCard">
-    <form onsubmit="event.preventDefault(); initializeExperience();">
+    <form id="setupForm">
       <div class="api-input-group">
         <label for="apiKey">Groq API Key</label>
         <input type="password" id="apiKey" required autocomplete="off" placeholder="Paste your Groq API key">
@@ -114,10 +96,10 @@
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <script>
-  window.React = React;
-</script>
-<script>
-let groqKey="", interactionCount=0, elementsCreated=0, adaptations=0, conversationHistory=[];
+window.React = React;
+// State variables
+let groqKey = "";
+let interactionCount = 0, elementsCreated = 0, adaptations = 0, conversationHistory = [];
 function updateStats() {
   document.getElementById('interactionCount').textContent = interactionCount;
   document.getElementById('elementsCreated').textContent = elementsCreated;
@@ -129,28 +111,43 @@ function logHistory(msg) {
   log.appendChild(item); log.scrollTop = log.scrollHeight;
 }
 function initializeExperience() {
-  groqKey = document.getElementById('apiKey').value.trim();
-  if(!groqKey) { alert('Paste your Groq API key!'); return; }
+  const keyInput = document.getElementById('apiKey');
+  groqKey = keyInput.value.trim();
+  if (!groqKey) { alert('Paste your Groq API key!'); return false; }
   window.groqKey = groqKey;
-  document.getElementById('setupCard').style.display="none";
-  document.getElementById('interactionZone').style.display="block";
+  document.getElementById('setupCard').style.display = "none";
+  document.getElementById('interactionZone').style.display = "block";
   logHistory('Responsive session started');
+  return true;
 }
+document.addEventListener("DOMContentLoaded", () => {
+  // Handle the login form submission reliably
+  const setupForm = document.getElementById('setupForm');
+  setupForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    if (initializeExperience()) {
+      // Focus textarea for user intent - nice UX
+      setTimeout(() => document.getElementById('userIntent').focus(), 300);
+    }
+  });
+  document.getElementById('userIntent')?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && e.ctrlKey) generateInterface();
+  });
+});
 async function generateInterface() {
-  const intent=document.getElementById('userIntent').value.trim();
-  const content=document.getElementById('generatedContent');
-  if(!intent){alert('Describe what to build!');return;}
-  content.innerHTML='<div class="loading">⚡️ Creating responsive app...</div>';
+  const intent = document.getElementById('userIntent').value.trim();
+  const content = document.getElementById('generatedContent');
+  if (!intent) { alert('Describe what to build!'); return; }
+  content.innerHTML = '<div class="loading">⚡️ Creating responsive app...</div>';
   interactionCount++; updateStats();
   let wantsAI = /(ai|assistant|chatbot|groq|language model|llm)/i.test(intent);
   let aiInstructions = wantsAI
     ? `If user wants AI features, use window.groqKey for Groq API calls to https://api.groq.com/openai/v1/chat/completions - never prompt for key again.`
     : '';
-
-  const reactSetup = `
-// IMPORTANT: Use React hooks for state management
+  const reactSetup =
+`// IMPORTANT: Use React hooks for state management
 import React, { useState, useEffect } from 'react';
-// Component must be exported as default. Always export as function App and export default App.
+// Component must be function App and export default App
 function App() {
   const [state, setState] = useState({});
   useEffect(() => {}, []);
@@ -160,10 +157,9 @@ function App() {
     </div>
   );
 }
-export default App;
-`;
-const context = conversationHistory.length>0?`Past: ${conversationHistory.slice(-2).join(' | ')}`:'';
-  const prompt=`You are MorphicWeb, expert responsive web app generator.
+export default App;`;
+  const context = conversationHistory.length > 0 ? `Past: ${conversationHistory.slice(-2).join(' | ')}` : '';
+  const prompt = `You are MorphicWeb, expert responsive web app generator.
 User wants: "${intent}"
 
 CRITICAL REACT REQUIREMENTS:
@@ -194,18 +190,17 @@ Output format:
 - NO markdown, code blocks, or explanations
 - Test that it works on mobile screens
 ${context}`;
-
   try {
     const reactCode = await callGroqAPI(prompt);
     parseAndInjectReact(reactCode, content);
     ensureResponsive();
-    setTimeout(()=>content.scrollIntoView({behavior:'smooth',block:'center'}), 100);
+    setTimeout(() => content.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
     conversationHistory.push(intent);
-    elementsCreated+=countElements(reactCode); adaptations++;
+    elementsCreated += countElements(reactCode); adaptations++;
     updateStats(); logHistory(`✨ Responsive app: "${intent.substring(0,45)}..."`);
-    document.getElementById('userIntent').value='';
-  } catch(e) {
-    content.innerHTML=`<div class='error-message'><b>Groq error:</b> ${e.message}</div>`;
+    document.getElementById('userIntent').value = '';
+  } catch (e) {
+    content.innerHTML = `<div class='error-message'><b>Groq error:</b> ${e.message}</div>`;
     logHistory(`⚠️ ${e.message}`);
   }
 }
@@ -227,21 +222,22 @@ function ensureResponsive() {
 async function callGroqAPI(prompt) {
   const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
-    headers: {'Authorization': `Bearer ${groqKey}`,'Content-Type': 'application/json'},
+    headers: { 'Authorization': `Bearer ${groqKey}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: 'llama-3.3-70b-versatile',
       max_tokens: 2048, temperature: 0.74,
       messages: [{ role: "user", content: prompt }]
     })
   });
-  if(!resp.ok){
+  if (!resp.ok) {
     let errorMsg = "Groq API error";
     try { const data = await resp.json(); errorMsg = data.error?.message || errorMsg; } catch {}
     throw new Error(errorMsg);
   }
   const data = await resp.json();
-  let componentCode = (data.choices && data.choices[0]?.message?.content) ? data.choices[0].message.content.trim() : "";
-  // Strip markdown, code blocks, etc.
+  let componentCode = (data.choices && data.choices[0]?.message?.content)
+    ? data.choices[0].message.content.trim()
+    : "";
   componentCode = componentCode.replace(/```
   return componentCode;
 }
@@ -254,18 +250,16 @@ function parseAndInjectReact(componentCode, container) {
       container.appendChild(reactRoot);
     }
     ReactDOM.unmountComponentAtNode(reactRoot);
-    // Ensure imports, always attach to window.App
     if (!componentCode.includes('import React')) {
       componentCode = `import React, { useState, useEffect } from 'react';
 ${componentCode}`;
     }
-    // NOTE: Always attach App to window for rendering
+    // Attach App to window for rendering
     const transpiledCode = Babel.transform(
       componentCode + '
 window.App = App;',
       { presets: ['react'], filename: 'generated-component.js' }
     ).code;
-    // Evaluate transpiled code so window.App is now available
     eval(transpiledCode);
     container.innerHTML = '<div id="react-root"></div>';
     reactRoot = document.getElementById('react-root');
@@ -281,14 +275,8 @@ window.App = App;',
   }
 }
 function countElements(code) {
-  // Just estimate by <div />, <input />, <button /> etc
-  return (code.match(/<w+/g)||[]).length;
+  return (code.match(/<w+/g) || []).length;
 }
-document.addEventListener("DOMContentLoaded", ()=>{
-  document.getElementById('userIntent')?.addEventListener('keydown',(e)=>{
-    if(e.key==='Enter'&&e.ctrlKey)generateInterface();
-  });
-});
 </script>
 </body>
 </html>
