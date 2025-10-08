@@ -12,9 +12,9 @@
     }
     html, body { 
       height: 100%; 
-      overflow-x: hidden; /* Never allow horizontal scroll on main page */
+      overflow-x: hidden;
     }
-body {
+    body {
       font-family: 'Inter', sans-serif;
       background: linear-gradient(122deg, #2435f7 0%, #9e7cea 85%);
       min-height: 100vh;
@@ -23,7 +23,7 @@ body {
       margin: 0; padding: 0;
     }
     .container {
-      max-width: 100vw; /* Never exceed viewport width */
+      max-width: 100vw;
       width: 95%;
       max-width: 700px;
       margin: 32px auto 20px;
@@ -35,65 +35,22 @@ body {
       position: relative;
       box-sizing: border-box;
     }
-    
-    /* CRITICAL: Force all generated content to stay within bounds */
-    .generated-content {
-      margin-top: 12px;
-      padding: 14px 10px 20px 10px;
-      background: rgba(245,250,255,0.94);
-      border-radius: 10px;
-      min-height: 78px;
-      
-      /* These are the key responsive fixes */
-      max-width: 100%;
-      overflow-x: auto;
-      overflow-y: auto;
-      box-sizing: border-box;
-      word-wrap: break-word;
-      
-      /* Force all child content to respect boundaries */
-    }
-    
-    /* FORCE all generated apps to be responsive */
-    .generated-content * {
-      max-width: 100% !important;
-      box-sizing: border-box !important;
-    }
-    
-    /* Specific fixes for common AI-generated elements that break layout */
+    .generated-content { margin-top: 12px; padding: 14px 10px 20px 10px; background: rgba(245,250,255,0.94); border-radius: 10px; min-height: 78px; max-width: 100%; overflow-x: auto; overflow-y: auto; box-sizing: border-box; word-wrap: break-word; }
+    .generated-content * { max-width: 100% !important; box-sizing: border-box !important; }
     .generated-content div,
     .generated-content #mainAPP,
-    .generated-content .mainAPP {
-      max-width: 100% !important;
-      overflow-x: auto !important;
-      word-wrap: break-word !important;
-      box-sizing: border-box !important;
-    }
-    
+    .generated-content .mainAPP { max-width: 100% !important; overflow-x: auto !important; word-wrap: break-word !important; box-sizing: border-box !important;}
     .generated-content input,
     .generated-content textarea,
     .generated-content button,
-    .generated-content table {
-      max-width: 100% !important;
-      box-sizing: border-box !important;
-    }
-    
-    .generated-content table {
-      width: 100% !important;
-      table-layout: fixed !important;
-    }
-    
-    /* Rest of your existing styles */
+    .generated-content table { max-width: 100% !important; box-sizing: border-box !important; }
+    .generated-content table { width: 100% !important; table-layout: fixed !important; }
     .header {text-align:center;margin-bottom:22px;}
     .logo {font-size:2.1em;color:#5857f8;font-weight:900; text-shadow:0 0 12px #dbeafe;}
     .slogan {font-size:1.11em;opacity:.88;color:#4f40b5;margin:11px auto 0;text-align:center;}
     .setup-card, .interaction-zone {margin-bottom:16px;}
     .api-input-group label{font-size:1.07em;font-weight:700;color:#7b64e7;display:block;margin-bottom:7px;}
-    .api-input-group input{
-      font-size:1.07em;padding:12px;width:95%;max-width:340px;border:2.1px solid #e3eafe;
-      border-radius:11px;outline:none;margin-bottom:6px; background:rgba(255,255,255,0.6);
-      box-shadow:0 2px 9px #b6bffb12 inset;
-    }
+    .api-input-group input{font-size:1.07em;padding:12px;width:95%;max-width:340px;border:2.1px solid #e3eafe; border-radius:11px;outline:none;margin-bottom:6px; background:rgba(255,255,255,0.6); box-shadow:0 2px 9px #b6bffb12 inset;}
     .api-input-group small{color:#6b7fa7;font-size:0.97em;margin-bottom:7px;display:block;}
     .start-btn {padding:12px 46px;border-radius:10px;font-size:1.07em;font-weight:700;background:linear-gradient(101deg,#524bb5 0%,#a5b4fc 80%);color:#fff;border:none;cursor:pointer;}
     .start-btn:hover{background:#7b64e7;}
@@ -102,11 +59,7 @@ body {
     .stat-card h3{margin:0;font-size:1.15em;}
     .stat-card p{margin:2px 0 0;opacity:.81;font-size:.97em;}
     .user-input-area{margin-bottom:8px;display:flex;gap:9px;flex-wrap:wrap;}
-    .user-input-area textarea {
-      flex:1;min-width:250px;padding:13px 16px;border-radius:11px;min-height:50px;font-size:1.07em;
-      border:2.1px solid #dadcff;background:#fbfbff;box-shadow:0 1.2px 9px #a9aaff10 inset;
-      font-weight:600;letter-spacing:.01em;resize:vertical;
-    }
+    .user-input-area textarea { flex:1;min-width:250px;padding:13px 16px;border-radius:11px;min-height:50px;font-size:1.07em; border:2.1px solid #dadcff;background:#fbfbff;box-shadow:0 1.2px 9px #a9aaff10 inset; font-weight:600;letter-spacing:.01em;resize:vertical;}
     .user-input-area textarea:focus {border-color:#7b64e7;}
     .generate-btn {background:linear-gradient(89deg,#6267eb 12%,#4ee5fd 95%);color:white;border:none;padding:11px 17px;border-radius:11px;font-size:1.1em;font-weight:900;cursor:pointer;}
     .generate-btn:hover {background:#5ec6fb;}
@@ -115,7 +68,6 @@ body {
     .branding{text-align:center;font-size:.94em;color:#7476af;margin-top:16px;}
     .history-log{margin-top:9px;padding:6px 8px;background:#f7f8fc;border-radius:8px;max-height:65px;overflow-y:auto;border:1.2px solid #e5e5fd;}
     .history-item{padding:4px 9px 3px 8px;margin-bottom:3px;background:#fff9;border-radius:5px;font-size:1em;border:1px solid #dfdbff;}
-    
     @media(max-width:900px){
       .container{width:98%;padding:15px;}
       .stats{flex-direction:column;gap:4px;}
@@ -154,17 +106,16 @@ body {
       <div id="react-root"></div>
       <p style="color:#68a;text-align:center;">Your responsive React app will appear here!</p>
     </div>
-<div class="history-log" id="historyLog"></div>
+    <div class="history-log" id="historyLog"></div>
   </div>
   <div class="branding">Morphic Web &copy; 2026 | Always Responsive</div>
 </div>
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <script>
-    // Ensure window.React is available for JSX compilation
-    window.React = React;
-  </script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script>
+  window.React = React;
+</script>
 <script>
 let groqKey="", interactionCount=0, elementsCreated=0, adaptations=0, conversationHistory=[];
 function updateStats() {
@@ -198,26 +149,18 @@ async function generateInterface() {
 
   const reactSetup = `
 // IMPORTANT: Use React hooks for state management
-// Must include these imports at top:
 import React, { useState, useEffect } from 'react';
-import ReactDOM from 'react-dom';
-
-// Component must be exported as default
-// Use functional components with hooks
-// Example structure:
+// Component must be exported as default. Always export as function App and export default App.
 function App() {
-  const [state, setState] = useState(initialValue);
-  
-  useEffect(() => {
-    // Side effects here
-  }, [dependencies]);
-
+  const [state, setState] = useState({});
+  useEffect(() => {}, []);
   return (
     <div style={{maxWidth: '100%', boxSizing: 'border-box'}}>
       {/* Responsive JSX here */}
     </div>
   );
 }
+export default App;
 `;
 const context = conversationHistory.length>0?`Past: ${conversationHistory.slice(-2).join(' | ')}`:'';
   const prompt=`You are MorphicWeb, expert responsive web app generator.
@@ -225,27 +168,26 @@ User wants: "${intent}"
 
 CRITICAL REACT REQUIREMENTS:
 - MUST output React functional component code (JSX)
-- Use useState/useEffect hooks for state management
-- Component must be exported as default
-- Include all necessary React imports
+- Must use useState/useEffect hooks
 - Wrap all string props in {}
 - Use style={{}} for inline styles
 - Must be mobile-first responsive
+- Use function App() and export default App
 ${reactSetup}
 
 RESPONSIVE REQUIREMENTS:
 - ALL CSS must use: max-width: 100%, box-sizing: border-box
 - NEVER use fixed pixel widths over 300px
-- ALL containers must use: width: 100%, max-width: 500px
+- ALL containers: width: 100%, max-width: 500px
 - Use flexbox with flex-wrap: wrap for layouts
-- Mobile-compatability always: make it work on any size screen
+- Mobile-compatibility always
 - All inputs/buttons: width: 100%, max-width: reasonable size
-- Use padding in % or vw units when possible
+- Use padding in % or vw units
 - Tables: width: 100%, table-layout: fixed
 Output format:
-- Valid React component code only (no HTML)
+- Valid React component code only (no HTML, no markdown)
 - Must include imports (React, useState, useEffect)
-- Must export default the component
+- Must export default the component as App
 - Use modern React practices (hooks)
 - Include responsive styles in JSX
 - ${aiInstructions}
@@ -254,13 +196,12 @@ Output format:
 ${context}`;
 
   try {
-    const html = await callGroqAPI(prompt);
-    parseAndInjectHTML(html,content);
-    // Ensure generated content is responsive
+    const reactCode = await callGroqAPI(prompt);
+    parseAndInjectReact(reactCode, content);
     ensureResponsive();
     setTimeout(()=>content.scrollIntoView({behavior:'smooth',block:'center'}), 100);
     conversationHistory.push(intent);
-    elementsCreated+=countElements(html); adaptations++;
+    elementsCreated+=countElements(reactCode); adaptations++;
     updateStats(); logHistory(`✨ Responsive app: "${intent.substring(0,45)}..."`);
     document.getElementById('userIntent').value='';
   } catch(e) {
@@ -271,13 +212,9 @@ ${context}`;
 function ensureResponsive() {
   const reactRoot = document.getElementById('react-root');
   if (!reactRoot) return;
-  
-  // Ensure root element has responsive styling
   reactRoot.style.maxWidth = '100%';
   reactRoot.style.boxSizing = 'border-box';
   reactRoot.style.width = '100%';
-  
-  // Check for overflow issues
   const walker = document.createTreeWalker(reactRoot, NodeFilter.SHOW_ELEMENT);
   while(walker.nextNode()) {
     const node = walker.currentNode;
@@ -303,89 +240,49 @@ async function callGroqAPI(prompt) {
     throw new Error(errorMsg);
   }
   const data = await resp.json();
-  let html = (data.choices && data.choices[0]?.message?.content) ? data.choices[0].message.content.trim() : "";
-  html = html.replace(/``````/g,'').trim();
-  if(!/<div/i.test(html)) throw new Error("No usable HTML generated");
-  return html;
+  let componentCode = (data.choices && data.choices[0]?.message?.content) ? data.choices[0].message.content.trim() : "";
+  // Strip markdown, code blocks, etc.
+  componentCode = componentCode.replace(/```
+  return componentCode;
 }
-function parseAndInjectHTML(raw, container) {
+function parseAndInjectReact(componentCode, container) {
   try {
-    // Ensure react-root exists
     let reactRoot = document.getElementById('react-root');
     if (!reactRoot) {
       reactRoot = document.createElement('div');
       reactRoot.id = 'react-root';
       container.appendChild(reactRoot);
     }
-    
-    // Clear previous app
     ReactDOM.unmountComponentAtNode(reactRoot);
-    
-    // Extract component code
-    let componentCode = raw.trim();
-    componentCode = componentCode.replace(/```(jsx|javascript)?/g, '').trim();
-    
-    // Add React imports if missing
+    // Ensure imports, always attach to window.App
     if (!componentCode.includes('import React')) {
-      componentCode = `import React, { useState, useEffect } from 'react';\n${componentCode}`;
+      componentCode = `import React, { useState, useEffect } from 'react';
+${componentCode}`;
     }
-    
-    // Transpile React code
-    const transpiledCode = Babel.transform(componentCode, {
-      presets: ['react'],
-      filename: 'generated-component.js'
-    }).code;
-    
-    // Create a temporary script to evaluate the component
-    const script = document.createElement('script');
-    script.type = 'text/babel';
-    script.text = transpiledCode;
-    
-    // Clear container and add react-root
+    // NOTE: Always attach App to window for rendering
+    const transpiledCode = Babel.transform(
+      componentCode + '
+window.App = App;',
+      { presets: ['react'], filename: 'generated-component.js' }
+    ).code;
+    // Evaluate transpiled code so window.App is now available
+    eval(transpiledCode);
     container.innerHTML = '<div id="react-root"></div>';
     reactRoot = document.getElementById('react-root');
-    
-    // Evaluate the script
-    document.body.appendChild(script);
-    // Wait a moment for the script to execute, then render
-    setTimeout(() => {
-      try {
-        const root = ReactDOM.createRoot(reactRoot);
-        
-        // Look for the exported component - check multiple possible names
-        let Component = null;
-        if (window.App) Component = window.App;
-        else if (window.AppComponent) Component = window.AppComponent;
-        else if (window.default) Component = window.default;
-        else {
-          // Try to find any function that looks like a React component
-          for (const key in window) {
-            if (typeof window[key] === 'function' && 
-                window[key].toString().includes('return') && 
-                window[key].toString().includes('React')) {
-            Component = window[key];
-            break;
-          }
-        }
-        
-        if (Component) {
-          root.render(React.createElement(Component));
-        } else {
-          throw new Error("No valid React component found");
-        }
-      } catch (e) {
-        container.innerHTML = `<div class='error-message'><b>Render Error:</b> ${e.message}</div>`;
-        logHistory(`⚠️ Render Error: ${e.message}`);
-      }
-    }, 100);
-} catch (e) {
+    const root = ReactDOM.createRoot(reactRoot);
+    if (window.App) {
+      root.render(React.createElement(window.App));
+    } else {
+      throw new Error("No valid React component found");
+    }
+  } catch (e) {
     container.innerHTML = `<div class='error-message'><b>React Error:</b> ${e.message}</div>`;
     logHistory(`⚠️ React Error: ${e.message}`);
   }
 }
-function countElements(html) {
-  const div=document.createElement('div'); div.innerHTML=html;
-  return div.querySelectorAll('*').length;
+function countElements(code) {
+  // Just estimate by <div />, <input />, <button /> etc
+  return (code.match(/<w+/g)||[]).length;
 }
 document.addEventListener("DOMContentLoaded", ()=>{
   document.getElementById('userIntent')?.addEventListener('keydown',(e)=>{
