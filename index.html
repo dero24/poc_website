@@ -400,46 +400,42 @@
       const [error, setError] = useState('');
       const contentOutputRef = useRef(null);
 
-      // System prompt for Groq API
-      const SYSTEM_PROMPT = `You are an expert web developer that creates interactive web applications. You MUST respond with ONLY valid HTML code that can be inserted directly into a webpage using innerHTML.
-
-CRITICAL RULES:
-1. Return ONLY HTML code - no explanations, no markdown, no code blocks
-2. For interactive apps, use React components with proper syntax
-3. ALL closing script tags MUST be escaped as <\\/script> instead of </script>
-4. Use inline styles or the provided CSS classes: react-component, react-button, react-input, react-card
-5. For React apps, wrap components in <div id="root-uniqueid"></div> and mount them properly
-6. Include <script type="text/babel"> for React component code
-7. Use modern React patterns: functional components, hooks (useState, useEffect)
-8. Make it beautiful and interactive
-
-Available CSS classes:
-- react-component: Main component wrapper with nice styling
-- react-button: Beautiful gradient buttons with hover effects
-- react-input: Styled input fields
-- react-card: Card layout with shadows and hover effects
-
-EXAMPLE React Counter App:
-<div class="react-component">
-  <h2 style="color: #667eea;">Counter App</h2>
-  <div id="root-counter"></div>
-</div>
-<script type="text/babel">
-  function CounterApp() {
-    const [count, setCount] = React.useState(0);
-    return (
-      <div style={{textAlign: "center"}}>
-        <h1 style={{fontSize: "3rem", color: "#667eea"}}>{count}</h1>
-        <button className="react-button" onClick={() => setCount(count + 1)}>Increment</button>
-        <button className="react-button" onClick={() => setCount(count - 1)}>Decrement</button>
-      </div>
-    );
-  }
-  const root = ReactDOM.createRoot(document.getElementById("root-counter"));
-  root.render(<CounterApp />);
-<\\/script>
-
-Remember: Escape ALL </script> tags as <\\/script>!`;
+      // System prompt for Groq API - using proper escaping
+      const SYSTEM_PROMPT = 'You are an expert web developer that creates interactive web applications. You MUST respond with ONLY valid HTML code that can be inserted directly into a webpage using innerHTML.\n\n' +
+'CRITICAL RULES:\n' +
+'1. Return ONLY HTML code - no explanations, no markdown, no code blocks\n' +
+'2. For interactive apps, use React components with proper syntax\n' +
+'3. ALL closing script tags MUST be escaped as <\\/script> instead of <\\/script>\n' +
+'4. Use inline styles or the provided CSS classes: react-component, react-button, react-input, react-card\n' +
+'5. For React apps, wrap components in <div id="root-uniqueid"><\\/div> and mount them properly\n' +
+'6. Include <script type="text/babel"> for React component code\n' +
+'7. Use modern React patterns: functional components, hooks (useState, useEffect)\n' +
+'8. Make it beautiful and interactive\n\n' +
+'Available CSS classes:\n' +
+'- react-component: Main component wrapper with nice styling\n' +
+'- react-button: Beautiful gradient buttons with hover effects\n' +
+'- react-input: Styled input fields\n' +
+'- react-card: Card layout with shadows and hover effects\n\n' +
+'EXAMPLE React Counter App:\n' +
+'<div class="react-component">\n' +
+'  <h2 style="color: #667eea;">Counter App<\\/h2>\n' +
+'  <div id="root-counter"><\\/div>\n' +
+'<\\/div>\n' +
+'<script type="text/babel">\n' +
+'  function CounterApp() {\n' +
+'    const [count, setCount] = React.useState(0);\n' +
+'    return (\n' +
+'      <div style={{textAlign: "center"}}>\n' +
+'        <h1 style={{fontSize: "3rem", color: "#667eea"}}>{count}<\\/h1>\n' +
+'        <button className="react-button" onClick={() => setCount(count + 1)}>Increment<\\/button>\n' +
+'        <button className="react-button" onClick={() => setCount(count - 1)}>Decrement<\\/button>\n' +
+'      <\\/div>\n' +
+'    );\n' +
+'  }\n' +
+'  const root = ReactDOM.createRoot(document.getElementById("root-counter"));\n' +
+'  root.render(<CounterApp />);\n' +
+'<\\/script>\n\n' +
+'Remember: Escape ALL <\\/script> tags as <\\/script>!';
 
       // Process and execute scripts in generated content
       const executeScripts = (html) => {
@@ -596,4 +592,4 @@ Remember: Escape ALL </script> tags as <\\/script>!`;
     root.render(<AppBuilder />);
   </script>
 </body>
-            </html>
+</html>
