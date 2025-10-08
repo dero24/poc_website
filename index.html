@@ -325,33 +325,60 @@ function parseAndInjectHTML(raw, container) {
     let componentCode = raw.trim();
     componentCode = componentCode.replace(/```(jsx|javascript)?/g, '').trim();
     
+    // Add React imports if missing
+    if (!componentCode.includes('import React')) {
+      componentCode = `import React, { useState, useEffect } from 'react';\n${componentCode}`;
+    }
+    
     // Transpile React code
     const transpiledCode = Babel.transform(componentCode, {
       presets: ['react'],
       filename: 'generated-component.js'
     }).code;
     
-    // Create and execute script
+    // Create a temporary script to evaluate the component
     const script = document.createElement('script');
     script.type = 'text/babel';
     script.text = transpiledCode;
     
-    // Use modern React 18 root API
-    const root = ReactDOM.createRoot(reactRoot);
+    // Clear container and add react-root
+    container.innerHTML = '<div id="react-root"></div>';
+    reactRoot = document.getElementById('react-root');
     
-    script.onload = function() {
-      if (window.AppComponent) {
-        root.render(React.createElement(window.AppComponent));
-      } else {
-        throw new Error("Component not properly exported");
-      }
-    };
-    
-    container.innerHTML = '';
-    container.appendChild(reactRoot);
+    // Evaluate the script
     document.body.appendChild(script);
-    
-  } catch (e) {
+    // Wait a moment for the script to execute, then render
+    setTimeout(() => {
+      try {
+        const root = ReactDOM.createRoot(reactRoot);
+        
+        // Look for the exported component - check multiple possible names
+        let Component = null;
+        if (window.App) Component = window.App;
+        else if (window.AppComponent) Component = window.AppComponent;
+        else if (window.default) Component = window.default;
+        else {
+          // Try to find any function that looks like a React component
+          for (const key in window) {
+            if (typeof window[key] === 'function' && 
+                window[key].toString().includes('return') && 
+                window[key].toString().includes('React')) {
+            Component = window[key];
+            break;
+          }
+        }
+        
+        if (Component) {
+          root.render(React.createElement(Component));
+        } else {
+          throw new Error("No valid React component found");
+        }
+      } catch (e) {
+        container.innerHTML = `<div class='error-message'><b>Render Error:</b> ${e.message}</div>`;
+        logHistory(`⚠️ Render Error: ${e.message}`);
+      }
+    }, 100);
+} catch (e) {
     container.innerHTML = `<div class='error-message'><b>React Error:</b> ${e.message}</div>`;
     logHistory(`⚠️ React Error: ${e.message}`);
   }
