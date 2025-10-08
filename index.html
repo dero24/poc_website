@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
-  <title>Morphic Web — AI-Powered App Builder</title>
+  <title>Morphic Web – AI-Powered App Builder</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
   
   <!-- React 18 + ReactDOM from CDN -->
@@ -428,21 +428,26 @@ EXAMPLE React Counter App:
   }
   const root = ReactDOM.createRoot(document.getElementById('root-counter'));
   root.render(<CounterApp />);
-</script>
-<script>
+<\\/script>`;
 
     // Main App Component
     const AppBuilder = memo(() => {
       const [prompt, setPrompt] = useState('');
-      const [apiKey, setApiKey] = useState(localStorage.getItem('groq_api_key') || '');
+      const [apiKey, setApiKey] = useState('');
       const [generatedContent, setGeneratedContent] = useState('');
       const [isLoading, setIsLoading] = useState(false);
       const [error, setError] = useState('');
 
-      // Save API key to localStorage
+      // Load API key from memory on mount
+      useEffect(() => {
+        const savedKey = window.savedApiKey || '';
+        setApiKey(savedKey);
+      }, []);
+
+      // Save API key to memory
       useEffect(() => {
         if (apiKey) {
-          localStorage.setItem('groq_api_key', apiKey);
+          window.savedApiKey = apiKey;
         }
       }, [apiKey]);
 
