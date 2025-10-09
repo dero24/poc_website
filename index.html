@@ -570,7 +570,7 @@ async function callGroqAPI(prompt, validateHTML = true) {
     );
     
     if(!hasValidContent) {
-      console.log("Raw response:", data.choices?.message?.content);
+      console.log("Raw response:", data.choices[0]?.message?.content);
       throw new Error("No usable HTML generated - AI returned invalid format");
     }
   }
