@@ -217,128 +217,54 @@ async function generateInterface() {
   interactionCount++; updateStats();
   
   try {
-  // Agent Chain: Multi-step reasoning process
-  content.innerHTML='<div class="loading">🔍 Step 1/4: Designing app architecture...</div>';
-  // Step 1: Architecture Design
-    const architecturePrompt = `CRITICAL: OUTPUT MUST BE PURE TEXT ARCHITECTURE SPECIFICATION ONLY. NO CODE, NO HTML, NO MARKDOWN, NO EXPLANATIONS.
-
-USER REQUIREMENT: "${intent}"
-
-ARCHITECTURE SPECIFICATION FORMAT:
-DATA MODEL:
-- [list state variables, data structures]
-
-COMPONENT HIERARCHY:
-- [parent-child relationships]
-
-USER INTERACTIONS:
-- [event handlers, user flows]
-
-API INTEGRATION:
-- [external data sources if needed]
-
-RESPONSIVE LAYOUT:
-- [mobile-first approach details]
-
-STRICT RULES:
-- NO HTML CODE
-- NO JAVASCRIPT CODE
-- NO REACT CODE
-- NO MARKDOWN FORMATTING
-- NO CODE BLOCKS
-- NO EXPLANATORY TEXT
-- NO INTRODUCTIONS
-- NO CONCLUSIONS
-- USE ONLY THE EXACT FORMAT ABOVE
-- DO NOT DEVIATE FROM THE SPECIFIED STRUCTURE`;
-const architecture = await callGroqAPI(architecturePrompt);
+    // Simplified approach - single step generation
+    content.innerHTML='<div class="loading">🎯 Generating complete responsive app...</div>';
     
-    // Enhanced validation for architecture step
-    if (!architecture || architecture.includes('<html') || architecture.includes('<!DOCTYPE') || architecture.includes('<div') || architecture.includes('<button')) {
-      throw new Error("AI returned HTML instead of architecture specification - retry with clearer instructions");
-    }
-// Step 2: HTML Architecture
-    content.innerHTML='<div class="loading">📐 Step 2/4: Converting to HTML structure...</div>';
-    const htmlArchitecturePrompt = `CRITICAL: OUTPUT MUST BE PURE HTML STRUCTURE ONLY. NO REACT, NO JAVASCRIPT, NO MARKDOWN, NO EXPLANATIONS.
-
-ARCHITECTURE SPECIFICATION:
-${architecture}
+    const generationPrompt = `CRITICAL: OUTPUT MUST BE PURE HTML/JS/CSS CODE ONLY. NO EXPLANATIONS, NO MARKDOWN, NO CODE BLOCKS.
 
 USER REQUIREMENT: "${intent}"
 
-CONVERT TO HTML STRUCTURE:
-- Use semantic HTML elements (div, button, input, form, etc.)
-- Include placeholder content and structure
-- NO event handlers or JavaScript
-- NO React components
-- NO Tailwind CSS (use basic inline styles if needed)
-- Mobile-first responsive design
-- Clean, organized HTML structure
+STRICT REQUIREMENTS:
+1. Create a complete, working web application
+2. Use semantic HTML elements (div, button, input, form, etc.)
+3. Include complete JavaScript for ALL functionality
+4. Use inline CSS for styling (NO external dependencies)
+5. Make it responsive (mobile-first, max-width: 100%)
+6. All interactive elements must work immediately
+7. Include proper event handlers (onclick, onchange, onsubmit)
+8. Ensure it works perfectly on screens from 320px to 1200px
+9. Use flexbox/grid for responsive layout
+10. Complete working code - no placeholders
 
 OUTPUT FORMAT:
-- Valid HTML code only
+- Pure HTML with embedded CSS and JavaScript
 - NO additional text
 - NO markdown
 - NO code blocks
-- NO explanations`;
-const htmlArchitecture = await callGroqAPI(htmlArchitecturePrompt);
+- NO explanations
+
+Generate the complete application now:`;
     
-    // Step 3: Component Generation
-    content.innerHTML='<div class="loading">⚙️ Step 3/4: Generating React components...</div>';
-const componentsPrompt = `CRITICAL: OUTPUT MUST BE PURE REACT HTML CODE ONLY. NO EXPLANATIONS, NO MARKDOWN, NO CODE BLOCKS.
-
-ARCHITECTURE SPECIFICATION:
-${architecture}
-
-USER REQUIREMENT: "${intent}"
-
-STRICT CODING REQUIREMENTS:
-1. React functional components with useState/useEffect hooks
-2. Tailwind CSS classes for ALL styling
-3. ALL containers: w-full max-w-[500px]
-4. NO fixed widths > 300px
-5. Use flex flex-wrap for responsive design
-6. Include ALL event handlers (onClick, onChange, onSubmit)
-7. Make ALL interactive elements functional
-8. Mobile-first (test at 320px width)
-9. Complete working application
-
-OUTPUT FORMAT:
-- Valid React HTML code
-- Embedded Tailwind CSS
-- NO additional text
-- NO markdown
-- NO code blocks
-- NO explanations`;
-const reactHtml = await callGroqAPI(componentsPrompt);
-    // Step 4: Logic and API Integration
-    content.innerHTML='<div class="loading">🔗 Step 4/4: Adding interaction logic...</div>';
-const logicPrompt = `CRITICAL: OUTPUT MUST BE PURE ENHANCED REACT HTML CODE ONLY. NO EXPLANATIONS, NO MARKDOWN, NO CODE BLOCKS.
-
-CURRENT CODE:
-${reactHtml}
-
-USER REQUIREMENT: "${intent}"
-
-STRICT ENHANCEMENT REQUIREMENTS:
-1. Add missing event handlers (onClick, onChange, onSubmit)
-2. Complete state management with useState/useEffect
-3. Implement API calls if needed
-4. Add error handling
-5. Include loading states
-6. Ensure ALL interactions work
-7. Maintain w-full max-w-[500px]
-8. Production-ready quality
-
-OUTPUT FORMAT:
-- Enhanced React HTML code
-- NO additional text
-- NO markdown
-- NO code blocks
-- NO explanations`;
-const finalHtml = await callGroqAPI(logicPrompt);
-    
+    const finalHtml = await callGroqAPI(generationPrompt);
     currentAppCode = finalHtml;
+    parseAndInjectHTML(finalHtml, content);
+    ensureResponsive();
+    
+    // Always offer React enhancement for consistency
+    reactEnhancement.style.display = 'block';
+    
+    setTimeout(()=>content.scrollIntoView({behavior:'smooth',block:'center'}), 100);
+    conversationHistory.push(intent);
+    elementsCreated+=countElements(finalHtml); adaptations++;
+    updateStats();
+    logHistory(`✨ Generated: "${intent.substring(0,45)}..."`);
+document.getElementById('userIntent').value='';
+  } catch(e) {
+    content.innerHTML=`<div class='error-message'><b>Generation error:</b> ${e.message}</div>`;
+    logHistory(`⚠️ ${e.message}`);
+  }
+}
+currentAppCode = finalHtml;
     parseAndInjectHTML(finalHtml, content);
     ensureResponsive();
     
