@@ -215,68 +215,84 @@ async function generateInterface() {
   try {
     // Agent Chain: Multi-step reasoning process
     content.innerHTML='<div class="loading">🔍 Step 1/3: Designing app architecture...</div>';
-    
     // Step 1: Architecture Design
-    const architecturePrompt = `You are an expert software architect. The user wants to build: "${intent}"
+    const architecturePrompt = `CRITICAL INSTRUCTION: You MUST respond with ONLY a clean architecture specification. NO HTML, NO CODE, NO MARKDOWN, NO EXPLANATIONS.
 
-Design a comprehensive architecture for this responsive web application:
+As a senior software architect, analyze this user requirement: "${intent}"
 
-1. Data Model: Define the data structures and state management needed
-2. Component Structure: Break down the app into logical components
-3. User Interactions: Identify key user flows and interactions
-4. API Integration: Plan any external data sources or APIs
-5. Responsive Layout: Design mobile-first responsive structure
+Generate a comprehensive architecture specification covering:
 
-Output ONLY a clear architecture specification that can be used by the next AI to generate code:`;
-    
+ARCHITECTURE SPECIFICATION:
+• Data Model: Required state variables and data structures
+• Component Hierarchy: Parent-child component relationships  
+• User Interactions: Key event handlers and user flows
+• API Integration: External data sources if needed
+• Responsive Layout: Mobile-first design approach
+
+RULES:
+- Output ONLY the architecture specification text
+- No code examples, no HTML, no markdown formatting
+- No introductory text, no concluding remarks
+- Use clear, structured bullet points
+- Focus on technical requirements only`;
+
     const architecture = await callGroqAPI(architecturePrompt);
-    
     // Step 2: Component Generation
     content.innerHTML='<div class="loading">⚙️ Step 2/3: Generating React components...</div>';
     
-    const componentsPrompt = `Based on this architecture design, generate complete React components with Tailwind CSS styling.
+    const componentsPrompt = `CRITICAL INSTRUCTION: You MUST output ONLY valid React HTML code with Tailwind CSS. NO explanations, NO markdown, NO code blocks.
 
-ARCHITECTURE:
+ARCHITECTURE SPECIFICATION:
 ${architecture}
 
-USER INTENT: "${intent}"
+USER REQUIREMENT: "${intent}"
 
-CRITICAL REQUIREMENTS:
-- Use React 18 with functional components and hooks
-- Implement proper state management with useState/useEffect
-- Use Tailwind CSS for responsive styling (mobile-first)
-- ALL containers must use: w-full max-w-[500px]
-- NEVER use fixed pixel widths over 300px
-- Use flexbox with flex-wrap for layouts
-- Include proper TypeScript-like prop interfaces
-- Make it fully functional and interactive
-- Test that it works on 320px width screens
-- Include all necessary event handlers
+MANDATORY CODING REQUIREMENTS:
+• Use React functional components with hooks (useState, useEffect)
+• Use Tailwind CSS classes for ALL styling
+• ALL container elements: w-full max-w-[500px]
+• NO fixed pixel widths > 300px anywhere
+• Use flex flex-wrap for responsive layouts
+• Include ALL event handlers (onClick, onChange, etc.)
+• Make it fully interactive and functional
+• Mobile-first design (test at 320px width)
+• Include proper state management
+• All interactive elements must work
+• Use responsive design patterns
 
-Output ONLY the complete React HTML code with embedded Tailwind CSS and no explanations:`;
-    
-    const reactHtml = await callGroqAPI(componentsPrompt);
-    
+OUTPUT FORMAT:
+• Valid HTML with React components
+• Embedded Tailwind CSS classes
+• Complete working application
+• NO additional text or explanations`;
+const reactHtml = await callGroqAPI(componentsPrompt);
     // Step 3: Logic and API Integration
     content.innerHTML='<div class="loading">🔗 Step 3/3: Adding interaction logic...</div>';
     
-    const logicPrompt = `Take this React application and enhance it with complete interaction logic and API integration.
+    const logicPrompt = `CRITICAL INSTRUCTION: You MUST output ONLY the enhanced React HTML code. NO explanations, NO markdown, NO code blocks.
 
-REACT CODE:
+CURRENT REACT CODE:
 ${reactHtml}
 
-USER INTENT: "${intent}"
+USER REQUIREMENT: "${intent}"
 
-REQUIREMENTS:
-- Add all missing event handlers and state updates
-- Implement any API calls or data fetching
-- Include error handling and loading states
-- Ensure all user interactions work properly
-- Maintain responsive design principles
+ENHANCEMENT REQUIREMENTS:
+• Add ALL missing event handlers
+• Complete state management with useState/useEffect
+• Implement any required API calls
+• Add proper error handling
+• Include loading states where needed
+• Ensure ALL user interactions work perfectly
+• Maintain responsive design (w-full max-w-[500px])
+• Test functionality thoroughly
+• Make it production-ready
 
-Output ONLY the enhanced complete React HTML code with no explanations:`;
-    
-    const finalHtml = await callGroqAPI(logicPrompt);
+OUTPUT FORMAT:
+• Enhanced React HTML code
+• Fully functional application
+• All interactive elements working
+• NO additional text or formatting`;
+const finalHtml = await callGroqAPI(logicPrompt);
     
     currentAppCode = finalHtml;
     parseAndInjectHTML(finalHtml, content);
@@ -401,12 +417,21 @@ async function callGroqAPI(prompt) {
   
   // Clean up any markdown or code blocks
   html = html.replace(/```html|```|``````/g,'').trim();
+  // Enhanced validation for different response formats
+  const hasValidContent = html && (
+    /<div/i.test(html) || 
+    /<button/i.test(html) ||
+    /<input/i.test(html) ||
+    /<form/i.test(html) ||
+    /<table/i.test(html) ||
+    /<canvas/i.test(html)
+  );
   
-  if(!/<div/i.test(html)) {
+  if(!hasValidContent) {
     console.log("Raw response:", data.choices[0]?.message?.content);
     throw new Error("No usable HTML generated - AI returned invalid format");
   }
-  return html;
+return html;
 }
 
 function parseAndInjectHTML(raw, container) {
