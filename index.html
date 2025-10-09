@@ -3,471 +3,623 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Morphic Web - AI Interface Generator</title>
+  <title>⚡ Morphic Web - Instant AI App Builder</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       padding: 20px;
+      color: #333;
     }
-
+    
     .container {
-      width: 100%;
-      max-width: 800px;
+      max-width: 1000px;
+      margin: 0 auto;
     }
-
-    .setup-card, .generation-area {
+    
+    .setup-card, .interaction-zone {
       background: white;
-      border-radius: 20px;
-      padding: 40px;
+      border-radius: 24px;
+      padding: 48px;
       box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      margin-bottom: 24px;
     }
-
-    .generation-area {
-      display: none;
-    }
-
+    
+    .interaction-zone { display: none; }
+    
     h1 {
-      color: #667eea;
-      margin-bottom: 10px;
-      font-size: 2.5em;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-size: 3em;
+      font-weight: 800;
       text-align: center;
+      margin-bottom: 12px;
     }
-
-    .subtitle {
+    
+    .tagline {
+      text-align: center;
+      font-size: 1.3em;
       color: #666;
+      margin-bottom: 32px;
+      font-weight: 500;
+    }
+    
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    
+    .feature-item {
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      padding: 20px;
+      border-radius: 16px;
       text-align: center;
-      margin-bottom: 30px;
-      font-size: 1.1em;
+      font-weight: 600;
+      color: #667eea;
     }
-
-    .api-input-group {
-      margin-bottom: 20px;
+    
+    .input-group {
+      margin-bottom: 24px;
     }
-
+    
     label {
       display: block;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
+      font-weight: 700;
+      font-size: 1.1em;
       color: #333;
-      font-weight: 600;
     }
-
+    
     input[type="text"], input[type="password"], textarea {
       width: 100%;
-      padding: 12px 15px;
-      border: 2px solid #e0e0e0;
-      border-radius: 10px;
+      padding: 16px 20px;
+      border: 3px solid #e0e0e0;
+      border-radius: 12px;
       font-size: 16px;
-      transition: border-color 0.3s;
+      font-family: inherit;
+      transition: all 0.3s ease;
+      background: #fafafa;
     }
-
+    
     input:focus, textarea:focus {
       outline: none;
       border-color: #667eea;
+      background: white;
+      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
     }
-
+    
     textarea {
-      min-height: 100px;
+      min-height: 140px;
       resize: vertical;
-      font-family: inherit;
+      line-height: 1.6;
     }
-
-    .start-btn, .generate-btn {
+    
+    .btn {
       width: 100%;
-      padding: 15px;
+      padding: 18px;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
       font-size: 18px;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-      margin-top: 10px;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
-
-    .start-btn:hover, .generate-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(102, 126, 234, 0.5);
     }
-
+    
+    .btn:active {
+      transform: translateY(-1px);
+    }
+    
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
     .stats-bar {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 15px;
-      margin-bottom: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
     }
-
-    .stat-item {
-      background: #f5f5f5;
-      padding: 15px;
-      border-radius: 10px;
+    
+    .stat-card {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      padding: 20px;
+      border-radius: 16px;
       text-align: center;
+      color: white;
+      box-shadow: 0 8px 24px rgba(240, 147, 251, 0.4);
     }
-
+    
     .stat-label {
       font-size: 0.9em;
-      color: #666;
-      margin-bottom: 5px;
+      opacity: 0.9;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
     }
-
+    
     .stat-value {
-      font-size: 1.5em;
-      font-weight: bold;
-      color: #667eea;
+      font-size: 2.2em;
+      font-weight: 800;
     }
-
-    #previewArea {
-      border: 2px solid #e0e0e0;
-      border-radius: 10px;
-      min-height: 300px;
-      padding: 20px;
-      margin-top: 20px;
-      background: #fafafa;
-    }
-
-    .history-panel {
-      margin-top: 20px;
-      padding: 15px;
-      background: #f5f5f5;
-      border-radius: 10px;
-      max-height: 200px;
-      overflow-y: auto;
-    }
-
-    .history-item {
-      padding: 8px;
-      margin-bottom: 5px;
+    
+    #generatedContent {
       background: white;
-      border-radius: 5px;
-      font-size: 0.9em;
-      color: #666;
+      border: 3px solid #e0e0e0;
+      border-radius: 16px;
+      min-height: 500px;
+      margin-top: 24px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
     }
-
+    
+    .history-log {
+      margin-top: 24px;
+      padding: 24px;
+      background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+      border-radius: 16px;
+      max-height: 300px;
+      overflow-y: auto;
+      box-shadow: 0 8px 24px rgba(252, 182, 159, 0.4);
+    }
+    
+    .history-item {
+      padding: 12px 16px;
+      margin-bottom: 10px;
+      background: white;
+      border-left: 5px solid #667eea;
+      border-radius: 8px;
+      font-size: 0.95em;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
     .loading {
       text-align: center;
-      padding: 40px;
+      padding: 80px 20px;
+      font-size: 1.5em;
       color: #667eea;
-      font-size: 1.2em;
+      font-weight: 600;
     }
-
-    .react-prompt-overlay {
+    
+    .loading::after {
+      content: '';
+      animation: dots 1.5s infinite;
+    }
+    
+    @keyframes dots {
+      0%, 20% { content: '.'; }
+      40% { content: '..'; }
+      60%, 100% { content: '...'; }
+    }
+    
+    .react-enhancement {
       display: none;
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0,0,0,0.7);
+      background: rgba(0,0,0,0.85);
       z-index: 1000;
       align-items: center;
       justify-content: center;
+      backdrop-filter: blur(10px);
     }
-
-    .react-prompt-box {
+    
+    .react-prompt {
       background: white;
-      padding: 40px;
-      border-radius: 20px;
-      max-width: 500px;
+      padding: 48px;
+      border-radius: 24px;
+      max-width: 600px;
       text-align: center;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+      animation: slideUp 0.4s ease;
     }
-
-    .react-prompt-box h2 {
+    
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .react-prompt h2 {
       color: #667eea;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
+      font-size: 2.2em;
     }
-
-    .react-prompt-box button {
-      margin: 10px;
-      padding: 12px 30px;
+    
+    .react-prompt p {
+      color: #666;
+      margin-bottom: 32px;
+      font-size: 1.15em;
+      line-height: 1.7;
+    }
+    
+    .react-prompt button {
+      margin: 12px;
+      padding: 16px 40px;
       border: none;
-      border-radius: 10px;
-      font-size: 16px;
+      border-radius: 12px;
+      font-size: 17px;
+      font-weight: 700;
       cursor: pointer;
-      transition: transform 0.2s;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
-
-    .react-prompt-box button:first-of-type {
+    
+    .react-prompt .primary {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
     }
-
-    .react-prompt-box button:last-of-type {
-      background: #e0e0e0;
+    
+    .react-prompt .secondary {
+      background: #f0f0f0;
       color: #333;
     }
-
-    .react-prompt-box button:hover {
-      transform: scale(1.05);
+    
+    .react-prompt button:hover {
+      transform: translateY(-3px);
     }
-
-    @media (max-width: 600px) {
-      .stats-bar {
-        grid-template-columns: 1fr;
-      }
-      
-      h1 {
-        font-size: 2em;
-      }
-      
-      .setup-card, .generation-area {
-        padding: 25px;
-      }
+    
+    @media (max-width: 768px) {
+      .setup-card, .interaction-zone { padding: 32px 24px; }
+      h1 { font-size: 2.2em; }
+      .tagline { font-size: 1.1em; }
+      .stats-bar { grid-template-columns: 1fr; }
+      .react-prompt { margin: 20px; padding: 32px 24px; }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <!-- Setup Screen -->
+    
+    <!-- Setup/Login Card -->
     <div class="setup-card" id="setupCard">
-      <h1>🌐 Morphic Web</h1>
-      <p class="subtitle">AI-Powered Interface Generator</p>
+      <h1>⚡ Morphic Web</h1>
+      <p class="tagline">Instant AI-Powered App Builder</p>
+      
+      <div class="feature-grid">
+        <div class="feature-item">🎨 Any Design</div>
+        <div class="feature-item">⚡ Instant Generation</div>
+        <div class="feature-item">🔄 Live Adaptation</div>
+        <div class="feature-item">🚀 React Ready</div>
+      </div>
       
       <form id="setupForm">
-        <div class="api-input-group">
-          <label for="apiKey">Groq API Key</label>
+        <div class="input-group">
+          <label for="apiKey">🔑 Groq API Key</label>
           <input 
             type="password" 
             id="apiKey" 
-            placeholder="Enter your Groq API key"
+            placeholder="Paste your Groq API key here..."
             required
           >
         </div>
         
-        <button type="submit" class="start-btn">🔓 Start Morphic Web</button>
+        <button type="submit" class="btn">🚀 Launch Morphic Web</button>
       </form>
     </div>
 
-    <!-- Generation Area -->
-    <div class="generation-area" id="generationArea">
+    <!-- Main Interaction Zone -->
+    <div class="interaction-zone" id="interactionZone">
       <h1>✨ Create Anything</h1>
       
       <div class="stats-bar">
-        <div class="stat-item">
-          <div class="stat-label">Generations</div>
-          <div class="stat-value" id="genCount">0</div>
+        <div class="stat-card">
+          <div class="stat-label">Interactions</div>
+          <div class="stat-value" id="interactionCount">0</div>
         </div>
-        <div class="stat-item">
+        <div class="stat-card">
           <div class="stat-label">Elements</div>
-          <div class="stat-value" id="elemCount">0</div>
+          <div class="stat-value" id="elementsCreated">0</div>
         </div>
-        <div class="stat-item">
-          <div class="stat-label">React Ready</div>
-          <div class="stat-value" id="reactStatus">❌</div>
+        <div class="stat-card">
+          <div class="stat-label">Adaptations</div>
+          <div class="stat-value" id="adaptations">0</div>
         </div>
       </div>
 
-      <div class="api-input-group">
-        <label for="promptInput">What do you want to create?</label>
+      <div class="input-group">
+        <label for="userIntent">💭 What do you want to build?</label>
         <textarea 
-          id="promptInput" 
-          placeholder="Describe anything... a game, a tool, an app, an animation..."
+          id="userIntent" 
+          placeholder="Describe anything... a calculator, game, dashboard, animation, tool, or creative experiment!"
         ></textarea>
       </div>
 
-      <button type="button" onclick="generateInterface()" class="generate-btn">✨ Generate</button>
+      <button onclick="generateInterface()" class="btn" id="generateBtn">✨ Generate Interface</button>
 
-      <div id="previewArea"></div>
+      <div id="generatedContent"></div>
 
-      <div class="history-panel" id="historyPanel"></div>
+      <div class="history-log" id="historyLog"></div>
+    </div>
+
+  </div>
+
+  <!-- React Enhancement Modal -->
+  <div class="react-enhancement" id="reactEnhancement">
+    <div class="react-prompt">
+      <h2>🚀 React Upgrade Available!</h2>
+      <p>Your creation has reached the complexity threshold where React architecture would provide better performance and maintainability. Want to upgrade?</p>
+      <button class="primary" onclick="enhanceWithReact()">⚡ Upgrade to React</button>
+      <button class="secondary" onclick="keepCurrentVersion()">Keep Current Version</button>
     </div>
   </div>
 
-  <!-- React Enhancement Prompt -->
-  <div class="react-prompt-overlay" id="reactPrompt">
-    <div class="react-prompt-box">
-      <h2>🚀 React Enhancement Available!</h2>
-      <p>Your creation has enough complexity to benefit from React. Would you like to upgrade it?</p>
-      <button onclick="enhanceWithReact()">Upgrade to React Version</button>
-      <button onclick="keepCurrentVersion()">Keep Current Version</button>
-    </div>
-  </div>
+<script>
 
-  <script>
-    let userApiKey = '';
-    let generationCount = 0;
-    let currentHTML = '';
-    let history = [];
+let groqKey="", interactionCount=0, elementsCreated=0, adaptations=0, conversationHistory=[];
+let currentAppCode = "";
 
-    // Stats updates
-    function updateStats() {
-      document.getElementById('genCount').textContent = generationCount;
-      document.getElementById('elemCount').textContent = countElements(currentHTML);
-    }
+function updateStats() {
+  document.getElementById('interactionCount').textContent = interactionCount;
+  document.getElementById('elementsCreated').textContent = elementsCreated;
+  document.getElementById('adaptations').textContent = adaptations;
+}
 
-    function logHistory(prompt) {
-      const timestamp = new Date().toLocaleTimeString();
-      history.unshift({ prompt, timestamp });
-      
-      const historyPanel = document.getElementById('historyPanel');
-      historyPanel.innerHTML = history.slice(0, 5).map(h => 
-        `<div class="history-item">${h.timestamp} - ${h.prompt.substring(0, 50)}...</div>`
-      ).join('');
-    }
+function logHistory(msg) {
+  const log = document.getElementById('historyLog'), item = document.createElement('div');
+  item.className = 'history-item'; item.textContent = `${new Date().toLocaleTimeString()} - ${msg}`;
+  log.appendChild(item); log.scrollTop = log.scrollHeight;
+}
 
-    // Initialize Experience - Fixed function
-    function initializeExperience(e) {
-      e.preventDefault();
-      
-      const apiKeyInput = document.getElementById('apiKey');
-      userApiKey = apiKeyInput.value.trim();
-      
-      if (!userApiKey) {
-        alert('Please enter your Groq API key');
-        return;
+function initializeExperience(e) {
+  if(e) e.preventDefault();
+  
+  groqKey = document.getElementById('apiKey').value.trim();
+  if(!groqKey) { 
+    alert('Please paste your Groq API key!'); 
+    return false;
+  }
+  
+  window.groqKey = groqKey;
+  document.getElementById('setupCard').style.display="none";
+  document.getElementById('interactionZone').style.display="block";
+  logHistory('🚀 Session initialized - Ready to build!');
+  
+  setTimeout(() => {
+    document.getElementById('interactionZone').scrollIntoView({ behavior: 'smooth' });
+  }, 100);
+  
+  return false;
+}
+
+async function generateInterface() {
+  const userInput = document.getElementById('userIntent').value.trim();
+  if (!userInput) { alert('Please describe what you want to create!'); return; }
+
+  const btn = document.getElementById('generateBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Generating...';
+
+  const container = document.getElementById('generatedContent');
+  container.innerHTML = '<div class="loading">Creating your interface</div>';
+
+  interactionCount++;
+  conversationHistory.push({ role: 'user', content: userInput });
+
+  try {
+    const generatedHTML = await callGroqAPI(userInput);
+    currentAppCode = generatedHTML;
+    
+    parseAndInjectHTML(generatedHTML, container);
+    
+    updateStats();
+    logHistory(`✅ Generated: ${userInput.substring(0, 50)}...`);
+    
+    conversationHistory.push({ role: 'assistant', content: `Generated interface with ${elementsCreated} elements` });
+    
+    checkForReactEnhancement();
+    
+  } catch (error) {
+    container.innerHTML = `<div style="color: #d32f2f; padding: 40px; text-align: center;"><h3>⚠️ Generation Failed</h3><p>${error.message}</p></div>`;
+    logHistory(`❌ Error: ${error.message}`);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '✨ Generate Interface';
+  }
+}
+
+function checkForReactEnhancement() {
+  if (interactionCount >= 3 && elementsCreated > 25 && currentAppCode.includes('function')) {
+    document.getElementById('reactEnhancement').style.display = 'flex';
+  }
+}
+
+async function enhanceWithReact() {
+  document.getElementById('reactEnhancement').style.display = 'none';
+  const container = document.getElementById('generatedContent');
+  container.innerHTML = '<div class="loading">🚀 Upgrading to React</div>';
+  
+  const reactPrompt = `Convert this into a modern React functional component with hooks:
+
+${currentAppCode}`;
+  
+  try {
+    const reactCode = await callGroqAPI(reactPrompt, true);
+    parseAndInjectHTML(reactCode, container);
+    adaptations++;
+    updateStats();
+    logHistory('⚡ Upgraded to React architecture');
+  } catch (error) {
+    container.innerHTML = `<div style="color: #d32f2f; padding: 20px;">React upgrade failed: ${error.message}</div>`;
+  }
+}
+
+function keepCurrentVersion() {
+  document.getElementById('reactEnhancement').style.display = 'none';
+  logHistory('Kept vanilla JavaScript version');
+}
+
+function ensureResponsive(html) {
+  if (!html.includes('viewport') && !html.includes('@media')) {
+    const responsiveCSS = `
+      <style>
+        @media (max-width: 768px) {
+          body { padding: 10px !important; font-size: 14px; }
+          * { max-width: 100%; }
+        }
+      </style>
+    `;
+    return html.replace('</head>', responsiveCSS + '</head>');
+  }
+  return html;
+}
+
+async function callGroqAPI(userPrompt, isReactUpgrade = false) {
+  const systemPrompt = `You are an expert web developer. Create complete, functional, beautiful HTML pages with inline CSS and JavaScript.
+
+REQUIREMENTS:
+- Generate a complete HTML document with <!DOCTYPE html>
+- Include inline CSS in <style> tags for modern, attractive design
+- Include a script tag with all JavaScript functionality
+- Make it fully interactive and functional
+- Use modern ES6+ JavaScript
+- Ensure responsive design
+- Add smooth animations and transitions
+- Make it visually impressive with gradients, shadows, and modern UI
+
+Return ONLY the complete HTML code, no explanations or markdown.`;
+
+  const messages = isReactUpgrade 
+    ? [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }]
+    : [{ role: 'system', content: systemPrompt }, ...conversationHistory.slice(-5), { role: 'user', content: userPrompt }];
+
+  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${groqKey}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      model: 'llama-3.1-70b-versatile',
+      messages: messages,
+      temperature: 0.85,
+      max_tokens: 4096,
+      top_p: 0.95
+    })
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(`API Error ${response.status}: ${errorData.error?.message || response.statusText}`);
+  }
+
+  const data = await response.json();
+  let content = data.choices[0].message.content.trim();
+  
+  const validateHTML = content.includes('<!DOCTYPE') || content.includes('<html');
+  
+  if (!validateHTML) {
+    try {
+      const decodedAttempt = atob(
+        content.replace(/[^A-Za-z0-9+/=]/g, '')
+      );
+      if (decodedAttempt.includes('<!DOCTYPE') || decodedAttempt.includes('<html')) {
+        content = decodedAttempt;
       }
-      
-      // Hide setup card and show generation area
-      document.getElementById('setupCard').style.display = 'none';
-      document.getElementById('generationArea').style.display = 'block';
+    } catch(e) {
+      console.error("Encoding error:", e);
+      content = data.choices[0].message.content.trim();
     }
-
-    // Generate Interface
-    async function generateInterface() {
-      const prompt = document.getElementById('promptInput').value.trim();
-      
-      if (!prompt) {
-        alert('Please describe what you want to create');
-        return;
-      }
-
-      const previewArea = document.getElementById('previewArea');
-      previewArea.innerHTML = '<div class="loading">✨ Generating your creation...</div>';
-
-      try {
-        const htmlContent = await callGroqAPI(prompt);
-        currentHTML = htmlContent;
-        generationCount++;
-        
-        parseAndInjectHTML(htmlContent);
-        updateStats();
-        logHistory(prompt);
-        checkForReactEnhancement();
-        
-      } catch (error) {
-        previewArea.innerHTML = `<div style="color: red; padding: 20px;">Error: ${error.message}</div>`;
-      }
+  }
+  
+  const tripleBacktick = '`' + '`' + '`';
+  const jsMarker = tripleBacktick + 'javascript';
+  const htmlMarker = tripleBacktick + 'html';
+  content = content.replace(new RegExp(jsMarker, 'g'), '').replace(new RegExp(htmlMarker, 'g'), '').replace(new RegExp(tripleBacktick, 'g'), '');
+  
+  if (validateHTML) {
+    const hasValidContent = content && (
+      /<div/i.test(content) || 
+      /<button/i.test(content) ||
+      /<input/i.test(content) ||
+      /<form/i.test(content) ||
+      /<canvas/i.test(content) ||
+      /<svg/i.test(content)
+    );
+    
+    if (!hasValidContent) {
+      throw new Error("Generated content doesn't contain valid HTML elements");
     }
+    
+    return ensureResponsive(content);
+  }
+  
+  throw new Error("Invalid HTML structure received from API");
+}
 
-    // React Enhancement Check
-    function checkForReactEnhancement() {
-      const elementCount = countElements(currentHTML);
-      const hasInteractivity = /onclick|addEventListener|setState/i.test(currentHTML);
-      
-      if (elementCount > 15 && hasInteractivity && generationCount >= 2) {
-        document.getElementById('reactPrompt').style.display = 'flex';
-        document.getElementById('reactStatus').textContent = '✅';
-      }
-    }
+function parseAndInjectHTML(html, container) {
+  const styleClosing = '<' + '/' + 'style>';
+  const scriptClosing = '<' + '/' + 'script' + '>';
+  
+  const stylePattern = new RegExp('<style[^>]*>([\\s\\S]*?)' + styleClosing, 'i');
+  const styleMatch = html.match(stylePattern);
+  const styleContent = styleMatch ? styleMatch[1] : "";
+  html = html.replace(new RegExp('<style[^>]*>[\\s\\S]*?' + styleClosing, 'gi'), "");
+  
+  const scriptOpenTag = '<' + 'script';
+  const scriptPattern = new RegExp(scriptOpenTag + '[^>]*>([\\s\\S]*?)' + scriptClosing, 'i');
+  const scriptMatch = html.match(scriptPattern);
+  const scriptContent = scriptMatch ? scriptMatch[1] : "";
+  html = html.replace(new RegExp(scriptOpenTag + '[^>]*>[\\s\\S]*?' + scriptClosing, 'gi'), "");
+  
+  html = html.replace(/\\//g, '/');
+  
+  container.innerHTML = html;
+  
+  if (styleContent) {
+    const styleElement = document.createElement('style');
+    styleElement.textContent = styleContent;
+    container.appendChild(styleElement);
+  }
+  
+  if (scriptContent) {
+    const scriptElement = document.createElement('script');
+    scriptElement.textContent = scriptContent;
+    container.appendChild(scriptElement);
+  }
+  
+  elementsCreated = countElements(html);
+}
 
-    async function enhanceWithReact() {
-      document.getElementById('reactPrompt').style.display = 'none';
-      const previewArea = document.getElementById('previewArea');
-      previewArea.innerHTML = '<div class="loading">🚀 Upgrading to React version...</div>';
-      
-      const reactPrompt = `Convert this HTML to a React component with hooks and modern practices:
+function countElements(html) {
+  const matches = html.match(/<[a-z][sS]*?>/gi);
+  return matches ? matches.length : 0;
+}
 
-${currentHTML}`;
-      
-      try {
-        const reactVersion = await callGroqAPI(reactPrompt);
-        parseAndInjectHTML(reactVersion);
-      } catch (error) {
-        previewArea.innerHTML = `<div style="color: red;">Enhancement failed: ${error.message}</div>`;
-      }
-    }
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('setupForm');
+  if (form) {
+    form.addEventListener('submit', initializeExperience);
+  }
+});
 
-    function keepCurrentVersion() {
-      document.getElementById('reactPrompt').style.display = 'none';
-    }
-
-    // Responsive check
-    function ensureResponsive(html) {
-      if (!html.includes('viewport') && !html.includes('@media')) {
-        return html.replace('<style>', '<style>
-@media (max-width: 768px) { body { padding: 10px; } }');
-      }
-      return html;
-    }
-
-    // Groq API Call
-    async function callGroqAPI(prompt) {
-      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${userApiKey}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          model: 'llama-3.1-70b-versatile',
-          messages: [{
-            role: 'user',
-            content: `Create a complete, functional, interactive HTML page for: "${prompt}". Include inline CSS and JavaScript. Make it beautiful, modern, and fully functional. Return ONLY the HTML code, no explanations.`
-          }],
-          temperature: 0.7,
-          max_tokens: 4000
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error(`API Error: ${response.status} - ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      let html = data.choices[0].message.content;
-      
-      // Clean markdown code blocks if present
-      html = html.replace(/``````
-?/g, '');
-      
-      return ensureResponsive(html);
-    }
-
-    // Parse and inject HTML
-    function parseAndInjectHTML(html) {
-      const previewArea = document.getElementById('previewArea');
-      previewArea.innerHTML = '';
-      
-      const iframe = document.createElement('iframe');
-      iframe.style.width = '100%';
-      iframe.style.minHeight = '400px';
-      iframe.style.border = 'none';
-      iframe.style.borderRadius = '10px';
-      
-      previewArea.appendChild(iframe);
-      
-      const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-      iframeDoc.open();
-      iframeDoc.write(html);
-      iframeDoc.close();
-      
-      // Auto-resize iframe
-      setTimeout(() => {
-        iframe.style.height = iframeDoc.body.scrollHeight + 'px';
-      }, 100);
-    }
-
-    // Count elements
-    function countElements(html) {
-      const matches = html.match(/<[^/][^>]*>/g);
-      return matches ? matches.length : 0;
-    }
-
-    // Setup form submission - Fixed event listener
-    document.addEventListener('DOMContentLoaded', () => {
-      const setupForm = document.getElementById('setupForm');
-      setupForm.addEventListener('submit', initializeExperience);
-    });
-  </script>
+</script>
 </body>
 </html>
