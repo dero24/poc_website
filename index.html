@@ -585,7 +585,7 @@ function parseAndInjectHTML(html, container) {
   const scriptContent = scriptMatch ? scriptMatch[1] : "";
   html = html.replace(new RegExp('<script[^>]*>[\\s\\S]*?' + scriptClosing, 'gi'), "");
   
-  html = html.replace(/\\//g, '/');
+  html = html.replace(/\\/g, '/');
   
   container.innerHTML = html;
   
