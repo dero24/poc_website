@@ -258,30 +258,9 @@ Generate the complete application now:`;
     elementsCreated+=countElements(finalHtml); adaptations++;
     updateStats();
     logHistory(`✨ Generated: "${intent.substring(0,45)}..."`);
-document.getElementById('userIntent').value='';
+    document.getElementById('userIntent').value='';
   } catch(e) {
     content.innerHTML=`<div class='error-message'><b>Generation error:</b> ${e.message}</div>`;
-    logHistory(`⚠️ ${e.message}`);
-  }
-}
-currentAppCode = finalHtml;
-    parseAndInjectHTML(finalHtml, content);
-    ensureResponsive();
-    
-    // Check if we should offer React enhancement (usually yes now)
-    const shouldEnhance = await checkForReactEnhancement(intent, finalHtml);
-    if (shouldEnhance) {
-      reactEnhancement.style.display = 'block';
-    }
-    
-    setTimeout(()=>content.scrollIntoView({behavior:'smooth',block:'center'}), 100);
-    conversationHistory.push(intent);
-    elementsCreated+=countElements(finalHtml); adaptations++;
-    updateStats();
-    logHistory(`✨ 4-step app: "${intent.substring(0,45)}..."`);
-document.getElementById('userIntent').value='';
-  } catch(e) {
-    content.innerHTML=`<div class='error-message'><b>Groq agent error:</b> ${e.message}</div>`;
     logHistory(`⚠️ ${e.message}`);
   }
 }
