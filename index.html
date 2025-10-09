@@ -472,9 +472,9 @@ return content;
   function parseAndInjectHTML(raw, container) {
   let html = raw;
   
-  const styleMatch = html.match(/<style[^>]*>([sS]*?)</style>/i);
+  const styleMatch = html.match(/<style[^>]*>([sS]*?)<\/style>/i);
   const styleContent = styleMatch ? styleMatch[1] : "";
-  html = html.replace(/<style[^>]*>[sS]*?</style>/gi, "");
+  html = html.replace(/<style[^>]*>[sS]*?<\/style>/gi, "");
   
   // Fix: Escape the closing script tag by breaking it up
   const scriptMatch = html.match(/<script[^>]*>([sS]*?)<\/script>/i);
