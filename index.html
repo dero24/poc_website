@@ -148,7 +148,7 @@
     <div class="agent-status">3-step chain: Architecture → Components → Logic</div>
   </div>
   <div class="setup-card" id="setupCard">
-    <form onsubmit="event.preventDefault(); initializeExperience();">
+    <form id="setupForm">
       <div class="api-input-group">
         <label for="apiKey">Groq API Key</label>
         <input type="password" id="apiKey" required autocomplete="off" placeholder="Paste your Groq API key">
@@ -189,19 +189,30 @@ function updateStats() {
   document.getElementById('elementsCreated').textContent = elementsCreated;
   document.getElementById('adaptations').textContent = adaptations;
 }
+
 function logHistory(msg) {
   const log = document.getElementById('historyLog'), item = document.createElement('div');
   item.className = 'history-item'; item.textContent = `${new Date().toLocaleTimeString()} - ${msg}`;
   log.appendChild(item); log.scrollTop = log.scrollHeight;
 }
-function initializeExperience() {
+
+function initializeExperience(e) {
+  if(e) e.preventDefault();
+  
   groqKey = document.getElementById('apiKey').value.trim();
-  if(!groqKey) { alert('Paste your Groq API key!'); return; }
+  if(!groqKey) { 
+    alert('Please paste your Groq API key!'); 
+    return false; 
+  }
+  
   window.groqKey = groqKey;
   document.getElementById('setupCard').style.display="none";
   document.getElementById('interactionZone').style.display="block";
   logHistory('Responsive session started');
+  
+  return false;
 }
+
 async function generateInterface() {
   const intent=document.getElementById('userIntent').value.trim();
   const content=document.getElementById('generatedContent');
@@ -254,7 +265,7 @@ STRICT CODING REQUIREMENTS:
 
 OUTPUT REQUIREMENTS:
 - Start directly with HTML tags (like <div>, <style>, etc.)
-- NO `````` markers
+- NO ```html or ``` markers
 - NO markdown formatting
 - NO explanatory text before or after
 - Just pure, valid, working HTML code`;
@@ -282,7 +293,7 @@ ENHANCEMENT REQUIREMENTS:
 
 OUTPUT REQUIREMENTS:
 - Start directly with HTML tags
-- NO `````` markers  
+- NO ```html or ``` markers  
 - NO markdown formatting
 - NO explanatory text
 - Just pure, enhanced, working HTML code`;
@@ -310,6 +321,7 @@ OUTPUT REQUIREMENTS:
     logHistory(`⚠️ ${e.message}`);
   }
 }
+
 async function checkForReactEnhancement(intent, currentCode) {
   // Only enhance complex apps that would benefit from React
   const complexPatterns = [
@@ -353,7 +365,7 @@ REQUIREMENTS:
 OUTPUT REQUIREMENTS:
 - Complete HTML file with React CDN links
 - Start directly with <!DOCTYPE html> or <div>
-- NO `````` markers
+- NO ```html or ``` markers
 - NO markdown
 - NO explanatory text
 - Just working React code`;
@@ -471,17 +483,17 @@ function parseAndInjectHTML(raw, container) {
   let html = raw;
   
   // Extract and remove style blocks
-  const styleMatch = html.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
-  const styleContent = styleMatch ? styleMatch : "";[1]
-  html = html.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "");
+  const styleMatch = html.match(/<style[^>]*>([sS]*?)</style>/i);
+  const styleContent = styleMatch ? styleMatch[3] : "";
+  html = html.replace(/<style[^>]*>[sS]*?</style>/gi, "");
   
   // Extract and remove script blocks  
-  const scriptMatch = html.match(/<script[^>]*>([\s\S]*?)<\/script>/i);
-  const scriptContent = scriptMatch ? scriptMatch : "";[1]
-  html = html.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "");
+  const scriptMatch = html.match(/<script[^>]*>([sS]*?)</script>/i);
+  const scriptContent = scriptMatch ? scriptMatch[3] : "";
+  html = html.replace(/<script[^>]*>[sS]*?</script>/gi, "");
   
   // Clean up any remaining backslash escapes
-  html = html.replace(/\\\//g, '/');
+  html = html.replace(/\\//g, '/');
   
   // Inject the HTML
   container.innerHTML = html;
@@ -508,7 +520,15 @@ function countElements(html) {
 }
 
 
+// Setup form event listener when DOM is ready
 document.addEventListener("DOMContentLoaded", ()=>{
+  // Add event listener to the setup form
+  const setupForm = document.getElementById('setupForm');
+  if(setupForm) {
+    setupForm.addEventListener('submit', initializeExperience);
+  }
+  
+  // Add Ctrl+Enter shortcut for generate button
   document.getElementById('userIntent')?.addEventListener('keydown',(e)=>{
     if(e.key==='Enter'&&e.ctrlKey) generateInterface();
   });
