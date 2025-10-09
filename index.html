@@ -205,7 +205,7 @@ function initializeExperience(e) {
   window.groqKey = groqKey;
   document.getElementById('setupCard').style.display="none";
   document.getElementById('interactionZone').style.display="block";
-  logHistory('Responsive session started');
+  logHistory('🚀 Session started - Ready to build amazing apps!');
   
   setTimeout(() => {
     document.getElementById('interactionZone').scrollIntoView({ behavior: 'smooth' });
@@ -219,85 +219,193 @@ async function generateInterface() {
   const content=document.getElementById('generatedContent');
   const reactEnhancement=document.getElementById('reactEnhancement');
   
-  if(!intent){alert('Describe what to build!');return;}
+  if(!intent){alert('Please describe what you want to build!');return;}
   
-  content.innerHTML='<div class="loading">⚡️ Creating responsive app...</div>';
+  content.innerHTML='<div class="loading">⚡️ Creating your amazing app...</div>';
   reactEnhancement.style.display = 'none';
   interactionCount++; updateStats();
   
   try {
-    // Step 1: Architecture Definition
-    content.innerHTML = '<div class="loading">🏗️ Step 1: Defining Architecture & Data Model...</div>';
+    // Step 1: Architecture Definition - ENHANCED WITH MORE DETAIL
+    content.innerHTML = '<div class="loading">🏗️ Step 1/3: Designing comprehensive architecture...</div>';
     
     const architecturePrompt = `USER REQUIREMENT: "${intent}"
 
-Create a brief technical architecture specification in plain text format.
+Create a detailed technical architecture specification in plain text format. Be thorough and comprehensive.
 
-Include:
-1. DATA MODEL: List key state variables and data structures needed
-2. COMPONENT HIERARCHY: Describe the main UI components and their relationships
-3. USER INTERACTIONS: List the key user actions and event handlers required
-4. RESPONSIVE LAYOUT: Note the mobile-first approach requirements
+Include these sections with detailed explanations:
 
-Keep this concise (under 200 words). This is for planning only - no code yet.`;
+1. DATA MODEL & STATE MANAGEMENT:
+   - All state variables needed with their types and initial values
+   - Data structures (objects, arrays, etc.) with their properties
+   - Data flow patterns and how state will be updated
+   - Any localStorage or sessionStorage needs
+
+2. COMPONENT HIERARCHY & UI STRUCTURE:
+   - Complete list of UI components from parent to child
+   - Layout structure and how components relate to each other
+   - Responsive breakpoints and mobile-first considerations
+   - Accessibility features to include
+
+3. USER INTERACTIONS & EVENT HANDLERS:
+   - Every user action that needs handling (clicks, inputs, submits, etc.)
+   - Event handler names and what they should do
+   - Form validation requirements
+   - Real-time updates or dynamic content changes
+
+4. VISUAL DESIGN & STYLING:
+   - Color scheme and theme
+   - Typography choices
+   - Spacing and layout approach
+   - Animations or transitions needed
+
+5. FUNCTIONALITY & FEATURES:
+   - Core features that must work perfectly
+   - Edge cases to handle
+   - Error states and user feedback
+   - Loading states
+
+6. EXTERNAL DEPENDENCIES (if needed):
+   - Any APIs to integrate
+   - External libraries or CDNs
+   - Data sources
+
+Be detailed and specific. Take 400-500 words to fully plan this application.`;
     
     const architecture = await callGroqAPI(architecturePrompt, false);
     
-    // Step 2: Component Generation
-    content.innerHTML='<div class="loading">⚙️ Step 2/3: Generating components...</div>';
-    const componentsPrompt = `CRITICAL: OUTPUT MUST BE COMPLETE, VALID HTML CODE ONLY. NO MARKDOWN, NO EXPLANATIONS, NO CODE BLOCKS.
+    // Step 2: Component Generation - ENHANCED INSTRUCTIONS
+    content.innerHTML='<div class="loading">⚙️ Step 2/3: Building beautiful, functional components...</div>';
+    const componentsPrompt = `CRITICAL INSTRUCTIONS - READ CAREFULLY:
 
-ARCHITECTURE PLAN:
+YOU MUST OUTPUT COMPLETE, VALID HTML CODE ONLY. 
+NO MARKDOWN CODE BLOCKS (no ```html or ```)
+NO EXPLANATORY TEXT BEFORE OR AFTER THE CODE
+START DIRECTLY WITH HTML TAGS
+
+ARCHITECTURE SPECIFICATION:
 ${architecture}
 
-USER REQUIREMENT: "${intent}"
+USER'S ORIGINAL REQUEST: "${intent}"
 
-STRICT CODING REQUIREMENTS:
-1. Create a complete, working single-page application
-2. Use vanilla JavaScript (or React if appropriate)
-3. ALL containers must use: max-width: 100%; box-sizing: border-box;
-4. NO fixed widths over 500px
-5. Use flexbox with flex-wrap for responsive layouts
-6. Include ALL necessary event handlers (onclick, onchange, onsubmit)
-7. Make it fully functional and interactive
-8. Mobile-first design (works at 320px width)
-9. Include inline styles or a <style> tag
-10. Complete working app in one HTML block
+YOUR MISSION: Create an absolutely AMAZING, fully-functional, beautiful application that will delight the user.
 
-OUTPUT REQUIREMENTS:
-- Start directly with HTML tags (like <div>, <style>, etc.)
-- NO ```html or ``` markers
-- NO markdown formatting
-- NO explanatory text before or after
-- Just pure, valid, working HTML code`;
+STRICT REQUIREMENTS - FOLLOW ALL OF THESE:
+
+1. STRUCTURE & COMPLETENESS:
+   - Create a complete, self-contained application
+   - Include a style tag with comprehensive CSS
+   - Include a script tag with all JavaScript functionality
+   - Everything must work without external dependencies (unless specified in architecture)
+
+2. RESPONSIVE DESIGN (CRITICAL):
+   - Mobile-first approach - test at 320px width minimum
+   - ALL containers: max-width: 100%; box-sizing: border-box;
+   - NO fixed widths over 500px anywhere
+   - Use flexbox with flex-wrap for all layouts
+   - Use responsive units (%, rem, em, vw, vh)
+   - Add proper meta viewport tag considerations
+
+3. FUNCTIONALITY (MUST BE PERFECT):
+   - Implement EVERY feature mentioned in the user's request
+   - Add ALL necessary event handlers (onclick, onchange, oninput, onsubmit, etc.)
+   - Make every button, input, and interactive element functional
+   - Include proper form validation where needed
+   - Add error handling for edge cases
+   - Include loading states for any async operations
+
+4. VISUAL DESIGN (MAKE IT BEAUTIFUL):
+   - Use a cohesive, modern color scheme
+   - Add proper spacing, padding, and margins
+   - Include hover effects and transitions
+   - Use modern CSS features (gradients, shadows, border-radius)
+   - Ensure great typography and readability
+   - Add visual feedback for all interactions
+
+5. CODE QUALITY:
+   - Write clean, organized, well-structured code
+   - Use semantic HTML5 elements
+   - Add helpful comments for complex logic
+   - Use meaningful variable and function names
+   - Ensure all functions are properly defined and called
+
+6. USER EXPERIENCE:
+   - Make the app intuitive and easy to use
+   - Provide clear user feedback for all actions
+   - Include helpful placeholders and labels
+   - Handle empty states gracefully
+   - Add success messages where appropriate
+
+OUTPUT FORMAT (CRITICAL):
+- Start IMMEDIATELY with <div> or <style> tag
+- NO triple backticks
+- NO explanatory text
+- Just pure, working HTML/CSS/JavaScript code
+- Make it production-ready and impressive!`;
     
     const componentsHtml = await callGroqAPI(componentsPrompt, true);
     
-    // Step 3: Logic and Interactivity Enhancement
-    content.innerHTML='<div class="loading">🔗 Step 3/3: Adding interaction logic...</div>';
-    const logicPrompt = `CRITICAL: OUTPUT MUST BE COMPLETE, ENHANCED HTML CODE ONLY. NO MARKDOWN, NO EXPLANATIONS, NO CODE BLOCKS.
+    // Step 3: Enhancement & Polish - IMPROVED INSTRUCTIONS
+    content.innerHTML='<div class="loading">✨ Step 3/3: Adding polish and perfecting interactions...</div>';
+    const logicPrompt = `CRITICAL INSTRUCTIONS:
+
+OUTPUT ONLY ENHANCED HTML CODE - NO MARKDOWN, NO EXPLANATIONS.
 
 CURRENT WORKING CODE:
 ${componentsHtml}
 
-USER REQUIREMENT: "${intent}"
+USER'S ORIGINAL REQUEST: "${intent}"
 
-ENHANCEMENT REQUIREMENTS:
-1. Verify ALL event handlers work correctly
-2. Add any missing interactive functionality
-3. Include proper error handling
-4. Add loading states where appropriate
-5. Ensure responsive design (max-width: 100% on all elements)
-6. Make sure it's production-ready
-7. Keep all existing styles and structure
-8. Enhance, don't rebuild from scratch
+YOUR MISSION: Take this already good code and make it EXCEPTIONAL.
 
-OUTPUT REQUIREMENTS:
-- Start directly with HTML tags
-- NO ```html or ``` markers  
-- NO markdown formatting
-- NO explanatory text
-- Just pure, enhanced, working HTML code`;
+ENHANCEMENT CHECKLIST - VERIFY AND IMPROVE ALL:
+
+1. INTERACTION PERFECTION:
+   - Test every single interactive element mentally
+   - Ensure ALL event handlers are properly attached and functional
+   - Add any missing onclick, onchange, oninput, onsubmit handlers
+   - Verify form submissions work correctly
+   - Check that buttons actually do what they should
+
+2. ERROR HANDLING & EDGE CASES:
+   - Add try-catch blocks for any operations that could fail
+   - Validate user inputs before processing
+   - Handle empty states and invalid data gracefully
+   - Show helpful error messages to users
+   - Prevent common errors (divide by zero, empty arrays, null values, etc.)
+
+3. USER FEEDBACK & POLISH:
+   - Add loading indicators for any delayed operations
+   - Include success messages for completed actions
+   - Add subtle animations and transitions
+   - Ensure all user actions provide immediate visual feedback
+   - Polish the overall user experience
+
+4. RESPONSIVE REFINEMENT:
+   - Double-check max-width: 100% on ALL elements
+   - Ensure perfect mobile experience (320px width)
+   - Test flexbox wrapping at different screen sizes
+   - Verify no horizontal scrolling occurs
+   - Check that touch targets are appropriately sized
+
+5. PERFORMANCE & OPTIMIZATION:
+   - Remove any duplicate code
+   - Optimize event listeners
+   - Ensure efficient DOM manipulation
+   - Clean up any unused CSS or JavaScript
+
+6. FINAL QUALITY CHECK:
+   - Verify the app does EXACTLY what the user requested
+   - Ensure professional appearance and smooth operation
+   - Check that all features work together harmoniously
+   - Make sure it's something users will love
+
+CRITICAL OUTPUT REQUIREMENTS:
+- Start DIRECTLY with HTML tags (like <div> or <style>)
+- NO triple backticks then html or triple backtick markdown blocks
+- NO explanatory text before or after
+- Just the complete, enhanced, production-ready code
+- Make it absolutely amazing!`;
     
     const finalHtml = await callGroqAPI(logicPrompt, true);
     
@@ -314,10 +422,10 @@ OUTPUT REQUIREMENTS:
     conversationHistory.push(intent);
     elementsCreated+=countElements(finalHtml); adaptations++;
     updateStats(); 
-    logHistory(`✨ Multi-step app: "${intent.substring(0,45)}..."`);
+    logHistory(`✨ Created amazing app: "${intent.substring(0,40)}..."`);
     document.getElementById('userIntent').value='';
   } catch(e) {
-    content.innerHTML=`<div class='error-message'><b>Groq agent error:</b> ${e.message}</div>`;
+    content.innerHTML=`<div class='error-message'><b>Error:</b> ${e.message}</div>`;
     logHistory(`⚠️ ${e.message}`);
   }
 }
@@ -339,34 +447,36 @@ async function enhanceWithReact() {
   const content = document.getElementById('generatedContent');
   const reactEnhancement = document.getElementById('reactEnhancement');
   
-  content.innerHTML = '<div class="loading">⚡️ Enhancing with React...</div>';
+  content.innerHTML = '<div class="loading">⚡️ Upgrading to React architecture...</div>';
   reactEnhancement.style.display = 'none';
   
   try {
-    const enhancementPrompt = `CRITICAL: OUTPUT MUST BE COMPLETE HTML WITH REACT CODE. NO MARKDOWN, NO EXPLANATIONS.
+    const enhancementPrompt = `CRITICAL: OUTPUT COMPLETE HTML WITH REACT CODE ONLY. NO MARKDOWN, NO EXPLANATIONS.
 
-Convert this app to use React with proper component architecture:
+Convert this application to use modern React architecture with hooks and functional components.
 
 CURRENT APP CODE:
 ${currentAppCode}
 
-REQUIREMENTS:
-1. Convert to React functional components with hooks
-2. Use useState for state management
-3. Keep ALL existing functionality and styling
-4. Ensure responsive design (max-width: 100%)
-5. Include React 18 CDN scripts
-6. Use createRoot to mount the app
-7. Keep inline styles or <style> tags
-8. Make it work exactly like the original
+REACT CONVERSION REQUIREMENTS:
 
-OUTPUT REQUIREMENTS:
-- Complete HTML file with React CDN links
-- Start directly with <!DOCTYPE html> or <div>
-- NO ```html or ``` markers
-- NO markdown
+1. Use React 18 with functional components and hooks
+2. Include React and ReactDOM from CDN (unpkg or cdnjs)
+3. Use useState for all state management
+4. Use useEffect for side effects if needed
+5. Properly structure components (can be multiple components)
+6. Keep ALL existing functionality - nothing should be lost
+7. Keep ALL existing styling - maintain the visual design
+8. Ensure perfect responsive design (max-width: 100%)
+9. Use createRoot for mounting (React 18 syntax)
+10. Make it work flawlessly
+
+OUTPUT FORMAT:
+- Complete HTML file with React CDN script tags
+- Start directly with <!DOCTYPE html> or HTML tags
+- NO triple backticks then html or triple backticks markdown blocks
 - NO explanatory text
-- Just working React code`;
+- Just working, production-ready React code`;
     
     const reactHtml = await callGroqAPI(enhancementPrompt, true);
     currentAppCode = reactHtml;
@@ -375,10 +485,10 @@ OUTPUT REQUIREMENTS:
     
     adaptations++;
     updateStats();
-    logHistory('🔄 Enhanced with React components');
+    logHistory('🔄 Successfully upgraded to React!');
   } catch(e) {
-    content.innerHTML = `<div class='error-message'><b>React enhancement failed:</b> ${e.message}</div>`;
-    logHistory(`⚠️ React enhancement failed: ${e.message}`);
+    content.innerHTML = `<div class='error-message'><b>React upgrade failed:</b> ${e.message}</div>`;
+    logHistory(`⚠️ React upgrade failed: ${e.message}`);
     parseAndInjectHTML(currentAppCode, content);
   }
 }
@@ -417,8 +527,8 @@ async function callGroqAPI(prompt, validateHTML = true) {
     headers: headers,
     body: JSON.stringify({
       model: 'llama-3.3-70b-versatile',
-      max_tokens: 2048, 
-      temperature: 0.7,
+      max_tokens: 4096, 
+      temperature: 0.8,
       messages: [{ role: "user", content: prompt }]
     })
   });
@@ -437,18 +547,18 @@ async function callGroqAPI(prompt, validateHTML = true) {
   const data = await resp.json();
   let content = "";
   
-  if (data.choices && data.choices[0]?.message?.content) {
+  if (data.choices && data.choices?.message?.content) {
     try {
       content = new TextDecoder('utf-8').decode(
-        new TextEncoder().encode(data.choices[0].message.content.trim())
+        new TextEncoder().encode(data.choices.message.content.trim())
       );
     } catch(e) {
       console.error("Encoding error:", e);
-      content = data.choices[0].message.content.trim();
+      content = data.choices.message.content.trim();
     }
   }
   
-  content = content.replace(/``````javascript|`````````
+  content = content.replace(/```html|``````|``````/gi,'').trim();
   
   if (validateHTML) {
     const hasValidContent = content && (
@@ -463,7 +573,7 @@ async function callGroqAPI(prompt, validateHTML = true) {
     );
     
     if(!hasValidContent) {
-      console.log("Raw response:", data.choices?.message?.content);
+      console.log("Raw response:", data.choices[0]?.message?.content);
       throw new Error("No usable HTML generated - AI returned invalid format");
     }
   }
@@ -474,7 +584,6 @@ async function callGroqAPI(prompt, validateHTML = true) {
 function parseAndInjectHTML(raw, container) {
   let html = raw;
   
-  // Build the closing tags dynamically to avoid browser interpretation
   const styleClosing = '<' + '/' + 'style>';
   const scriptClosing = '<' + '/' + 'script>';
   
