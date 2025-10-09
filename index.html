@@ -538,7 +538,7 @@ Return ONLY the complete HTML code, no explanations or markdown.`;
   if (!validateHTML) {
     try {
       const decodedAttempt = atob(
-        content.replace(/[^A-Za-z0-9+/=]/g, '')
+        content.replace(/[^A-Za-z0-9+\/=]/g, '')
       );
       if (decodedAttempt.includes('<!DOCTYPE') || decodedAttempt.includes('<html')) {
         content = decodedAttempt;
