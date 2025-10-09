@@ -4,9 +4,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
-  <title>Morphic Web — Always Fits Screen</title>
+  <title>Morphic Web — AI Agent Workflow</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-  <style>
+  <script src="https://cdn.tailwindcss.com"></script>
+<style>
     html, body { 
       height: 100%; 
       overflow-x: hidden;
@@ -101,7 +102,8 @@
     .header {text-align:center;margin-bottom:22px;}
     .logo {font-size:2.1em;color:#5857f8;font-weight:900; text-shadow:0 0 12px #dbeafe;}
     .slogan {font-size:1.11em;opacity:.88;color:#4f40b5;margin:11px auto 0;text-align:center;}
-    .setup-card, .interaction-zone {margin-bottom:16px;}
+    .agent-status {font-size:0.9em;color:#6b7280;margin-top:5px;font-style:italic;}
+.setup-card, .interaction-zone {margin-bottom:16px;}
     .api-input-group label{font-size:1.07em;font-weight:700;color:#7b64e7;display:block;margin-bottom:7px;}
     .api-input-group input{
       font-size:1.07em;padding:12px;width:95%;max-width:340px;border:2.1px solid #e3eafe;
@@ -142,9 +144,10 @@
 <div class="container">
   <div class="header">
     <div class="logo">Morphic Web</div>
-    <div class="slogan">Responsive AI Apps - Always fits your screen perfectly!</div>
+    <div class="slogan">AI Agent Workflow - Multi-step reasoning for complex apps</div>
+    <div class="agent-status">3-step chain: Architecture → Components → Logic</div>
   </div>
-  <div class="setup-card" id="setupCard">
+<div class="setup-card" id="setupCard">
     <form onsubmit="event.preventDefault(); initializeExperience();">
       <div class="api-input-group">
         <label for="apiKey">Groq API Key</label>
@@ -198,7 +201,6 @@ function initializeExperience() {
   document.getElementById('interactionZone').style.display="block";
   logHistory('Responsive session started');
 }
-
 async function generateInterface() {
   const intent=document.getElementById('userIntent').value.trim();
   const content=document.getElementById('generatedContent');
@@ -210,52 +212,93 @@ async function generateInterface() {
   reactEnhancement.style.display = 'none';
   interactionCount++; updateStats();
   
-  const prompt=`You are MorphicWeb, expert responsive web app generator.
-User wants: "${intent}"
+  try {
+    // Agent Chain: Multi-step reasoning process
+    content.innerHTML='<div class="loading">🔍 Step 1/3: Designing app architecture...</div>';
+    
+    // Step 1: Architecture Design
+    const architecturePrompt = `You are an expert software architect. The user wants to build: "${intent}"
+
+Design a comprehensive architecture for this responsive web application:
+
+1. Data Model: Define the data structures and state management needed
+2. Component Structure: Break down the app into logical components
+3. User Interactions: Identify key user flows and interactions
+4. API Integration: Plan any external data sources or APIs
+5. Responsive Layout: Design mobile-first responsive structure
+
+Output ONLY a clear architecture specification that can be used by the next AI to generate code:`;
+    
+    const architecture = await callGroqAPI(architecturePrompt);
+    
+    // Step 2: Component Generation
+    content.innerHTML='<div class="loading">⚙️ Step 2/3: Generating React components...</div>';
+    
+    const componentsPrompt = `Based on this architecture design, generate complete React components with Tailwind CSS styling.
+
+ARCHITECTURE:
+${architecture}
+
+USER INTENT: "${intent}"
 
 CRITICAL REQUIREMENTS:
-- Generate COMPLETE, WORKING HTML/CSS/JavaScript code
-- NO React components - use plain JavaScript only
-- ALL CSS must use: max-width: 100%, box-sizing: border-box
+- Use React 18 with functional components and hooks
+- Implement proper state management with useState/useEffect
+- Use Tailwind CSS for responsive styling (mobile-first)
+- ALL containers must use: w-full max-w-[500px]
 - NEVER use fixed pixel widths over 300px
-- ALL containers must use: width: 100%, max-width: 500px
-- Use flexbox with flex-wrap: wrap for layouts
-- Mobile-first: make it work on 320px width screens
-- All inputs/buttons: width: 100%, max-width: reasonable size
-- Tables: width: 100%, table-layout: fixed
+- Use flexbox with flex-wrap for layouts
+- Include proper TypeScript-like prop interfaces
+- Make it fully functional and interactive
+- Test that it works on 320px width screens
+- Include all necessary event handlers
 
-Output format:
-- Single <div> with proper styling
-- Include <style> with mobile-first responsive CSS
-- Include <script> for functionality using plain JavaScript
-- NO markdown, code blocks, or explanations
-- Test that it works on mobile screens
-- Make sure the app is fully functional`;
+Output ONLY the complete React HTML code with embedded Tailwind CSS and no explanations:`;
+    
+    const reactHtml = await callGroqAPI(componentsPrompt);
+    
+    // Step 3: Logic and API Integration
+    content.innerHTML='<div class="loading">🔗 Step 3/3: Adding interaction logic...</div>';
+    
+    const logicPrompt = `Take this React application and enhance it with complete interaction logic and API integration.
 
-  try {
-    const html = await callGroqAPI(prompt);
-    currentAppCode = html;
-    parseAndInjectHTML(html, content);
+REACT CODE:
+${reactHtml}
+
+USER INTENT: "${intent}"
+
+REQUIREMENTS:
+- Add all missing event handlers and state updates
+- Implement any API calls or data fetching
+- Include error handling and loading states
+- Ensure all user interactions work properly
+- Maintain responsive design principles
+
+Output ONLY the enhanced complete React HTML code with no explanations:`;
+    
+    const finalHtml = await callGroqAPI(logicPrompt);
+    
+    currentAppCode = finalHtml;
+    parseAndInjectHTML(finalHtml, content);
     ensureResponsive();
     
-    // Check if this app would benefit from React enhancement
-    const shouldEnhance = await checkForReactEnhancement(intent, html);
+    // Check if we should offer React enhancement (usually yes now)
+    const shouldEnhance = await checkForReactEnhancement(intent, finalHtml);
     if (shouldEnhance) {
       reactEnhancement.style.display = 'block';
     }
     
     setTimeout(()=>content.scrollIntoView({behavior:'smooth',block:'center'}), 100);
     conversationHistory.push(intent);
-    elementsCreated+=countElements(html); adaptations++;
+    elementsCreated+=countElements(finalHtml); adaptations++;
     updateStats(); 
-    logHistory(`✨ Responsive app: "${intent.substring(0,45)}..."`);
+    logHistory(`✨ Multi-step app: "${intent.substring(0,45)}..."`);
     document.getElementById('userIntent').value='';
   } catch(e) {
-    content.innerHTML=`<div class='error-message'><b>Groq error:</b> ${e.message}</div>`;
+    content.innerHTML=`<div class='error-message'><b>Groq agent error:</b> ${e.message}</div>`;
     logHistory(`⚠️ ${e.message}`);
   }
 }
-
 async function checkForReactEnhancement(intent, currentCode) {
   // Only enhance complex apps that would benefit from React
   const complexPatterns = [
