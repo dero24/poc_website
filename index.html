@@ -406,11 +406,15 @@ function ensureResponsive() {
 }
 
 async function callGroqAPI(prompt) {
+  const headers = new Headers();
+  headers.append('Authorization', `Bearer ${groqKey}`);
+  headers.append('Content-Type', 'application/json; charset=utf-8');
+  
   const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
-    headers: {'Authorization': `Bearer ${groqKey}`,'Content-Type': 'application/json'},
+    headers: headers,
     body: JSON.stringify({
-      model: 'llama-3.3-70b-versatile',
+model: 'llama-3.3-70b-versatile',
       max_tokens: 2048, 
       temperature: 0.7,
       messages: [{ role: "user", content: prompt }]
@@ -418,13 +422,27 @@ async function callGroqAPI(prompt) {
   });
   if(!resp.ok){
     let errorMsg = "Groq API error";
-    try { const data = await resp.json(); errorMsg = data.error?.message || errorMsg; } catch {}
+    try { 
+      const data = await resp.json(); 
+      errorMsg = data.error?.message || errorMsg; 
+    } catch(e) {
+      console.error("Error parsing error response:", e);
+    }
     throw new Error(errorMsg);
   }
   const data = await resp.json();
-  let html = (data.choices && data.choices[0]?.message?.content) ? data.choices[0].message.content.trim() : "";
-  
-  // Clean up any markdown or code blocks
+  let html = "";
+  if (data.choices && data.choices[0]?.message?.content) {
+    try {
+      html = new TextDecoder('utf-8').decode(
+        new TextEncoder().encode(data.choices[0].message.content.trim())
+      );
+    } catch(e) {
+      console.error("Encoding error:", e);
+      html = data.choices[0].message.content.trim();
+    }
+  }
+// Clean up any markdown or code blocks
   html = html.replace(/```html|```|``````/g,'').trim();
   // Enhanced validation for different response formats
   const hasValidContent = html && (
