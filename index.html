@@ -206,61 +206,133 @@ function initializeExperience() {
   }, 100);
 }
 async function generateInterface() {
-  const intent=document.getElementById('userIntent').value.trim();
-  const content=document.getElementById('generatedContent');
-  const reactEnhancement=document.getElementById('reactEnhancement');
+  const intent = document.getElementById('userIntent').value.trim();
+  const content = document.getElementById('generatedContent');
+  const reactEnhancement = document.getElementById('reactEnhancement');
   
-  if(!intent){alert('Describe what to build!');return;}
+  if(!intent) { alert('Describe what to build!'); return; }
   
-  content.innerHTML='<div class="loading">⚡️ Creating responsive app...</div>';
+  content.innerHTML = '<div class="loading">🏗️ Step 1: Defining Architecture...</div>';
   reactEnhancement.style.display = 'none';
   interactionCount++; updateStats();
   
   try {
-    // Simplified approach - single step generation
-    content.innerHTML='<div class="loading">🎯 Generating complete responsive app...</div>';
+    // Step 1: Architecture Definition
+    content.innerHTML = '<div class="loading">🏗️ Step 1: Defining Architecture & Data Model...</div>';
     
-    const generationPrompt = `CRITICAL: OUTPUT MUST BE PURE HTML/JS/CSS CODE ONLY. NO EXPLANATIONS, NO MARKDOWN, NO CODE BLOCKS.
+    const architecturePrompt = `USER REQUIREMENT: "${intent}"
+
+CRITICAL: OUTPUT MUST BE PURE TEXT ONLY - NO CODE, NO MARKDOWN.
+
+Analyze this requirement and define the complete application architecture:
+
+1. DATA MODEL: What data structures, state variables, and data flow are needed?
+2. COMPONENT STRUCTURE: What are the main UI components and their hierarchy?
+3. INTERACTIONS: What user interactions and event handlers are required?
+4. RESPONSIVENESS: How will it adapt to different screen sizes?
+5. EXTERNAL DEPENDENCIES: Any APIs or external data sources?
+6. ERROR HANDLING: What edge cases need to be handled?
+
+Output ONLY the architecture definition as plain text:`;
+    
+    const architecture = await callGroqAPI(architecturePrompt);
+    
+    // Step 2: Component Generation
+    content.innerHTML = '<div class="loading">🧩 Step 2: Generating UI Components...</div>';
+    
+    const componentsPrompt = `ARCHITECTURE DEFINITION:
+${architecture}
 
 USER REQUIREMENT: "${intent}"
 
+CRITICAL: OUTPUT MUST BE PURE HTML/JS/CSS CODE ONLY. NO EXPLANATIONS, NO MARKDOWN, NO CODE BLOCKS.
+
+Generate the complete HTML/CSS/JavaScript interface based on the architecture:
+
 STRICT REQUIREMENTS:
-1. Create a complete, working web application
-2. Use semantic HTML elements (div, button, input, form, etc.)
-3. Include complete JavaScript for ALL functionality
-4. Use inline CSS for styling (NO external dependencies)
-5. Make it responsive (mobile-first, max-width: 100%)
-6. All interactive elements must work immediately
-7. Include proper event handlers (onclick, onchange, onsubmit)
-8. Ensure it works perfectly on screens from 320px to 1200px
-9. Use flexbox/grid for responsive layout
-10. Complete working code - no placeholders
+1. Create semantic HTML structure matching the component hierarchy
+2. Include all necessary CSS for styling and responsiveness
+3. Use flexbox/grid for layout
+4. Make it mobile-first (max-width: 100%)
+5. Include placeholder JavaScript functions for all interactions
+6. Ensure all elements are properly sized and positioned
+7. NO external dependencies - everything must be inline
+8. All interactive elements must have proper IDs and classes
+9. Complete working structure - no broken elements
 
-OUTPUT FORMAT:
-- Pure HTML with embedded CSS and JavaScript
-- NO additional text
-- NO markdown
-- NO code blocks
-- NO explanations
-
-Generate the complete application now:`;
+Output ONLY the complete HTML/CSS code:`;
     
-    const finalHtml = await callGroqAPI(generationPrompt);
+    const componentsHtml = await callGroqAPI(componentsPrompt);
+    
+    // Step 3: Logic Implementation
+    content.innerHTML = '<div class="loading">⚡️ Step 3: Implementing Business Logic...</div>';
+    
+    const logicPrompt = `COMPONENT STRUCTURE:
+${componentsHtml}
+
+ARCHITECTURE DEFINITION:
+${architecture}
+
+USER REQUIREMENT: "${intent}"
+
+CRITICAL: OUTPUT MUST BE PURE HTML/JS/CSS CODE ONLY. NO EXPLANATIONS, NO MARKDOWN, NO CODE BLOCKS.
+
+Implement the complete JavaScript business logic:
+
+STRICT REQUIREMENTS:
+1. Add complete JavaScript implementation for ALL functionality
+2. Handle all user interactions (onclick, onchange, onsubmit)
+3. Implement proper state management
+4. Add error handling for edge cases
+5. Make sure ALL interactive elements work immediately
+6. Include proper event listeners and DOM manipulation
+7. Ensure data flows correctly between components
+8. Prevent any navigation or page reloads (use event.preventDefault())
+9. Handle form submissions without page refresh
+10. Complete working application - no broken functionality
+
+IMPORTANT: Prevent any navigation to external URLs or API pages. All interactions must stay within the app.
+
+Output ONLY the complete HTML/CSS/JavaScript code:`;
+    
+    const finalHtml = await callGroqAPI(logicPrompt);
     currentAppCode = finalHtml;
     parseAndInjectHTML(finalHtml, content);
     ensureResponsive();
     
+    // Add navigation prevention to all links and forms
+    setTimeout(() => {
+      const allLinks = content.querySelectorAll('a');
+      const allForms = content.querySelectorAll('form');
+      
+      allLinks.forEach(link => {
+        if (link.href && !link.href.startsWith('javascript:')) {
+          link.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log('Navigation prevented:', link.href);
+          });
+        }
+      });
+      
+      allForms.forEach(form => {
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          console.log('Form submission prevented');
+        });
+      });
+    }, 100);
+    
     // Always offer React enhancement for consistency
     reactEnhancement.style.display = 'block';
     
-    setTimeout(()=>content.scrollIntoView({behavior:'smooth',block:'center'}), 100);
+    setTimeout(() => content.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
     conversationHistory.push(intent);
-    elementsCreated+=countElements(finalHtml); adaptations++;
+    elementsCreated += countElements(finalHtml); adaptations++;
     updateStats();
-    logHistory(`✨ Generated: "${intent.substring(0,45)}..."`);
-    document.getElementById('userIntent').value='';
+    logHistory(`✨ Generated via 3-step chain: "${intent.substring(0,45)}..."`);
+    document.getElementById('userIntent').value = '';
   } catch(e) {
-    content.innerHTML=`<div class='error-message'><b>Generation error:</b> ${e.message}</div>`;
+    content.innerHTML = `<div class='error-message'><b>Generation error:</b> ${e.message}</div>`;
     logHistory(`⚠️ ${e.message}`);
   }
 }
