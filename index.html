@@ -73,8 +73,6 @@
       table-layout: fixed !important;
     }
 
-
-    /* React enhancement section */
     .react-enhancement {
       margin-top: 15px;
       padding: 12px;
@@ -209,8 +207,13 @@ function initializeExperience(e) {
   document.getElementById('interactionZone').style.display="block";
   logHistory('Responsive session started');
   
+  setTimeout(() => {
+    document.getElementById('interactionZone').scrollIntoView({ behavior: 'smooth' });
+  }, 100);
+  
   return false;
 }
+
 async function generateInterface() {
   const intent=document.getElementById('userIntent').value.trim();
   const content=document.getElementById('generatedContent');
@@ -302,7 +305,6 @@ OUTPUT REQUIREMENTS:
     parseAndInjectHTML(finalHtml, content);
     ensureResponsive();
     
-    // Check if we should offer React enhancement
     const shouldEnhance = await checkForReactEnhancement(intent, finalHtml);
     if (shouldEnhance) {
       reactEnhancement.style.display = 'block';
@@ -465,21 +467,26 @@ async function callGroqAPI(prompt, validateHTML = true) {
       throw new Error("No usable HTML generated - AI returned invalid format");
     }
   }
-
-return content;
-}
   
-  function parseAndInjectHTML(raw, container) {
+  return content;
+}
+
+function parseAndInjectHTML(raw, container) {
   let html = raw;
   
-  const styleMatch = html.match(/<style[^>]*>([sS]*?)<\/style>/i);
-  const styleContent = styleMatch ? styleMatch[1] : "";
-  html = html.replace(/<style[^>]*>[sS]*?<\/style>/gi, "");
+  // Build the closing tags dynamically to avoid browser interpretation
+  const styleClosing = '<' + '/' + 'style>';
+  const scriptClosing = '<' + '/' + 'script>';
   
-  // Fix: Escape the closing script tag by breaking it up
-  const scriptMatch = html.match(/<script[^>]*>([sS]*?)<\/script>/i);
+  const stylePattern = new RegExp('<style[^>]*>([\\s\\S]*?)' + styleClosing, 'i');
+  const styleMatch = html.match(stylePattern);
+  const styleContent = styleMatch ? styleMatch[1] : "";
+  html = html.replace(new RegExp('<style[^>]*>[\\s\\S]*?' + styleClosing, 'gi'), "");
+  
+  const scriptPattern = new RegExp('<script[^>]*>([\\s\\S]*?)' + scriptClosing, 'i');
+  const scriptMatch = html.match(scriptPattern);
   const scriptContent = scriptMatch ? scriptMatch[1] : "";
-  html = html.replace(/<script[^>]*>[sS]*?<\/script>/gi, "");
+  html = html.replace(new RegExp('<script[^>]*>[\\s\\S]*?' + scriptClosing, 'gi'), "");
   
   html = html.replace(/\\//g, '/');
   
