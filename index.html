@@ -492,7 +492,7 @@ function ensureResponsive(html) {
 }
 
 async function callGroqAPI(userPrompt, isReactUpgrade = false) {
-  const systemPrompt = `You are an expert web developer. Create complete, functional, beautiful HTML pages with inline CSS, JavaScript and React.
+  const systemPrompt = `You are an expert web developer. Create complete, functional, beautiful HTML widgets with inline CSS, JavaScript and HTML-buildable React components.
 
 REQUIREMENTS:
 - Generate a complete, standalone HTML document starting with <!DOCTYPE html>
@@ -566,10 +566,7 @@ GOAL:
     }
   }
   
-  const tripleBacktick = '`' + '`' + '`';
-  const jsMarker = tripleBacktick + 'javascript';
-  const htmlMarker = tripleBacktick + 'html';
-  content = content.replace(new RegExp(jsMarker, 'g'), '').replace(new RegExp(htmlMarker, 'g'), '').replace(new RegExp(tripleBacktick, 'g'), '');
+  const bt = '`' + '`' + '`'; content = content.replace(new RegExp(bt + 'javascript|' + bt + 'html|' + bt, 'g'), '');
   
   if (validateHTML) {
     const hasValidContent = content && (
@@ -600,11 +597,10 @@ function parseAndInjectHTML(html, container) {
   const styleContent = styleMatch ? styleMatch[1] : "";
   html = html.replace(new RegExp('<style[^>]*>[\\s\\S]*?' + styleClosing, 'gi'), "");
   
-  const scriptOpenTag = '<' + 'script';
-  const scriptPattern = new RegExp(scriptOpenTag + '[^>]*>([\\s\\S]*?)' + scriptClosing, 'i');
+  const scriptPattern = new RegExp('<script[^>]*>([\\s\\S]*?)' + scriptClosing, 'i');
   const scriptMatch = html.match(scriptPattern);
   const scriptContent = scriptMatch ? scriptMatch[1] : "";
-  html = html.replace(new RegExp(scriptOpenTag + '[^>]*>[\\s\\S]*?' + scriptClosing, 'gi'), "");
+  html = html.replace(new RegExp('<script[^>]*>[\\s\\S]*?' + scriptClosing, 'gi'), "");
   
   html = html.replace(/\\//g, '/');
   
@@ -630,11 +626,15 @@ function countElements(html) {
   return matches ? matches.length : 0;
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-  const form = document.getElementById('setupForm');
-  if (form) {
-    form.addEventListener('submit', initializeExperience);
+document.addEventListener("DOMContentLoaded", ()=>{
+  const setupForm = document.getElementById('setupForm');
+  if(setupForm) {
+    setupForm.addEventListener('submit', initializeExperience);
   }
+  
+  document.getElementById('userIntent')?.addEventListener('keydown',(e)=>{
+    if(e.key==='Enter'&&e.ctrlKey) generateInterface();
+  });
 });
 
 </script>
