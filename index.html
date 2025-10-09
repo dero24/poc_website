@@ -219,7 +219,7 @@ async function generateInterface() {
   try {
   // Agent Chain: Multi-step reasoning process
   content.innerHTML='<div class="loading">🔍 Step 1/4: Designing app architecture...</div>';
-// Step 1: Architecture Design
+  // Step 1: Architecture Design
     const architecturePrompt = `CRITICAL: OUTPUT MUST BE PURE TEXT ARCHITECTURE SPECIFICATION ONLY. NO CODE, NO HTML, NO MARKDOWN, NO EXPLANATIONS.
 
 USER REQUIREMENT: "${intent}"
@@ -253,7 +253,11 @@ STRICT RULES:
 - DO NOT DEVIATE FROM THE SPECIFIED STRUCTURE`;
 const architecture = await callGroqAPI(architecturePrompt);
     
-    // Step 2: HTML Architecture
+    // Enhanced validation for architecture step
+    if (!architecture || architecture.includes('<html') || architecture.includes('<!DOCTYPE') || architecture.includes('<div') || architecture.includes('<button')) {
+      throw new Error("AI returned HTML instead of architecture specification - retry with clearer instructions");
+    }
+// Step 2: HTML Architecture
     content.innerHTML='<div class="loading">📐 Step 2/4: Converting to HTML structure...</div>';
     const htmlArchitecturePrompt = `CRITICAL: OUTPUT MUST BE PURE HTML STRUCTURE ONLY. NO REACT, NO JAVASCRIPT, NO MARKDOWN, NO EXPLANATIONS.
 
@@ -534,6 +538,11 @@ function parseAndInjectHTML(raw, container) {
     scriptEl.textContent = scriptContent; 
     container.appendChild(scriptEl);
   }
+  
+  // Ensure responsive behavior
+  setTimeout(() => {
+    ensureResponsive();
+  }, 100);
 }
 function countElements(html) {
   const div = document.createElement('div'); 
