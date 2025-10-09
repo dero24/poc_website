@@ -216,82 +216,91 @@ async function generateInterface() {
     // Agent Chain: Multi-step reasoning process
     content.innerHTML='<div class="loading">🔍 Step 1/3: Designing app architecture...</div>';
     // Step 1: Architecture Design
-    const architecturePrompt = `CRITICAL INSTRUCTION: You MUST respond with ONLY a clean architecture specification. NO HTML, NO CODE, NO MARKDOWN, NO EXPLANATIONS.
+    const architecturePrompt = `CRITICAL: OUTPUT MUST BE PURE TEXT ARCHITECTURE SPECIFICATION ONLY. NO CODE, NO HTML, NO MARKDOWN, NO EXPLANATIONS.
 
-As a senior software architect, analyze this user requirement: "${intent}"
+USER REQUIREMENT: "${intent}"
 
-Generate a comprehensive architecture specification covering:
+ARCHITECTURE SPECIFICATION FORMAT:
+DATA MODEL:
+- [list state variables, data structures]
 
-ARCHITECTURE SPECIFICATION:
-• Data Model: Required state variables and data structures
-• Component Hierarchy: Parent-child component relationships  
-• User Interactions: Key event handlers and user flows
-• API Integration: External data sources if needed
-• Responsive Layout: Mobile-first design approach
+COMPONENT HIERARCHY:
+- [parent-child relationships]
 
-RULES:
-- Output ONLY the architecture specification text
-- No code examples, no HTML, no markdown formatting
-- No introductory text, no concluding remarks
-- Use clear, structured bullet points
-- Focus on technical requirements only`;
+USER INTERACTIONS:
+- [event handlers, user flows]
 
-    const architecture = await callGroqAPI(architecturePrompt);
+API INTEGRATION:
+- [external data sources if needed]
+
+RESPONSIVE LAYOUT:
+- [mobile-first approach details]
+
+STRICT RULES:
+- NO HTML CODE
+- NO JAVASCRIPT CODE
+- NO REACT CODE
+- NO MARKDOWN FORMATTING
+- NO CODE BLOCKS
+- NO EXPLANATORY TEXT
+- NO INTRODUCTIONS
+- NO CONCLUSIONS
+- USE ONLY THE EXACT FORMAT ABOVE
+- DO NOT DEVIATE FROM THE SPECIFIED STRUCTURE`;
+const architecture = await callGroqAPI(architecturePrompt);
     // Step 2: Component Generation
     content.innerHTML='<div class="loading">⚙️ Step 2/3: Generating React components...</div>';
-    
-    const componentsPrompt = `CRITICAL INSTRUCTION: You MUST output ONLY valid React HTML code with Tailwind CSS. NO explanations, NO markdown, NO code blocks.
+    const componentsPrompt = `CRITICAL: OUTPUT MUST BE PURE REACT HTML CODE ONLY. NO EXPLANATIONS, NO MARKDOWN, NO CODE BLOCKS.
 
 ARCHITECTURE SPECIFICATION:
 ${architecture}
 
 USER REQUIREMENT: "${intent}"
 
-MANDATORY CODING REQUIREMENTS:
-• Use React functional components with hooks (useState, useEffect)
-• Use Tailwind CSS classes for ALL styling
-• ALL container elements: w-full max-w-[500px]
-• NO fixed pixel widths > 300px anywhere
-• Use flex flex-wrap for responsive layouts
-• Include ALL event handlers (onClick, onChange, etc.)
-• Make it fully interactive and functional
-• Mobile-first design (test at 320px width)
-• Include proper state management
-• All interactive elements must work
-• Use responsive design patterns
+STRICT CODING REQUIREMENTS:
+1. React functional components with useState/useEffect hooks
+2. Tailwind CSS classes for ALL styling
+3. ALL containers: w-full max-w-[500px]
+4. NO fixed widths > 300px
+5. Use flex flex-wrap for responsive design
+6. Include ALL event handlers (onClick, onChange, onSubmit)
+7. Make ALL interactive elements functional
+8. Mobile-first (test at 320px width)
+9. Complete working application
 
 OUTPUT FORMAT:
-• Valid HTML with React components
-• Embedded Tailwind CSS classes
-• Complete working application
-• NO additional text or explanations`;
+- Valid React HTML code
+- Embedded Tailwind CSS
+- NO additional text
+- NO markdown
+- NO code blocks
+- NO explanations`;
 const reactHtml = await callGroqAPI(componentsPrompt);
     // Step 3: Logic and API Integration
     content.innerHTML='<div class="loading">🔗 Step 3/3: Adding interaction logic...</div>';
-    
-    const logicPrompt = `CRITICAL INSTRUCTION: You MUST output ONLY the enhanced React HTML code. NO explanations, NO markdown, NO code blocks.
+    const logicPrompt = `CRITICAL: OUTPUT MUST BE PURE ENHANCED REACT HTML CODE ONLY. NO EXPLANATIONS, NO MARKDOWN, NO CODE BLOCKS.
 
-CURRENT REACT CODE:
+CURRENT CODE:
 ${reactHtml}
 
 USER REQUIREMENT: "${intent}"
 
-ENHANCEMENT REQUIREMENTS:
-• Add ALL missing event handlers
-• Complete state management with useState/useEffect
-• Implement any required API calls
-• Add proper error handling
-• Include loading states where needed
-• Ensure ALL user interactions work perfectly
-• Maintain responsive design (w-full max-w-[500px])
-• Test functionality thoroughly
-• Make it production-ready
+STRICT ENHANCEMENT REQUIREMENTS:
+1. Add missing event handlers (onClick, onChange, onSubmit)
+2. Complete state management with useState/useEffect
+3. Implement API calls if needed
+4. Add error handling
+5. Include loading states
+6. Ensure ALL interactions work
+7. Maintain w-full max-w-[500px]
+8. Production-ready quality
 
 OUTPUT FORMAT:
-• Enhanced React HTML code
-• Fully functional application
-• All interactive elements working
-• NO additional text or formatting`;
+- Enhanced React HTML code
+- NO additional text
+- NO markdown
+- NO code blocks
+- NO explanations`;
 const finalHtml = await callGroqAPI(logicPrompt);
     
     currentAppCode = finalHtml;
@@ -433,9 +442,15 @@ async function callGroqAPI(prompt) {
   }
 return html;
 }
-
 function parseAndInjectHTML(raw, container) {
   let html = raw;
+  
+  // Enhanced validation - check for actual HTML content
+  const hasValidHTML = /<(div|button|input|form|table|canvas|svg|img|p|h[1-6])/i.test(html);
+  
+  if (!hasValidHTML) {
+    throw new Error("No valid HTML content detected in AI response");
+  }
   
   // Extract and remove style blocks
   const styleMatch = html.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
@@ -449,6 +464,11 @@ function parseAndInjectHTML(raw, container) {
   
   // Clean up any remaining backslash escapes
   html = html.replace(/\\\//g, '/');
+  
+  // Final validation
+  if (!html.trim() || !/<(div|button|input|form|table)/i.test(html)) {
+    throw new Error("AI response contains no usable HTML interface elements");
+  }
   
   container.innerHTML = html;
   
@@ -466,7 +486,6 @@ function parseAndInjectHTML(raw, container) {
     container.appendChild(scriptEl);
   }
 }
-
 function countElements(html) {
   const div = document.createElement('div'); 
   div.innerHTML = html;
