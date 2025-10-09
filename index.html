@@ -492,19 +492,36 @@ function ensureResponsive(html) {
 }
 
 async function callGroqAPI(userPrompt, isReactUpgrade = false) {
-  const systemPrompt = `You are an expert web developer. Create complete, functional, beautiful HTML pages with inline CSS and JavaScript.
+  const systemPrompt = `You are an expert web developer. Create complete, functional, beautiful HTML pages with inline CSS, JavaScript and React.
 
 REQUIREMENTS:
-- Generate a complete HTML document with <!DOCTYPE html>
-- Include inline CSS in <style> tags for modern, attractive design
-- Include a script tag with all JavaScript functionality
-- Make it fully interactive and functional
-- Use modern ES6+ JavaScript
-- Ensure responsive design
-- Add smooth animations and transitions
-- Make it visually impressive with gradients, shadows, and modern UI
+- Generate a complete, standalone HTML document starting with <!DOCTYPE html>
+- Include inline <style> tags for modern, attractive design using CSS3 features (e.g., gradients, shadows, transitions)
+- Include a <script> tag with all JavaScript functionality using modern ES6+ syntax
+- Ensure full interactivity and responsiveness across desktop and mobile
+- Use smooth animations and transitions for UI elements
+- Make the UI visually impressive with modern design patterns (glassmorphism, neumorphism, etc.)
+- Use only CDN-compatible libraries that work directly in HTML without build tools
 
-Return ONLY the complete HTML code, no explanations or markdown.`;
+REACT INTEGRATION:
+- Use React and ReactDOM via CDN (e.g., unpkg or jsDelivr)
+- Include Babel via CDN to allow JSX in the browser
+- Define React components inline using JSX and mount them with ReactDOM.render
+- Ensure all React components are self-contained and functional
+- Use functional components with hooks (e.g., useState, useEffect)
+- Avoid external packages that require bundlers (e.g., Webpack, Vite)
+
+OPTIONAL LIBRARIES (only if relevant to the user’s request):
+- TailwindCSS via CDN for utility-first styling
+- Chart.js via CDN for data visualization
+- Font Awesome via CDN for icons
+- GSAP or Anime.js via CDN for advanced animations
+- Google Fonts for typography
+
+GOAL:
+- Based on the user’s request, intelligently select the best tools and libraries to deliver a highly detailed, visually stunning, and satisfying HTML webapp widget
+- The widget should be immediately usable in any browser or editor without additional setup
+- Return ONLY the complete HTML code — no explanations, no markdown, no commentary`;
 
   const messages = isReactUpgrade 
     ? [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }]
