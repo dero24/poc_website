@@ -60,7 +60,6 @@
             font-size: 0.95rem;
         }
 
-        /* Control Panel */
         .control-panel {
             background: var(--surface);
             border-radius: 12px;
@@ -92,17 +91,15 @@
             transition: all 0.3s ease;
         }
 
-        /* Greyed out disabled inputs - FIXED */
-        input[type="text"]:disabled,
-        input:disabled {
-            background: #1a1f2e !important;
+        input[type="text"].disabled-field {
+            background: #141824 !important;
             color: #4a5568 !important;
-            opacity: 0.6 !important;
+            opacity: 0.5 !important;
             cursor: not-allowed !important;
-            border-color: #2d3748 !important;
+            border-color: #1e293b !important;
         }
 
-        select:focus, input[type="text"]:focus:not(:disabled), textarea:focus {
+        select:focus, input[type="text"]:not(.disabled-field):focus, textarea:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
@@ -114,7 +111,6 @@
             font-family: 'Consolas', 'Monaco', monospace;
         }
 
-        /* Checkbox styling */
         .checkbox-group {
             display: flex;
             align-items: center;
@@ -134,7 +130,6 @@
             cursor: pointer;
         }
 
-        /* Button */
         .btn {
             background: var(--primary);
             color: white;
@@ -163,7 +158,6 @@
             cursor: not-allowed;
         }
 
-        /* Loading spinner */
         .spinner {
             border: 3px solid rgba(255, 255, 255, 0.3);
             border-top-color: white;
@@ -177,16 +171,16 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Results Section */
         .results-section {
             background: var(--surface);
             border-radius: 12px;
             padding: 24px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            display: block;
         }
 
         .results-section.hidden {
-            display: none;
+            display: none !important;
         }
 
         .result-header {
@@ -213,7 +207,6 @@
             font-weight: 600;
         }
 
-        /* View Toggle Buttons */
         .view-toggle {
             display: flex;
             gap: 8px;
@@ -246,7 +239,6 @@
             border-color: var(--primary);
         }
 
-        /* Prompt Display */
         .prompt-display {
             background: var(--surface-light);
             border-radius: 8px;
@@ -271,7 +263,6 @@
             word-wrap: break-word;
         }
 
-        /* Response Display */
         .response-container {
             background: var(--bg);
             border-radius: 8px;
@@ -298,19 +289,19 @@
             font-size: 0.85rem;
         }
 
-        /* Error styling */
         .error {
             background: rgba(239, 68, 68, 0.1);
             border-left-color: var(--error);
+        }
+
+        .error .response-text {
             color: var(--error);
         }
 
-        /* Success styling */
         .success {
             border-left-color: var(--success);
         }
 
-        /* Info box */
         .info-box {
             background: rgba(37, 99, 235, 0.1);
             border: 1px solid var(--primary);
@@ -324,7 +315,6 @@
             color: var(--primary);
         }
 
-        /* API Key hint */
         .api-hint {
             font-size: 0.8rem;
             color: var(--text-dim);
@@ -332,23 +322,6 @@
             font-style: italic;
         }
 
-        /* Code blocks in formatted view */
-        .code-block {
-            background: var(--surface-light);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 12px;
-            margin: 12px 0;
-            overflow-x: auto;
-        }
-
-        .code-block code {
-            font-family: 'Consolas', 'Monaco', monospace;
-            font-size: 0.85rem;
-            color: var(--success);
-        }
-
-        /* Responsive Design */
         @media (max-width: 768px) {
             body {
                 padding: 12px;
@@ -392,7 +365,6 @@
             }
         }
 
-        /* Scrollbar styling */
         ::-webkit-scrollbar {
             width: 10px;
         }
@@ -425,23 +397,21 @@
             </div>
 
             <div class="form-group">
-                <label for="model-select">
-                    Select Model / API
-                </label>
+                <label for="model-select">Select Model / API</label>
                 <select id="model-select">
                     <optgroup label="AI Coding Models">
                         <option value="codestral">Codestral-v2 (Mistral AI) - Free</option>
                         <option value="deepseek">DeepSeek R1 (OpenRouter) - Free</option>
                     </optgroup>
                     <optgroup label="Search APIs">
-                        <option value="duckduckgo">DuckDuckGo Search</option>
+                        <option value="duckduckgo">DuckDuckGo Search (No Key Needed)</option>
                         <option value="bing">Bing Web Search (Paid)</option>
                         <option value="google">Google Custom Search (100/day free)</option>
                     </optgroup>
                 </select>
             </div>
 
-            <div class="form-group">
+            <div class="form-group" id="api-key-group">
                 <label for="api-key">
                     API Key <span id="key-required" style="color: var(--warning);">(Required)</span>
                 </label>
@@ -452,9 +422,7 @@
             </div>
 
             <div class="form-group" id="cx-field" style="display: none;">
-                <label for="cx-id">
-                    Google Custom Search Engine ID
-                </label>
+                <label for="cx-id">Google Custom Search Engine ID</label>
                 <input type="text" id="cx-id" placeholder="Your search engine ID (cx)">
                 <div class="api-hint">
                     Create at: <a href="https://programmablesearchengine.google.com/" target="_blank" style="color: var(--primary);">programmablesearchengine.google.com</a>
@@ -467,10 +435,8 @@
             </div>
 
             <div class="form-group">
-                <label for="query-input">
-                    Your Query / Prompt
-                </label>
-                <textarea id="query-input" placeholder="Enter your query or code prompt here..."></textarea>
+                <label for="query-input">Your Query / Prompt</label>
+                <textarea id="query-input" placeholder="Enter your query or code prompt here...">hello</textarea>
             </div>
 
             <button class="btn" id="test-btn">
@@ -510,7 +476,6 @@
     </div>
 
     <script>
-        // API Configuration
         const API_CONFIGS = {
             codestral: {
                 name: 'Codestral-v2',
@@ -529,13 +494,13 @@
             duckduckgo: {
                 name: 'DuckDuckGo',
                 endpoint: 'https://api.duckduckgo.com/',
-                source: 'No API key needed (free)',
+                source: 'No API key needed',
                 requiresKey: false
             },
             bing: {
                 name: 'Bing Search',
                 endpoint: 'https://api.bing.microsoft.com/v7.0/search',
-                source: 'portal.azure.com (Bing Search v7)',
+                source: 'portal.azure.com',
                 requiresKey: true
             },
             google: {
@@ -547,9 +512,9 @@
             }
         };
 
-        // DOM Elements
         const modelSelect = document.getElementById('model-select');
         const apiKeyInput = document.getElementById('api-key');
+        const apiKeyGroup = document.getElementById('api-key-group');
         const cxIdInput = document.getElementById('cx-id');
         const cxField = document.getElementById('cx-field');
         const enhanceCheckbox = document.getElementById('enhance-prompt');
@@ -567,40 +532,33 @@
         const apiSource = document.getElementById('api-source');
         const keyRequired = document.getElementById('key-required');
 
-        // Store raw response data
         let currentResponse = null;
         let currentModelType = null;
 
-        // Update UI based on selected model - FIXED
         function updateUIForModel() {
             const selected = modelSelect.value;
             const config = API_CONFIGS[selected];
-
-            apiSource.textContent = config.source;
             
+            apiSource.textContent = config.source;
+
             if (config.requiresKey) {
                 apiKeyInput.disabled = false;
+                apiKeyInput.classList.remove('disabled-field');
                 apiKeyInput.placeholder = 'Enter your API key here';
                 keyRequired.style.display = 'inline';
                 apiHint.style.display = 'block';
             } else {
-                // Grey out the API key field for DuckDuckGo - FIXED
                 apiKeyInput.disabled = true;
+                apiKeyInput.classList.add('disabled-field');
                 apiKeyInput.value = '';
-                apiKeyInput.placeholder = 'No API key required for this service';
+                apiKeyInput.placeholder = '✓ No API key required';
                 keyRequired.style.display = 'none';
                 apiHint.style.display = 'block';
             }
 
-            // Show/hide Google CX field
-            if (config.requiresCX) {
-                cxField.style.display = 'block';
-            } else {
-                cxField.style.display = 'none';
-            }
+            cxField.style.display = config.requiresCX ? 'block' : 'none';
         }
 
-        // Prompt Enhancement Function
         function enhancePrompt(query, modelType) {
             const isAI = ['codestral', 'deepseek'].includes(modelType);
             
@@ -618,22 +576,18 @@ Requirements:
 
 Please provide a comprehensive solution:`;
             } else {
-                // Search enhancement
-                return `${query} site-specific comprehensive detailed information latest 2025`;
+                return `${query} comprehensive detailed information 2025`;
             }
         }
 
-        // Extract text content from API responses
         function extractTextContent(data, modelType) {
             try {
-                // AI models (OpenAI-compatible format)
                 if (modelType === 'codestral' || modelType === 'deepseek') {
                     if (data.choices && data.choices[0] && data.choices[0].message) {
                         return data.choices[0].message.content;
                     }
                 }
 
-                // DuckDuckGo
                 if (modelType === 'duckduckgo') {
                     let text = '';
                     if (data.AbstractText) text += data.AbstractText + '
@@ -655,10 +609,9 @@ Please provide a comprehensive solution:`;
                         });
                     }
                     
-                    return text || 'No direct answer found. See full JSON for more details.';
+                    return text || 'No direct answer found. Try a different query or view JSON for raw data.';
                 }
 
-                // Bing
                 if (modelType === 'bing') {
                     let text = '';
                     if (data.webPages && data.webPages.value) {
@@ -678,7 +631,6 @@ Please provide a comprehensive solution:`;
                     return text || 'No results found.';
                 }
 
-                // Google
                 if (modelType === 'google') {
                     let text = '';
                     if (data.items && data.items.length > 0) {
@@ -704,7 +656,6 @@ Please provide a comprehensive solution:`;
             }
         }
 
-        // Format response based on view type
         function formatResponse(data, viewType, modelType) {
             if (viewType === 'formatted') {
                 return extractTextContent(data, modelType);
@@ -715,7 +666,6 @@ Please provide a comprehensive solution:`;
             }
         }
 
-        // View toggle functionality
         function setupViewToggle() {
             const toggleBtns = document.querySelectorAll('.toggle-btn');
             
@@ -723,11 +673,9 @@ Please provide a comprehensive solution:`;
                 btn.addEventListener('click', () => {
                     const viewType = btn.getAttribute('data-view');
                     
-                    // Update active state
                     toggleBtns.forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     
-                    // Update response display
                     if (currentResponse) {
                         updateResponseView(viewType);
                     }
@@ -735,12 +683,10 @@ Please provide a comprehensive solution:`;
             });
         }
 
-        // Update response view
         function updateResponseView(viewType) {
             const content = formatResponse(currentResponse, viewType, currentModelType);
             responseOutput.textContent = content;
             
-            // Update styling
             responseOutput.classList.remove('formatted', 'raw');
             if (viewType === 'formatted') {
                 responseOutput.classList.add('formatted');
@@ -749,7 +695,6 @@ Please provide a comprehensive solution:`;
             }
         }
 
-        // API Call Functions
         async function callCodestral(apiKey, prompt) {
             const response = await fetch(API_CONFIGS.codestral.endpoint, {
                 method: 'POST',
@@ -759,9 +704,7 @@ Please provide a comprehensive solution:`;
                 },
                 body: JSON.stringify({
                     model: API_CONFIGS.codestral.model,
-                    messages: [
-                        { role: 'user', content: prompt }
-                    ],
+                    messages: [{ role: 'user', content: prompt }],
                     temperature: 0.7,
                     max_tokens: 2000
                 })
@@ -769,7 +712,7 @@ Please provide a comprehensive solution:`;
 
             if (!response.ok) {
                 const error = await response.text();
-                throw new Error(`API Error: ${response.status} - ${error}`);
+                throw new Error(`API Error ${response.status}: ${error}`);
             }
 
             return await response.json();
@@ -782,40 +725,31 @@ Please provide a comprehensive solution:`;
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${apiKey}`,
                     'HTTP-Referer': window.location.origin,
-                    'X-Title': 'AI Coder & Search Tester'
+                    'X-Title': 'AI Coder Tester'
                 },
                 body: JSON.stringify({
                     model: API_CONFIGS.deepseek.model,
-                    messages: [
-                        { role: 'user', content: prompt }
-                    ]
+                    messages: [{ role: 'user', content: prompt }]
                 })
             });
 
             if (!response.ok) {
                 const error = await response.text();
-                throw new Error(`API Error: ${response.status} - ${error}`);
+                throw new Error(`API Error ${response.status}: ${error}`);
             }
 
             return await response.json();
         }
 
-        // DuckDuckGo with CORS proxy - FIXED
         async function callDuckDuckGo(query) {
-            // Using CORS proxy for DuckDuckGo
-            const proxyUrl = 'https://corsproxy.io/?';
+            const proxyUrl = 'https://api.allorigins.win/raw?url=';
             const apiUrl = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1&skip_disambig=1`;
             const url = proxyUrl + encodeURIComponent(apiUrl);
             
-            const response = await fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json'
-                }
-            });
+            const response = await fetch(url);
             
             if (!response.ok) {
-                throw new Error(`API Error: ${response.status}`);
+                throw new Error(`API Error ${response.status}`);
             }
 
             return await response.json();
@@ -826,14 +760,12 @@ Please provide a comprehensive solution:`;
             
             const response = await fetch(url, {
                 method: 'GET',
-                headers: {
-                    'Ocp-Apim-Subscription-Key': apiKey
-                }
+                headers: { 'Ocp-Apim-Subscription-Key': apiKey }
             });
 
             if (!response.ok) {
                 const error = await response.text();
-                throw new Error(`API Error: ${response.status} - ${error}`);
+                throw new Error(`API Error ${response.status}: ${error}`);
             }
 
             return await response.json();
@@ -846,13 +778,12 @@ Please provide a comprehensive solution:`;
 
             if (!response.ok) {
                 const error = await response.text();
-                throw new Error(`API Error: ${response.status} - ${error}`);
+                throw new Error(`API Error ${response.status}: ${error}`);
             }
 
             return await response.json();
         }
 
-        // Main Test Function - FIXED
         async function testAPI() {
             const modelType = modelSelect.value;
             const apiKey = apiKeyInput.value.trim();
@@ -860,7 +791,8 @@ Please provide a comprehensive solution:`;
             const shouldEnhance = enhanceCheckbox.checked;
             const config = API_CONFIGS[modelType];
 
-            // Validation
+            console.log('Testing API:', modelType);
+
             if (!query) {
                 alert('Please enter a query or prompt!');
                 return;
@@ -876,19 +808,15 @@ Please provide a comprehensive solution:`;
                 return;
             }
 
-            // Disable button and show loading
             testBtn.disabled = true;
             btnText.innerHTML = '<div class="spinner"></div> Testing...';
 
             try {
-                // Prepare prompts
                 const originalQuery = query;
                 const finalQuery = shouldEnhance ? enhancePrompt(query, modelType) : query;
 
-                // Start timer
                 const startTime = performance.now();
 
-                // Make API call based on model type
                 let response;
                 switch (modelType) {
                     case 'codestral':
@@ -910,18 +838,16 @@ Please provide a comprehensive solution:`;
                         throw new Error('Invalid model selection');
                 }
 
-                // End timer
                 const endTime = performance.now();
                 const duration = (endTime - startTime).toFixed(3);
 
-                // Store response
                 currentResponse = response;
                 currentModelType = modelType;
 
-                // Display results - FIXED TYPO
-                displayResults(originalQuery, finalQuery, shouldEnhance, response, duration, modelType);
+                displayResults(originalQuery, finalQuery, shouldEnhance, response, duration);
 
             } catch (error) {
+                console.error('API Error:', error);
                 displayError(error.message);
             } finally {
                 testBtn.disabled = false;
@@ -929,15 +855,13 @@ Please provide a comprehensive solution:`;
             }
         }
 
-        // Display Results - FIXED
-        function displayResults(original, enhanced, wasEnhanced, response, duration, modelType) {
-            // Show results section
+        function displayResults(original, enhanced, wasEnhanced, response, duration) {
+            console.log('Displaying results');
+            
             resultsSection.classList.remove('hidden');
             
-            // Update timer
             timerDisplay.textContent = `⏱️ ${duration}ms`;
 
-            // Show prompts
             if (wasEnhanced) {
                 originalPromptSection.style.display = 'block';
                 originalPrompt.textContent = original;
@@ -948,23 +872,21 @@ Please provide a comprehensive solution:`;
                 enhancedPromptSection.style.display = 'none';
             }
 
-            // Reset to formatted view
             const toggleBtns = document.querySelectorAll('.toggle-btn');
             toggleBtns.forEach(b => b.classList.remove('active'));
             toggleBtns[0].classList.add('active');
             
-            // Display response in formatted view
             updateResponseView('formatted');
             responseOutput.parentElement.parentElement.classList.remove('error');
 
-            // Scroll to results
             setTimeout(() => {
                 resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }, 100);
         }
 
-        // Display Error
         function displayError(errorMsg) {
+            console.log('Displaying error:', errorMsg);
+            
             resultsSection.classList.remove('hidden');
             
             timerDisplay.textContent = '⏱️ Error';
@@ -973,7 +895,10 @@ Please provide a comprehensive solution:`;
             
             responseOutput.textContent = `❌ Error: ${errorMsg}
 
-Note: DuckDuckGo uses a CORS proxy. If it fails, try another service or check your internet connection.`;
+Troubleshooting:
+• Check your API key
+• Verify internet connection
+• Try a different service`;
             responseOutput.classList.add('formatted');
             responseOutput.classList.remove('raw');
             responseOutput.parentElement.parentElement.classList.add('error');
@@ -983,20 +908,19 @@ Note: DuckDuckGo uses a CORS proxy. If it fails, try another service or check yo
             }, 100);
         }
 
-        // Event Listeners
         modelSelect.addEventListener('change', updateUIForModel);
         testBtn.addEventListener('click', testAPI);
 
-        // Handle Enter key in textarea (Ctrl+Enter to submit)
         queryInput.addEventListener('keydown', (e) => {
             if (e.ctrlKey && e.key === 'Enter') {
                 testAPI();
             }
         });
 
-        // Initialize
         updateUIForModel();
         setupViewToggle();
+
+        console.log('AI Coder & Search API Tester loaded successfully');
     </script>
 </body>
 </html>
