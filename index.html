@@ -1,295 +1,773 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Search API Playground — DuckDuckGo / Bing / Google</title>
-<style>
-  :root{--bg:#0f1724;--panel:#0b1220;--muted:#94a3b8;--accent:#7c3aed;--card:#071126;--success:#10b981}
-  body{margin:0;font-family:Inter,Segoe UI,system-ui,Roboto,"Helvetica Neue",Arial;background:linear-gradient(180deg,#071029 0%, #071126 50%, #081226 100%);color:#e6eef8;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px}
-  .app{width:980px;max-width:98%;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border:1px solid rgba(255,255,255,0.04);box-shadow:0 10px 30px rgba(2,6,23,0.6);border-radius:12px;overflow:hidden}
-  header{padding:18px 22px;background:linear-gradient(90deg,rgba(124,58,237,0.12),transparent);display:flex;gap:12px;align-items:center}
-  header h1{font-size:16px;margin:0}
-  .grid{display:grid;grid-template-columns:340px 1fr;gap:18px;padding:18px}
-  .panel{background:linear-gradient(180deg,rgba(255,255,255,0.01),transparent);padding:14px;border-radius:10px;border:1px solid rgba(255,255,255,0.02)}
-  label{display:block;font-size:13px;color:var(--muted);margin-bottom:8px}
-  select,input[type="text"],textarea{width:100%;padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:rgba(255,255,255,0.02);color:inherit;font-size:14px}
-  textarea{min-height:110px;resize:vertical}
-  .row{display:flex;gap:8px;align-items:center}
-  .small{font-size:12px;color:var(--muted)}
-  .actions{display:flex;gap:8px;margin-top:10px}
-  button{background:var(--accent);color:white;padding:8px 12px;border-radius:8px;border:0;cursor:pointer;font-weight:600}
-  button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04)}
-  .out{padding:14px;min-height:320px;display:flex;flex-direction:column;gap:12px}
-  .response{white-space:pre-wrap;background:linear-gradient(180deg,rgba(255,255,255,0.01),transparent);padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.02);overflow:auto;max-height:540px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
-  .meta{display:flex;justify-content:space-between;align-items:center}
-  .chip{background:rgba(255,255,255,0.03);padding:6px 8px;border-radius:999px;font-size:13px;color:var(--muted)}
-  .rimer{width:18px;height:18px;border-radius:50%;border:3px solid rgba(255,255,255,0.08);border-top-color:var(--accent);animation:none}
-  .rimer.running{animation:spin 1s linear infinite}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .footerpx;background:rgba(255,255,255,0.01);display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted)}
-  .row-compact{display:flex;gap:8px;align-items:center}
-  .badge{background:rgba(255,255,255,0.03);padding:3px 8px;border-radius:6px;font-size:12px;color:var(--muted)}
-  .example{font-size:13px;color:var(--muted);margin-top:10px}
-  .error{color:#ffb4a2;background:rgba(255,80,80,0.06);padding:8px;border-radius:6px;border:1px solid rgba(255,80,80,0.06)}
-  a.link{color:var(--accent);text-decoration:none}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Coder & Search API Tester</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --surface-light: #334155;
+            --text: #e2e8f0;
+            --text-dim: #94a3b8;
+            --border: #475569;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--success));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+        }
+
+        /* Control Panel */
+        .control-panel {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text);
+            font-size: 0.9rem;
+        }
+
+        select, input[type="text"], textarea {
+            width: 100%;
+            padding: 12px;
+            background: var(--surface-light);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        select:focus, input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        /* Checkbox styling */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
+        }
+
+        /* Button */
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:hover:not(:disabled) {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Results Section */
+        .results-section {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .results-section.hidden {
+            display: none;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .result-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .timer {
+            background: var(--surface-light);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9rem;
+            color: var(--warning);
+            font-weight: 600;
+        }
+
+        /* Prompt Display */
+        .prompt-display {
+            background: var(--surface-light);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .prompt-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .prompt-text {
+            color: var(--text);
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        /* Response Display */
+        .response-container {
+            background: var(--bg);
+            border-radius: 8px;
+            padding: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+        }
+
+        .response-text {
+            color: var(--text);
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            line-height: 1.8;
+        }
+
+        /* Error styling */
+        .error {
+            background: rgba(239, 68, 68, 0.1);
+            border-left-color: var(--error);
+            color: var(--error);
+        }
+
+        /* Success styling */
+        .success {
+            border-left-color: var(--success);
+        }
+
+        /* Info box */
+        .info-box {
+            background: rgba(37, 99, 235, 0.1);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+
+        .info-box strong {
+            color: var(--primary);
+        }
+
+        /* API Key hint */
+        .api-hint {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-top: 6px;
+            font-style: italic;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .control-panel, .results-section {
+                padding: 16px;
+            }
+
+            .btn {
+                padding: 12px 20px;
+            }
+
+            .result-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--surface);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-dim);
+        }
+
+        /* Model info badges */
+        .model-info {
+            display: inline-block;
+            background: var(--surface-light);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: var(--success);
+            margin-left: 8px;
+        }
+    </style>
 </head>
 <body>
-  <div class="app" role="application">
-    <header>
-      <h1>Search API Playground — DuckDuckGo, Bing, Google, Proxy</h1>
-      <div class="chip">Single-file demo</div>
-    </header>
+    <div class="container">
+        <header>
+            <h1>🚀 AI Coder & Search API Tester</h1>
+            <p class="subtitle">Test multiple AI models and search APIs with precise timing and prompt enhancement</p>
+        </header>
 
-    <div class="grid">
-      <div class="panel">
-        <label for="source">Choose source</label>
-        <select id="source" aria-label="source selector">
-          <option value="duckduckgo">DuckDuckGo Instant Answer (free)</option>
-          <option value="bing">Bing Web Search (requires key / proxy)</option>
-          <option value="google">Google Programmable Search (requires key)</option>
-          <option value="proxy">Generic Proxy Endpoint (your fetch proxy)</option>
-        </select>
+        <div class="control-panel">
+            <div class="info-box">
+                <strong>📌 Quick Start:</strong> Select a model/API, enter your query, optionally enhance it, and click Test API. 
+                Some services require API keys (see hints below each field).
+            </div>
 
-        <div style="height:12px"></div>
+            <div class="form-group">
+                <label for="model-select">
+                    Select Model / API
+                </label>
+                <select id="model-select">
+                    <optgroup label="AI Coding Models">
+                        <option value="codestral">Codestral-v2 (Mistral AI) - Free</option>
+                        <option value="deepseek">DeepSeek R1 (OpenRouter) - Free</option>
+                    </optgroup>
+                    <optgroup label="Search APIs">
+                        <option value="duckduckgo">DuckDuckGo Search</option>
+                        <option value="bing">Bing Web Search (Paid)</option>
+                        <option value="google">Google Custom Search (100/day free)</option>
+                    </optgroup>
+                </select>
+            </div>
 
-        <label for="apikey">API Key or Proxy Endpoint (paste full URL for proxy)</label>
-        <input id="apikey" type="text" placeholder="Bing subscription key OR proxy URL (https://...)" />
+            <div class="form-group">
+                <label for="api-key">
+                    API Key <span id="key-required" style="color: var(--warning);">(Required)</span>
+                </label>
+                <input type="text" id="api-key" placeholder="Enter your API key here">
+                <div class="api-hint" id="api-hint">
+                    Get your key from: <span id="api-source"></span>
+                </div>
+            </div>
 
-        <label for="cx" style="margin-top:10px">Google CX / Search Engine ID (optional)</label>
-        <input id="cx" type="text" placeholder="Google Programmable Search engine ID (cx)" />
+            <div class="form-group" id="cx-field" style="display: none;">
+                <label for="cx-id">
+                    Google Custom Search Engine ID
+                </label>
+                <input type="text" id="cx-id" placeholder="Your search engine ID (cx)">
+                <div class="api-hint">
+                    Create at: <a href="https://programmablesearchengine.google.com/" target="_blank" style="color: var(--primary);">programmablesearchengine.google.com</a>
+                </div>
+            </div>
 
-        <label style="margin-top:12px">Prompt (user input)</label>
-        <textarea id="prompt" placeholder="Enter a query or 'react component to fetch data'..."></textarea>
+            <div class="checkbox-group">
+                <input type="checkbox" id="enhance-prompt">
+                <label for="enhance-prompt">🎯 Auto-enhance prompt with prompt engineering</label>
+            </div>
 
-        <div style="height:10px"></div>
+            <div class="form-group">
+                <label for="query-input">
+                    Your Query / Prompt
+                </label>
+                <textarea id="query-input" placeholder="Enter your query or code prompt here..."></textarea>
+            </div>
 
-        <label class="row-compact"><input id="smartEnhance" type="checkbox" /> <span style="margin-left:8px">Enable Smart prompt enhancement (local)</span></label>
-
-        <div class="actions">
-          <button id="sendBtn">Send</button>
-          <button id="clearBtn" class="ghost">Clear Output</button>
+            <button class="btn" id="test-btn">
+                <span id="btn-text">🚀 Test API</span>
+            </button>
         </div>
 
-        <div class="example">
-          Example prompts: "react fetch example", "debounce input React", "python open file example"
+        <div class="results-section hidden" id="results">
+            <div class="result-header">
+                <h2 class="result-title">📊 Results</h2>
+                <div class="timer" id="timer">⏱️ 0.000ms</div>
+            </div>
+
+            <div id="original-prompt-section" class="prompt-display" style="display: none;">
+                <div class="prompt-label">📝 Original Prompt</div>
+                <div class="prompt-text" id="original-prompt"></div>
+            </div>
+
+            <div id="enhanced-prompt-section" class="prompt-display success" style="display: none;">
+                <div class="prompt-label">✨ Enhanced Prompt</div>
+                <div class="prompt-text" id="enhanced-prompt"></div>
+            </div>
+
+            <div class="prompt-display">
+                <div class="prompt-label">🔍 API Response (Raw JSON/Text)</div>
+                <div class="response-container">
+                    <pre class="response-text" id="response-output"></pre>
+                </div>
+            </div>
         </div>
-      </div>
-
-      <div class="panel out">
-        <div class="meta">
-          <div>
-            <strong>Response</strong>
-            <div class="small">See raw result and code snippets below</div>
-          </div>
-          <div style="display:flex;gap:10px;align-items:center">
-            <div id="rimer" class="rimer" title="request activity indicator" aria-hidden="true"></div>
-            <div class="chip" id="statusChip">idle</div>
-          </div>
-        </div>
-
-        <div id="messages" class="response" role="log" aria-live="polite"></div>
-
-        <div id="infoRow" class="row" style="margin-top:6px">
-          <div class="small" id="timing">—</div>
-          <div style="flex:1"></div>
-          <div id="note" class="small">Local smart enhancer: adds concise instruction to the prompt</div>
-        </div>
-
-        <div id="errorBox" style="display:none;margin-top:8px"></div>
-      </div>
     </div>
 
-    <div class="footer">
-      <div class="small">Deployable single file. For Bing/Google you may need a server-side proxy to avoid CORS and to keep keys secret.</div>
-      <div><span class="badge">Tip</span></div>
-    </div>
-  </div>
+    <script>
+        // API Configuration
+        const API_CONFIGS = {
+            codestral: {
+                name: 'Codestral-v2',
+                endpoint: 'https://api.mistral.ai/v1/chat/completions',
+                source: 'console.mistral.ai',
+                requiresKey: true,
+                model: 'codestral-latest'
+            },
+            deepseek: {
+                name: 'DeepSeek R1',
+                endpoint: 'https://openrouter.ai/api/v1/chat/completions',
+                source: 'openrouter.ai/keys',
+                requiresKey: true,
+                model: 'deepseek/deepseek-r1:free'
+            },
+            duckduckgo: {
+                name: 'DuckDuckGo',
+                endpoint: 'https://api.duckduckgo.com/',
+                source: 'No API key needed (free)',
+                requiresKey: false
+            },
+            bing: {
+                name: 'Bing Search',
+                endpoint: 'https://api.bing.microsoft.com/v7.0/search',
+                source: 'portal.azure.com (Bing Search v7)',
+                requiresKey: true
+            },
+            google: {
+                name: 'Google Custom Search',
+                endpoint: 'https://www.googleapis.com/customsearch/v1',
+                source: 'console.cloud.google.com/apis',
+                requiresKey: true,
+                requiresCX: true
+            }
+        };
 
-<script>
-/*
-  Single-file Search API Playground
-  - Supports DuckDuckGo (direct JSON), Bing Web Search, Google Programmable Search, and a generic proxy.
-  - For Bing/Google in production: use a server-side proxy to keep API keys secret and to resolve CORS.
-  - The "Smart prompt enhancement" is local and optional; it modifies the prompt before sending.
-*/
+        // DOM Elements
+        const modelSelect = document.getElementById('model-select');
+        const apiKeyInput = document.getElementById('api-key');
+        const cxIdInput = document.getElementById('cx-id');
+        const cxField = document.getElementById('cx-field');
+        const enhanceCheckbox = document.getElementById('enhance-prompt');
+        const queryInput = document.getElementById('query-input');
+        const testBtn = document.getElementById('test-btn');
+        const btnText = document.getElementById('btn-text');
+        const resultsSection = document.getElementById('results');
+        const timerDisplay = document.getElementById('timer');
+        const originalPromptSection = document.getElementById('original-prompt-section');
+        const enhancedPromptSection = document.getElementById('enhanced-prompt-section');
+        const originalPrompt = document.getElementById('original-prompt');
+        const enhancedPrompt = document.getElementById('enhanced-prompt');
+        const responseOutput = document.getElementById('response-output');
+        const apiHint = document.getElementById('api-hint');
+        const apiSource = document.getElementById('api-source');
+        const keyRequired = document.getElementById('key-required');
 
-const $ = id => document.getElementById(id);
-const sourceEl = $('source');
-const apiKeyEl = $('apikey');
-const promptEl = $('prompt');
-const sendBtn = $('sendBtn');
-const clearBtn = $('clearBtn');
-const messages = $('messages');
-const statusChip = $('statusChip');
-const rimer = $('rimer');
-const timing = $('timing');
-const cxEl = $('cx');
-const errorBox = $('errorBox');
-const smartEnhanceEl = $('smartEnhance');
+        // Update UI based on selected model
+        function updateUIForModel() {
+            const selected = modelSelect.value;
+            const config = API_CONFIGS[selected];
 
-let requestStart = 0;
+            apiSource.textContent = config.source;
+            
+            if (config.requiresKey) {
+                apiKeyInput.disabled = false;
+                keyRequired.style.display = 'inline';
+                apiHint.style.display = 'block';
+            } else {
+                apiKeyInput.disabled = true;
+                apiKeyInput.value = '';
+                keyRequired.style.display = 'none';
+                apiHint.style.display = 'block';
+            }
 
-// Utility: set running indicator
-function setRunning(r) {
-  if (r) {
-    rimer.classList.add('running');
-    statusChip.textContent = 'running';
-  } else {
-    rimer.classList.remove('running');
-    statusChip.textContent = 'idle';
-  }
-}
+            // Show/hide Google CX field
+            if (config.requiresCX) {
+                cxField.style.display = 'block';
+            } else {
+                cxField.style.display = 'none';
+            }
+        }
 
-// Local "smart" enhancer: simple deterministic enhancement for clarity and code requests
-function enhancePrompt(original) {
-  // Keep enhancement short and generic. This runs locally and never sends your keys.
-  const guide = "Provide a concise, well-formatted answer. If code, return a runnable snippet with minimal explanation and no extra commentary.";
-  // If the user is clearly asking for code, hint for a code block
-  const wantsCode = /\b(code|example|snippet|react|python|javascript|js|jsx)\b/i.test(original);
-  if (wantsCode) {
-    return `${original.trim()} ${guide}`;
-  }
-  return original.trim();
-}
+        // Prompt Enhancement Function
+        function enhancePrompt(query, modelType) {
+            const isAI = ['codestral', 'deepseek'].includes(modelType);
+            
+            if (isAI) {
+                return `You are an expert software engineer and code architect. 
 
-// Short helper to append text to the response area
-function appendMessage(text, isError=false) {
-  const node = document.createElement('div');
-  node.textContent = text;
-  if (isError) node.style.color = '#ffb4a2';
-  messages.appendChild(node);
-  messages.scrollTop = messages.scrollHeight;
-}
+Task: ${query}
 
-// Clear UI
-clearBtn.addEventListener('click', () => {
-  messages.textContent = '';
-  timing.textContent = '—';
-  errorBox.style.display = 'none';
-  errorBox.innerHTML = '';
-});
+Requirements:
+- Provide clean, well-documented code
+- Follow best practices and design patterns
+- Include error handling where appropriate
+- Explain key decisions and trade-offs
+- Make code production-ready and maintainable
 
-// Main send action
-sendBtn.addEventListener('click', async () => {
-  errorBox.style.display = 'none';
-  errorBox.innerHTML = '';
-  messages.textContent = '';
-  const rawPrompt = promptEl.value || '';
-  if (!rawPrompt.trim()) {
-    errorBox.style.display = 'block';
-    errorBox.innerHTML = '<div class="error">Please enter a prompt to send.</div>';
-    return;
-  }
+Please provide a comprehensive solution:`;
+            } else {
+                // Search enhancement
+                return `${query} site-specific comprehensive detailed information latest 2025`;
+            }
+        }
 
-  const source = sourceEl.value;
-  const apiKeyOrProxy = apiKeyEl.value.trim();
-  const googleCx = cxEl.value.trim();
+        // Format response for display
+        function formatResponse(data, modelType) {
+            try {
+                if (typeof data === 'string') {
+                    return data;
+                }
+                return JSON.stringify(data, null, 2);
+            } catch (e) {
+                return String(data);
+            }
+        }
 
-  const finalPrompt = smartEnhanceEl.checked ? enhancePrompt(rawPrompt) : rawPrompt.trim();
+        // API Call Functions
+        async function callCodestral(apiKey, prompt) {
+            const response = await fetch(API_CONFIGS.codestral.endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                },
+                body: JSON.stringify({
+                    model: API_CONFIGS.codestral.model,
+                    messages: [
+                        { role: 'user', content: prompt }
+                    ],
+                    temperature: 0.7,
+                    max_tokens: 2000
+                })
+            });
 
-  setRunning(true);
-  requestStart = performance.now();
-  timing.textContent = 'requesting...';
+            if (!response.ok) {
+                const error = await response.text();
+                throw new Error(`API Error: ${response.status} - ${error}`);
+            }
 
-  try {
-    if (source === 'duckduckgo') {
-      // DuckDuckGo Instant Answer API (free)
-      // Direct call: https://api.duckduckgo.com/?q=...&format=json&no_html=1
-      const url = `https://api.duckduckgo.com/?q=${encodeURIComponent(finalPrompt)}&format=json&no_html=1&skip_disambig=1`;
-      appendMessage(`Requesting DuckDuckGo: ${url}`);
-      const res = await fetch(url, {method:'GET'});
-      if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
-      const data = await res.json();
-      // Present the most useful fields
-      const out = [];
-      if (data.AbstractText) out.push(`Abstract:\n${data.AbstractText}`);
-      if (data.RelatedTopics && data.RelatedTopics.length) {
-        const snippets = data.RelatedTopics.slice(0,6).map(t => (t.Text || t.Result || '').replace(/<\/?[^>]+(>|$)/g, ''));
-        out.push(`Related Topics:\n- ${snippets.join('\n- ')}`);
-      }
-      if (data.AbstractURL) out.push(`Source: ${data.AbstractURL}`);
-      if (out.length === 0) out.push(JSON.stringify(data,null,2));
-      appendMessage(out.join('\n\n'));
-    } else if (source === 'bing') {
-      // Bing Web Search: Requires key. Best practice: call via server-side proxy.
-      // Client usage below will succeed only if you supply a proxy endpoint that forwards the request,
-      // or if your environment permits CORS and you provide subscription key in a secure way (not recommended).
-      if (!apiKeyOrProxy) throw new Error('Bing requires a subscription key OR a proxy endpoint. Paste the proxy full URL in the API Key field.');
-      // If user provided a proxy URL, call it; otherwise assume it's a direct Bing key (not recommended from browser)
-      if (apiKeyOrProxy.startsWith('http')) {
-        // Proxy expected to accept ?q=... and forward to Bing
-        const url = `${apiKeyOrProxy}${apiKeyOrProxy.includes('?')? '&' : '?'}q=${encodeURIComponent(finalPrompt)}`;
-        appendMessage(`Requesting via proxy: ${url}`);
-        const res = await fetch(url, {method:'GET'});
-        if (!res.ok) throw new Error(`Proxy HTTP ${res.status} ${res.statusText}`);
-        const payload = await res.json();
-        appendMessage(JSON.stringify(payload, null, 2));
-      } else {
-        // Direct call attempt (will usually fail due to CORS and exposing key)
-        appendMessage('Attempting direct Bing Web Search (not recommended from browser).');
-        const endpoint = `https://api.bing.microsoft.com/v7.0/search?q=${encodeURIComponent(finalPrompt)}`;
-        const res = await fetch(endpoint, {
-          headers: { 'Ocp-Apim-Subscription-Key': apiKeyOrProxy }
+            return await response.json();
+        }
+
+        async function callDeepSeek(apiKey, prompt) {
+            const response = await fetch(API_CONFIGS.deepseek.endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`,
+                    'HTTP-Referer': window.location.origin,
+                    'X-Title': 'AI Coder & Search Tester'
+                },
+                body: JSON.stringify({
+                    model: API_CONFIGS.deepseek.model,
+                    messages: [
+                        { role: 'user', content: prompt }
+                    ]
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.text();
+                throw new Error(`API Error: ${response.status} - ${error}`);
+            }
+
+            return await response.json();
+        }
+
+        async function callDuckDuckGo(query) {
+            // Note: DuckDuckGo Instant Answer API (free, no auth)
+            const url = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&pretty=1`;
+            
+            const response = await fetch(url);
+            
+            if (!response.ok) {
+                throw new Error(`API Error: ${response.status}`);
+            }
+
+            return await response.json();
+        }
+
+        async function callBing(apiKey, query) {
+            const url = `${API_CONFIGS.bing.endpoint}?q=${encodeURIComponent(query)}&count=10`;
+            
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Ocp-Apim-Subscription-Key': apiKey
+                }
+            });
+
+            if (!response.ok) {
+                const error = await response.text();
+                throw new Error(`API Error: ${response.status} - ${error}`);
+            }
+
+            return await response.json();
+        }
+
+        async function callGoogle(apiKey, cx, query) {
+            const url = `${API_CONFIGS.google.endpoint}?key=${apiKey}&cx=${cx}&q=${encodeURIComponent(query)}`;
+            
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                const error = await response.text();
+                throw new Error(`API Error: ${response.status} - ${error}`);
+            }
+
+            return await response.json();
+        }
+
+        // Main Test Function
+        async function testAPI() {
+            const modelType = modelSelect.value;
+            const apiKey = apiKeyInput.value.trim();
+            const query = queryInput.value.trim();
+            const shouldEnhance = enhanceCheckbox.checked;
+            const config = API_CONFIGS[modelType];
+
+            // Validation
+            if (!query) {
+                alert('Please enter a query or prompt!');
+                return;
+            }
+
+            if (config.requiresKey && !apiKey) {
+                alert('API key is required for this service!');
+                return;
+            }
+
+            if (config.requiresCX && !cxIdInput.value.trim()) {
+                alert('Google Custom Search Engine ID is required!');
+                return;
+            }
+
+            // Disable button and show loading
+            testBtn.disabled = true;
+            btnText.innerHTML = '<div class="spinner"></div> Testing...';
+            resultsSection.classList.add('hidden');
+
+            try {
+                // Prepare prompts
+                const originalQuery = query;
+                const finalQuery = shouldEnhance ? enhancePrompt(query, modelType) : query;
+
+                // Start timer
+                const startTime = performance.now();
+
+                // Make API call based on model type
+                let response;
+                switch (modelType) {
+                    case 'codestral':
+                        response = await callCodestral(apiKey, finalQuery);
+                        break;
+                    case 'deepseek':
+                        response = await callDeepSeek(apiKey, finalQuery);
+                        break;
+                    case 'duckduckgo':
+                        response = await callDuckDuckGo(finalQuery);
+                        break;
+                    case 'bing':
+                        response = await callBing(apiKey, finalQuery);
+                        break;
+                    case 'google':
+                        response = await callGoogle(apiKey, cxIdInput.value.trim(), finalQuery);
+                        break;
+                    default:
+                        throw new Error('Invalid model selection');
+                }
+
+                // End timer
+                const endTime = performance.now();
+                const duration = (endTime - startTime).toFixed(3);
+
+                // Display results
+                displayResults(originalQuery, finalQuery, shouldEnhance, response, duration, modelType);
+
+            } catch (error) {
+                displayError(error.message);
+            } finally {
+                testBtn.disabled = false;
+                btnText.innerHTML = '🚀 Test API';
+            }
+        }
+
+        // Display Results
+        function displayResults(original, enhanced, wasEnhanced, response, duration, modelType) {
+            resultsSection.classList.remove('hidden');
+            
+            // Update timer
+            timerDisplay.textContent = `⏱️ ${duration}ms`;
+
+            // Show prompts
+            if (wasEnhanced) {
+                originalPromptSection.style.display = 'block';
+                originalPrompt.textContent = original;
+                enhancedPromptSection.style.display = 'block';
+                enhancedPrompt.textContent = enhanced;
+            } else {
+                originalPromptSection.style.display = 'none';
+                enhancedPromptSection.style.display = 'none';
+            }
+
+            // Display response
+            responseOutput.textContent = formatResponse(response, modelType);
+            responseOutput.parentElement.parentElement.classList.remove('error');
+
+            // Scroll to results
+            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Display Error
+        function displayError(errorMsg) {
+            resultsSection.classList.remove('hidden');
+            
+            timerDisplay.textContent = '⏱️ Error';
+            originalPromptSection.style.display = 'none';
+            enhancedPromptSection.style.display = 'none';
+            
+            responseOutput.textContent = `❌ Error: ${errorMsg}`;
+            responseOutput.parentElement.parentElement.classList.add('error');
+
+            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Event Listeners
+        modelSelect.addEventListener('change', updateUIForModel);
+        testBtn.addEventListener('click', testAPI);
+
+        // Handle Enter key in textarea (Ctrl+Enter to submit)
+        queryInput.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                testAPI();
+            }
         });
-        if (!res.ok) throw new Error(`Bing HTTP ${res.status} ${res.statusText}`);
-        const payload = await res.json();
-        appendMessage(JSON.stringify(payload, null, 2));
-      }
-    } else if (source === 'google') {
-      // Google Programmable Search (Custom Search JSON API)
-      // Requires API key and cx. Browser calls may hit CORS and will expose the key.
-      if (!apiKeyOrProxy || !googleCx) throw new Error('Google requires an API key (paste in API Key field) and a search engine ID (cx).');
-      // User provided key in apiKeyOrProxy variable
-      const endpoint = `https://www.googleapis.com/customsearch/v1?key=${encodeURIComponent(apiKeyOrProxy)}&cx=${encodeURIComponent(googleCx)}&q=${encodeURIComponent(finalPrompt)}`;
-      appendMessage(`Requesting Google Programmable Search...`);
-      const res = await fetch(endpoint);
-      if (!res.ok) throw new Error(`Google HTTP ${res.status} ${res.statusText}`);
-      const payload = await res.json();
-      // Extract useful parts
-      const items = payload.items || [];
-      if (items.length === 0) {
-        appendMessage('No items returned. Full payload:\n' + JSON.stringify(payload, null, 2));
-      } else {
-        const out = items.slice(0,6).map(it => `Title: ${it.title}\nLink: ${it.link}\nSnippet: ${it.snippet}`).join('\n\n---\n\n');
-        appendMessage(out);
-      }
-    } else if (source === 'proxy') {
-      // Generic proxy: the proxy should accept ?q=... and return JSON.
-      if (!apiKeyOrProxy || !apiKeyOrProxy.startsWith('http')) throw new Error('Provide a full proxy URL in the API Key field, e.g. https://myproxy.example/search');
-      const url = `${apiKeyOrProxy}${apiKeyOrProxy.includes('?')? '&' : '?'}q=${encodeURIComponent(finalPrompt)}`;
-      appendMessage(`Requesting proxy: ${url}`);
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`Proxy HTTP ${res.status} ${res.statusText}`);
-      const payload = await res.json();
-      appendMessage(JSON.stringify(payload, null, 2));
-    } else {
-      throw new Error('Unknown source selection.');
-    }
 
-    const totalMs = Math.round(performance.now() - requestStart);
-    timing.textContent = `completed in ${totalMs} ms`;
-  } catch (err) {
-    const elapsed = Math.round(performance.now() - requestStart);
-    timing.textContent = `error after ${elapsed} ms`;
-    errorBox.style.display = 'block';
-    errorBox.innerHTML = `<div class="error">Error: ${String(err.message || err)}</div>`;
-  } finally {
-    setRunning(false);
-  }
-});
-
-// Small UX: press Ctrl+Enter to send
-promptEl.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-    sendBtn.click();
-  }
-});
-
-// Example: prefill prompt for quick testing
-promptEl.value = "react fetch data example: simple component that fetches JSON and displays list";
-
-</script>
+        // Initialize
+        updateUIForModel();
+    </script>
 </body>
 </html>
