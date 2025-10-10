@@ -203,6 +203,36 @@
             font-weight: 600;
         }
 
+        /* View Toggle Buttons */
+        .view-toggle {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .toggle-btn {
+            background: var(--surface-light);
+            color: var(--text-dim);
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn:hover {
+            background: var(--border);
+        }
+
+        .toggle-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
         /* Prompt Display */
         .prompt-display {
             background: var(--surface-light);
@@ -240,11 +270,19 @@
 
         .response-text {
             color: var(--text);
-            font-family: 'Consolas', 'Monaco', monospace;
-            font-size: 0.85rem;
+            font-size: 0.95rem;
             white-space: pre-wrap;
             word-wrap: break-word;
             line-height: 1.8;
+        }
+
+        .response-text.formatted {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .response-text.raw {
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.85rem;
         }
 
         /* Error styling */
@@ -279,6 +317,22 @@
             color: var(--text-dim);
             margin-top: 6px;
             font-style: italic;
+        }
+
+        /* Code blocks in formatted view */
+        .code-block {
+            background: var(--surface-light);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 12px;
+            margin: 12px 0;
+            overflow-x: auto;
+        }
+
+        .code-block code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.85rem;
+            color: var(--success);
         }
 
         /* Responsive Design */
@@ -322,30 +376,19 @@
         ::-webkit-scrollbar-thumb:hover {
             background: var(--text-dim);
         }
-
-        /* Model info badges */
-        .model-info {
-            display: inline-block;
-            background: var(--surface-light);
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            color: var(--success);
-            margin-left: 8px;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>🚀 AI Coder & Search API Tester</h1>
-            <p class="subtitle">Test multiple AI models and search APIs with precise timing and prompt enhancement</p>
+            <p class="subtitle">Test multiple AI models and search APIs with toggleable text/JSON views</p>
         </header>
 
         <div class="control-panel">
             <div class="info-box">
                 <strong>📌 Quick Start:</strong> Select a model/API, enter your query, optionally enhance it, and click Test API. 
-                Some services require API keys (see hints below each field).
+                Toggle between Formatted Text, Pretty JSON, and Raw JSON views.
             </div>
 
             <div class="form-group">
@@ -408,6 +451,12 @@
                 <div class="timer" id="timer">⏱️ 0.000ms</div>
             </div>
 
+            <div class="view-toggle">
+                <button class="toggle-btn active" data-view="formatted">💬 Formatted Text</button>
+                <button class="toggle-btn" data-view="pretty">🎨 Pretty JSON</button>
+                <button class="toggle-btn" data-view="raw">📄 Raw JSON</button>
+            </div>
+
             <div id="original-prompt-section" class="prompt-display" style="display: none;">
                 <div class="prompt-label">📝 Original Prompt</div>
                 <div class="prompt-text" id="original-prompt"></div>
@@ -419,9 +468,9 @@
             </div>
 
             <div class="prompt-display">
-                <div class="prompt-label">🔍 API Response (Raw JSON/Text)</div>
+                <div class="prompt-label">🔍 Response</div>
                 <div class="response-container">
-                    <pre class="response-text" id="response-output"></pre>
+                    <div class="response-text formatted" id="response-output"></div>
                 </div>
             </div>
         </div>
@@ -485,6 +534,10 @@
         const apiSource = document.getElementById('api-source');
         const keyRequired = document.getElementById('key-required');
 
+        // Store raw response data
+        let currentResponse = null;
+        let currentModelType = null;
+
         // Update UI based on selected model
         function updateUIForModel() {
             const selected = modelSelect.value;
@@ -534,15 +587,129 @@ Please provide a comprehensive solution:`;
             }
         }
 
-        // Format response for display
-        function formatResponse(data, modelType) {
+        // Extract text content from API responses
+        function extractTextContent(data, modelType) {
             try {
-                if (typeof data === 'string') {
-                    return data;
+                // AI models (OpenAI-compatible format)
+                if (modelType === 'codestral' || modelType === 'deepseek') {
+                    if (data.choices && data.choices[0] && data.choices[0].message) {
+                        return data.choices[0].message.content;
+                    }
                 }
-                return JSON.stringify(data, null, 2);
+
+                // DuckDuckGo
+                if (modelType === 'duckduckgo') {
+                    let text = '';
+                    if (data.AbstractText) text += data.AbstractText + '
+
+';
+                    if (data.Answer) text += 'Answer: ' + data.Answer + '
+
+';
+                    if (data.Definition) text += 'Definition: ' + data.Definition + '
+
+';
+                    
+                    if (data.RelatedTopics && data.RelatedTopics.length > 0) {
+                        text += 'Related Topics:
+';
+                        data.RelatedTopics.slice(0, 5).forEach(topic => {
+                            if (topic.Text) text += '• ' + topic.Text + '
+';
+                        });
+                    }
+                    
+                    return text || 'No direct answer found. See full JSON for more details.';
+                }
+
+                // Bing
+                if (modelType === 'bing') {
+                    let text = '';
+                    if (data.webPages && data.webPages.value) {
+                        text += 'Web Results:
+
+';
+                        data.webPages.value.slice(0, 5).forEach((result, i) => {
+                            text += `${i + 1}. ${result.name}
+`;
+                            text += `   ${result.snippet}
+`;
+                            text += `   ${result.url}
+
+`;
+                        });
+                    }
+                    return text || 'No results found.';
+                }
+
+                // Google
+                if (modelType === 'google') {
+                    let text = '';
+                    if (data.items && data.items.length > 0) {
+                        text += 'Search Results:
+
+';
+                        data.items.slice(0, 5).forEach((result, i) => {
+                            text += `${i + 1}. ${result.title}
+`;
+                            text += `   ${result.snippet}
+`;
+                            text += `   ${result.link}
+
+`;
+                        });
+                    }
+                    return text || 'No results found.';
+                }
+
+                return 'Could not extract text. View JSON for full response.';
             } catch (e) {
-                return String(data);
+                return `Error extracting text: ${e.message}`;
+            }
+        }
+
+        // Format response based on view type
+        function formatResponse(data, viewType, modelType) {
+            if (viewType === 'formatted') {
+                return extractTextContent(data, modelType);
+            } else if (viewType === 'pretty') {
+                return JSON.stringify(data, null, 2);
+            } else {
+                return JSON.stringify(data);
+            }
+        }
+
+        // View toggle functionality
+        function setupViewToggle() {
+            const toggleBtns = document.querySelectorAll('.toggle-btn');
+            
+            toggleBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const viewType = btn.getAttribute('data-view');
+                    
+                    // Update active state
+                    toggleBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    // Update response display
+                    if (currentResponse) {
+                        updateResponseView(viewType);
+                    }
+                });
+            });
+        }
+
+        // Update response view
+        function updateResponseView(viewType) {
+            const content = formatResponse(currentResponse, viewType, currentModelType);
+            responseOutput.textContent = content;
+            
+            // Update styling
+            responseOutput.classList.remove('formatted', 'raw');
+            if (viewType === 'formatted') {
+                responseOutput.classList.add('formatted');
+            } else {
+                responseOutput.classList.add('raw');
             }
         }
 
@@ -598,7 +765,6 @@ Please provide a comprehensive solution:`;
         }
 
         async function callDuckDuckGo(query) {
-            // Note: DuckDuckGo Instant Answer API (free, no auth)
             const url = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&pretty=1`;
             
             const response = await fetch(url);
@@ -704,6 +870,10 @@ Please provide a comprehensive solution:`;
                 const endTime = performance.now();
                 const duration = (endTime - startTime).toFixed(3);
 
+                // Store response
+                currentResponse = response;
+                currentModelType = modelType;
+
                 // Display results
                 displayResults(originalQuery, finalQuery, shouldEnhance, response, duration, modelType);
 
@@ -733,8 +903,11 @@ Please provide a comprehensive solution:`;
                 enhancedPromptSection.style.display = 'none';
             }
 
+            // Get active view
+            const activeView = document.querySelector('.toggle-btn.active').getAttribute('data-view');
+            
             // Display response
-            responseOutput.textContent = formatResponse(response, modelType);
+            updateResponseView(activeView);
             responseOutput.parentElement.parentElement.classList.remove('error');
 
             // Scroll to results
@@ -768,6 +941,7 @@ Please provide a comprehensive solution:`;
 
         // Initialize
         updateUIForModel();
+        setupViewToggle();
     </script>
 </body>
 </html>
