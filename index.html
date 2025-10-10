@@ -442,6 +442,18 @@ async function fetchAvailableModels() {
     logHistory('⚠️ Could not fetch models, using default');
   }
 }
+function initializeExperience() {
+  const apiKeyInput = document.getElementById('apiKey');
+  groqKey = apiKeyInput.value.trim();
+  if(!groqKey) { 
+    apiKeyInput.focus();
+    alert('Please paste your Groq API key!'); 
+    return false;
+  }
+  localStorage.setItem('groqKey', groqKey);
+  window.location.href = 'generation.html';
+  return false;
+}
 async function generateInterface() {
   const userInput = document.getElementById('userIntent').value.trim();
   if (!userInput) { alert('Please describe what you want to create!'); return; }
@@ -603,18 +615,9 @@ document.addEventListener("DOMContentLoaded", ()=>{
     if(launchBtn) {
       launchBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        const apiKeyInput = document.getElementById('apiKey');
-        const groqKey = apiKeyInput.value.trim();
-        if(!groqKey) { 
-          apiKeyInput.focus();
-          alert('Please paste your Groq API key!'); 
-          return false;
-        }
-        localStorage.setItem('groqKey', groqKey);
-        window.location.href = 'generation.html';
+        initializeExperience();
       });
     }
-=======
 document.getElementById('userIntent')?.addEventListener('keydown',(e)=>{
       if(e.key==='Enter'&&e.ctrlKey) generateInterface();
     });
