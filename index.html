@@ -336,7 +336,7 @@
             required
           >
         </div>
-      <button type="button" class="btn" id="launchBtn" onclick="initializeExperience()">🚀 Launch Morphic Web</button>
+      <button type="button" class="btn" id="launchBtn" onclick="window.location.href='generation.html'">🚀 Launch Morphic Web</button>
 </form>
 </div>
 
@@ -441,28 +441,6 @@ async function fetchAvailableModels() {
     console.error('Error fetching models:', error);
     logHistory('⚠️ Could not fetch models, using default');
   }
-}
-function initializeExperience() {
-const apiKeyInput = document.getElementById('apiKey');
-  groqKey = apiKeyInput.value.trim();
-  if(!groqKey) { 
-    apiKeyInput.focus();
-    alert('Please paste your Groq API key!'); 
-    return false;
-  }
-  window.groqKey = groqKey;
-  document.getElementById('setupCard').style.display = "none";
-  document.getElementById('interactionZone').style.display = "block";
-  logHistory('🚀 Session initialized - Ready to build!');
-  
-  fetchAvailableModels();
-  
-  setTimeout(() => {
-    document.getElementById('interactionZone').scrollIntoView({ behavior: 'smooth' });
-    document.getElementById('userIntent').focus();
-  }, 100);
-  
-  return false;
 }
 async function generateInterface() {
   const userInput = document.getElementById('userIntent').value.trim();
@@ -625,9 +603,18 @@ document.addEventListener("DOMContentLoaded", ()=>{
     if(launchBtn) {
       launchBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        initializeExperience();
+        const apiKeyInput = document.getElementById('apiKey');
+        const groqKey = apiKeyInput.value.trim();
+        if(!groqKey) { 
+          apiKeyInput.focus();
+          alert('Please paste your Groq API key!'); 
+          return false;
+        }
+        localStorage.setItem('groqKey', groqKey);
+        window.location.href = 'generation.html';
       });
     }
+=======
 document.getElementById('userIntent')?.addEventListener('keydown',(e)=>{
       if(e.key==='Enter'&&e.ctrlKey) generateInterface();
     });
