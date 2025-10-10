@@ -3,568 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Coder & Search API Tester</title>
+    <title>API Tester</title>
     <style>
-        :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --success: #10b981;
-            --error: #ef4444;
-            --warning: #f59e0b;
-            --bg: #0f172a;
-            --surface: #1e293b;
-            --surface-light: #334155;
-            --text: #e2e8f0;
-            --text-dim: #94a3b8;
-            --border: #475569;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.6;
+            background: #0f172a;
+            color: #e2e8f0;
+            font-family: Arial, sans-serif;
             padding: 20px;
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 0 auto;
         }
-
-        header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid var(--border);
-        }
-
-        h1 {
-            font-size: 2rem;
-            margin-bottom: 10px;
-            background: linear-gradient(135deg, var(--primary), var(--success));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .subtitle {
-            color: var(--text-dim);
-            font-size: 0.95rem;
-        }
-
-        .control-panel {
-            background: var(--surface);
-            border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 24px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-        }
-
-        .form-group {
+        .box {
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 8px;
             margin-bottom: 20px;
         }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--text);
-            font-size: 0.9rem;
-        }
-
-        select, input[type="text"], textarea {
+        input, select, textarea, button {
             width: 100%;
             padding: 12px;
-            background: var(--surface-light);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text);
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
+            margin: 10px 0;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #475569;
+            background: #334155;
+            color: #e2e8f0;
         }
-
-        select:focus, input[type="text"]:focus, textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 120px;
-            font-family: 'Consolas', 'Monaco', monospace;
-        }
-
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-            accent-color: var(--primary);
-        }
-
-        .checkbox-group label {
-            margin: 0;
-            cursor: pointer;
-        }
-
-        .btn {
-            background: var(--primary);
+        button {
+            background: #2563eb;
             color: white;
-            border: none;
-            padding: 14px 28px;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+            font-weight: bold;
         }
-
-        .btn:hover:not(:disabled) {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+        button:hover {
+            background: #1d4ed8;
         }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .spinner {
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .results-section {
-            background: var(--surface);
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-            margin-top: 24px;
-        }
-
-        .result-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .result-title {
-            font-size: 1.3rem;
-            font-weight: 700;
-        }
-
-        .timer {
-            background: var(--surface-light);
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-family: 'Consolas', 'Monaco', monospace;
-            font-size: 0.9rem;
-            color: var(--warning);
-            font-weight: 600;
-        }
-
-        .view-toggle {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .toggle-btn {
-            background: var(--surface-light);
-            color: var(--text-dim);
-            border: 1px solid var(--border);
-            padding: 10px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            flex: 1;
-            min-width: 120px;
-            text-align: center;
-        }
-
-        .toggle-btn:hover {
-            background: var(--border);
-        }
-
-        .toggle-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-
-        .prompt-display {
-            background: var(--surface-light);
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 16px;
-            border-left: 4px solid var(--primary);
-        }
-
-        .prompt-label {
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            color: var(--text-dim);
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-
-        .prompt-text {
-            color: var(--text);
-            font-family: 'Consolas', 'Monaco', monospace;
-            font-size: 0.9rem;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-
-        .response-container {
-            background: var(--bg);
-            border-radius: 8px;
+        #output {
+            background: #0a0e1a;
             padding: 20px;
-            max-height: 600px;
-            overflow-y: auto;
-            border: 1px solid var(--border);
-        }
-
-        .response-text {
-            color: var(--text);
-            font-size: 0.95rem;
+            border-radius: 5px;
             white-space: pre-wrap;
-            word-wrap: break-word;
-            line-height: 1.8;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 200px;
+            border: 1px solid #475569;
         }
-
-        .response-text.raw {
-            font-family: 'Consolas', 'Monaco', monospace;
-            font-size: 0.85rem;
+        .debug {
+            background: #0a3d0a;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-size: 14px;
+            border: 1px solid #10b981;
         }
-
-        .info-box {
-            background: rgba(37, 99, 235, 0.1);
-            border: 1px solid var(--primary);
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 20px;
-            font-size: 0.9rem;
-        }
-
-        .info-box strong {
-            color: var(--primary);
-        }
-
-        .api-hint {
-            font-size: 0.8rem;
-            color: var(--text-dim);
-            margin-top: 6px;
-            font-style: italic;
-        }
-
-        @media (max-width: 768px) {
-            .toggle-btn {
-                min-width: 90px;
-                font-size: 0.8rem;
-            }
-        }
+        h1 { margin: 0 0 10px 0; }
+        label { display: block; margin-top: 10px; font-weight: bold; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🚀 AI Coder & Search API Tester</h1>
-            <p class="subtitle">Test multiple AI models and search APIs</p>
-        </header>
+    <div class="box">
+        <h1>🚀 API Tester</h1>
+        <div class="debug" id="debug">System Status: Loading...</div>
 
-        <div class="control-panel">
-            <div class="info-box">
-                <strong>📌 Quick Start:</strong> Select DuckDuckGo (no key needed), keep the default query, and click Test API.
-            </div>
+        <label>Select API:</label>
+        <select id="api">
+            <option value="ddg">DuckDuckGo (No Key)</option>
+            <option value="other">Other APIs (Need Key)</option>
+        </select>
 
-            <div class="form-group">
-                <label for="model-select">Select Model / API</label>
-                <select id="model-select">
-                    <option value="duckduckgo">DuckDuckGo (No Key Required)</option>
-                    <option value="codestral">Codestral-v2 (Needs Key)</option>
-                    <option value="deepseek">DeepSeek R1 (Needs Key)</option>
-                    <option value="bing">Bing Search (Needs Key)</option>
-                    <option value="google">Google Search (Needs Key)</option>
-                </select>
-            </div>
+        <label>API Key:</label>
+        <input type="text" id="key" placeholder="API Key">
+        
+        <label>Query:</label>
+        <textarea id="query" rows="3">Python programming</textarea>
 
-            <div class="form-group">
-                <label for="api-key">
-                    API Key <span id="key-status">(Not Required)</span>
-                </label>
-                <input type="text" id="api-key" placeholder="✓ No API key required">
-                <div class="api-hint" id="api-hint">No API key needed</div>
-            </div>
+        <button onclick="runTest()">🚀 TEST NOW</button>
+    </div>
 
-            <div class="form-group" id="cx-group" style="display:none;">
-                <label for="cx-id">Google CX ID</label>
-                <input type="text" id="cx-id" placeholder="Your CX ID">
-            </div>
-
-            <div class="checkbox-group">
-                <input type="checkbox" id="enhance-prompt">
-                <label for="enhance-prompt">🎯 Auto-enhance prompt</label>
-            </div>
-
-            <div class="form-group">
-                <label for="query-input">Your Query</label>
-                <textarea id="query-input">Python programming language</textarea>
-            </div>
-
-            <button class="btn" id="test-btn">🚀 Test API</button>
-        </div>
-
-        <div class="results-section" id="results" style="display:none;">
-            <div class="result-header">
-                <h2 class="result-title">📊 Results</h2>
-                <div class="timer" id="timer">⏱️ 0ms</div>
-            </div>
-
-            <div class="view-toggle">
-                <button class="toggle-btn active" data-view="text">💬 Text</button>
-                <button class="toggle-btn" data-view="pretty">🎨 Pretty JSON</button>
-                <button class="toggle-btn" data-view="raw">📄 Raw JSON</button>
-            </div>
-
-            <div class="prompt-display" id="prompt-section" style="display:none;">
-                <div class="prompt-label">📝 Prompts</div>
-                <div class="prompt-text" id="prompts"></div>
-            </div>
-
-            <div class="prompt-display">
-                <div class="prompt-label">🔍 Response</div>
-                <div class="response-container">
-                    <div class="response-text" id="output">Waiting for response...</div>
-                </div>
-            </div>
-        </div>
+    <div class="box" id="results" style="display:none;">
+        <h2>📊 Results</h2>
+        <div id="output">Waiting...</div>
     </div>
 
     <script>
-        console.log('=== APP STARTING ===');
+        // Debug function
+        function debug(msg) {
+            console.log(msg);
+            document.getElementById('debug').textContent = msg;
+        }
 
-        const CONFIGS = {
-            duckduckgo: { requiresKey: false, requiresCX: false, hint: 'No API key needed' },
-            codestral: { requiresKey: true, requiresCX: false, hint: 'Get key from console.mistral.ai' },
-            deepseek: { requiresKey: true, requiresCX: false, hint: 'Get key from openrouter.ai/keys' },
-            bing: { requiresKey: true, requiresCX: false, hint: 'Get key from portal.azure.com' },
-            google: { requiresKey: true, requiresCX: true, hint: 'Get key from console.cloud.google.com' }
-        };
-
-        let currentData = null;
-        let currentModel = null;
-
-        const $ = id => document.getElementById(id);
-
-        // Update UI based on selection
-        function updateUI() {
-            const model = $('model-select').value;
-            const config = CONFIGS[model];
+        // Update UI when API changes
+        document.getElementById('api').addEventListener('change', function() {
+            const api = this.value;
+            const keyInput = document.getElementById('key');
             
-            console.log('Model changed to:', model);
-
-            // Update API key field using INLINE STYLES (guaranteed to work)
-            if (config.requiresKey) {
-                $('api-key').style.background = '#334155';
-                $('api-key').style.color = '#e2e8f0';
-                $('api-key').style.opacity = '1';
-                $('api-key').style.cursor = 'text';
-                $('api-key').disabled = false;
-                $('api-key').placeholder = 'Enter your API key';
-                $('key-status').textContent = '(Required)';
-                $('key-status').style.color = '#f59e0b';
+            debug('Selected: ' + api);
+            
+            if (api === 'ddg') {
+                // GREY OUT for DuckDuckGo
+                keyInput.value = '';
+                keyInput.placeholder = '✓ No key needed';
+                keyInput.disabled = true;
+                keyInput.style.background = '#0a0e1a';
+                keyInput.style.color = '#6b7280';
+                keyInput.style.opacity = '0.5';
+                debug('API Key field: DISABLED (greyed out)');
             } else {
-                $('api-key').style.background = '#0a0e1a';
-                $('api-key').style.color = '#6b7280';
-                $('api-key').style.opacity = '0.5';
-                $('api-key').style.cursor = 'not-allowed';
-                $('api-key').disabled = true;
-                $('api-key').value = '';
-                $('api-key').placeholder = '✓ No API key required';
-                $('key-status').textContent = '(Not Required)';
-                $('key-status').style.color = '#10b981';
+                // ENABLE for other APIs
+                keyInput.disabled = false;
+                keyInput.placeholder = 'Enter API key';
+                keyInput.style.background = '#334155';
+                keyInput.style.color = '#e2e8f0';
+                keyInput.style.opacity = '1';
+                debug('API Key field: ENABLED');
             }
-
-            $('api-hint').textContent = config.hint;
-            $('cx-group').style.display = config.requiresCX ? 'block' : 'none';
-
-            console.log('API key field disabled:', !config.requiresKey);
-        }
-
-        // Call DuckDuckGo
-        async function callDDG(query) {
-            return new Promise((resolve, reject) => {
-                const cb = 'ddg' + Date.now();
-                window[cb] = data => {
-                    delete window[cb];
-                    resolve(data);
-                };
-                const script = document.createElement('script');
-                script.src = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&callback=${cb}`;
-                script.onerror = () => reject(new Error('DuckDuckGo failed'));
-                document.body.appendChild(script);
-            });
-        }
-
-        // Extract text from response
-        function getText(data, model) {
-            if (model === 'duckduckgo') {
-                let txt = '';
-                if (data.Heading) txt += `Topic: ${data.Heading}
-
-`;
-                if (data.AbstractText) txt += data.AbstractText + '
-
-';
-                if (data.Answer) txt += `Answer: ${data.Answer}
-
-`;
-                if (data.RelatedTopics && data.RelatedTopics.length) {
-                    txt += 'Related:
-';
-                    data.RelatedTopics.slice(0, 5).forEach(t => {
-                        if (t.Text) txt += `• ${t.Text}
-`;
-                    });
-                }
-                return txt || 'No instant answer found. Try "JavaScript", "Albert Einstein", or view JSON.';
-            }
-            return 'Text extraction not implemented for this service yet.';
-        }
-
-        // Format output
-        function format(data, view, model) {
-            if (view === 'text') return getText(data, model);
-            if (view === 'pretty') return JSON.stringify(data, null, 2);
-            return JSON.stringify(data);
-        }
-
-        // Update display
-        function updateDisplay(view) {
-            const content = format(currentData, view, currentModel);
-            $('output').textContent = content;
-            $('output').classList.toggle('raw', view !== 'text');
-        }
-
-        // Test API
-        async function test() {
-            console.log('=== TEST BUTTON CLICKED ===');
-            
-            const model = $('model-select').value;
-            const query = $('query-input').value.trim();
-            const config = CONFIGS[model];
-
-            if (!query) {
-                alert('Enter a query!');
-                return;
-            }
-
-            if (config.requiresKey && !$('api-key').value.trim()) {
-                alert('API key required!');
-                return;
-            }
-
-            $('test-btn').disabled = true;
-            $('test-btn').innerHTML = '<div class="spinner"></div> Testing...';
-
-            try {
-                console.log('Calling API:', model);
-                const start = Date.now();
-                
-                let data;
-                if (model === 'duckduckgo') {
-                    data = await callDDG(query);
-                } else {
-                    throw new Error('Only DuckDuckGo implemented in this demo');
-                }
-
-                const duration = Date.now() - start;
-                
-                console.log('Got response:', data);
-                
-                currentData = data;
-                currentModel = model;
-
-                // SHOW RESULTS
-                $('results').style.display = 'block';
-                $('timer').textContent = `⏱️ ${duration}ms`;
-                
-                // Reset to text view
-                document.querySelectorAll('.toggle-btn').forEach(btn => {
-                    btn.classList.toggle('active', btn.dataset.view === 'text');
-                });
-                
-                updateDisplay('text');
-                
-                console.log('=== RESULTS DISPLAYED ===');
-                
-                setTimeout(() => $('results').scrollIntoView({ behavior: 'smooth' }), 100);
-
-            } catch (err) {
-                console.error('Error:', err);
-                $('results').style.display = 'block';
-                $('output').textContent = `❌ Error: ${err.message}`;
-                $('timer').textContent = '⏱️ Error';
-            } finally {
-                $('test-btn').disabled = false;
-                $('test-btn').innerHTML = '🚀 Test API';
-            }
-        }
-
-        // Event listeners
-        $('model-select').addEventListener('change', updateUI);
-        $('test-btn').addEventListener('click', test);
-
-        document.querySelectorAll('.toggle-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const view = btn.dataset.view;
-                document.querySelectorAll('.toggle-btn').forEach(b => {
-                    b.classList.toggle('active', b === btn);
-                });
-                updateDisplay(view);
-            });
         });
 
+        // Run test
+        async function runTest() {
+            debug('🚀 TEST STARTED');
+            
+            const api = document.getElementById('api').value;
+            const query = document.getElementById('query').value;
+            const resultsDiv = document.getElementById('results');
+            const output = document.getElementById('output');
+
+            if (!query) {
+                alert('Please enter a query!');
+                return;
+            }
+
+            debug('Calling DuckDuckGo API...');
+            output.textContent = 'Loading...';
+            resultsDiv.style.display = 'block';
+
+            try {
+                // Call DuckDuckGo using JSONP
+                const data = await new Promise((resolve, reject) => {
+                    const callback = 'ddgCallback' + Date.now();
+                    
+                    window[callback] = function(response) {
+                        delete window[callback];
+                        resolve(response);
+                    };
+                    
+                    const script = document.createElement('script');
+                    script.src = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&callback=${callback}`;
+                    script.onerror = () => reject(new Error('Failed to load'));
+                    document.body.appendChild(script);
+                });
+
+                debug('✅ SUCCESS! Got response');
+
+                // Extract text
+                let text = '';
+                if (data.Heading) text += '📌 ' + data.Heading + '
+
+';
+                if (data.AbstractText) text += data.AbstractText + '
+
+';
+                if (data.Answer) text += '💡 Answer: ' + data.Answer + '
+
+';
+                
+                if (data.RelatedTopics && data.RelatedTopics.length > 0) {
+                    text += '🔗 Related Topics:
+';
+                    data.RelatedTopics.slice(0, 5).forEach(topic => {
+                        if (topic.Text) text += '  • ' + topic.Text + '
+';
+                    });
+                }
+
+                if (!text) {
+                    text = '⚠️ No instant answer found.
+
+Try queries like:
+• "JavaScript"
+• "Albert Einstein"
+• "Python programming"
+
+Raw JSON:
+' + JSON.stringify(data, null, 2);
+                }
+
+                output.textContent = text;
+                resultsDiv.scrollIntoView({ behavior: 'smooth' });
+
+            } catch (error) {
+                debug('❌ ERROR: ' + error.message);
+                output.textContent = '❌ Error: ' + error.message;
+            }
+        }
+
         // Initialize
-        updateUI();
-        console.log('=== APP READY ===');
+        debug('✅ Page loaded. Select DuckDuckGo and click TEST NOW');
+        document.getElementById('api').dispatchEvent(new Event('change'));
     </script>
 </body>
 </html>
