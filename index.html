@@ -515,8 +515,11 @@ async function generateInterface() {
   }
 }
 function checkForReactEnhancement() {
-  if (interactionCount >= 1 && currentAppCode) {
-    setTimeout(() => enhanceWithReact(), 500);
+  // Only suggest React enhancement after multiple interactions
+  if (interactionCount >= 3 && elementsCreated >= 15 && currentAppCode) {
+    setTimeout(() => {
+      document.getElementById('reactEnhancement').style.display = 'flex';
+    }, 1000);
   }
 }
 async function enhanceWithReact() {
@@ -560,23 +563,36 @@ function ensureResponsive(html) {
   }
   return html;
 }
-
 async function callGroqAPI(userPrompt, isReactUpgrade = false) {
   const systemPrompt = `You are an expert web developer. Create complete, functional, beautiful HTML pages with inline CSS and JavaScript.
 
-REQUIREMENTS:
-- Generate a complete HTML document with <!DOCTYPE html>
-- Include inline CSS in <style> tags for modern, attractive design
-- Include a <script> tag with all JavaScript functionality
-- Make it fully interactive and functional
-- Use modern ES6+ JavaScript
-- Ensure responsive design
-- Add smooth animations and transitions
-- Make it visually impressive with gradients, shadows, and modern UI
+STRICT REQUIREMENTS:
+1. Generate ONLY the complete HTML code, nothing else - no explanations, markdown, or extra text
+2. Must include <!DOCTYPE html> declaration
+3. Must have complete <html>, <head>, and <body> tags
+4. All CSS must be in <style> tags in the head
+5. All JavaScript must be in <script> tags at the end of body
+6. Make it fully interactive and functional
+7. Use modern ES6+ JavaScript
+8. Ensure responsive design
+9. Add smooth animations/transitions
+10. Visually impressive with gradients, shadows, modern UI
 
-Return ONLY the complete HTML code, no explanations or markdown.`;
+IMPORTANT:
+- If this is a React conversion, include proper React structure with imports
+- DO NOT include any text outside the HTML document structure
+- DO NOT add explanations or commentary
+- DO NOT use markdown code blocks`;
 
-  const messages = isReactUpgrade 
+  if (isReactUpgrade) {
+    systemPrompt += `
+For React conversion:
+- Must include proper React imports
+- Must be a functional component with hooks
+- Must return valid JSX
+- Ensure all functionality works in React context`;
+  }
+const messages = isReactUpgrade 
     ? [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }]
     : [{ role: 'system', content: systemPrompt }, ...conversationHistory.slice(-5), { role: 'user', content: userPrompt }];
 
@@ -620,25 +636,27 @@ messages: messages,
   }
   
   const bt = '`' + '`' + '`'; content = content.replace(new RegExp(bt + 'javascript|' + bt + 'html|' + bt, 'g'), '');
-  
-  if (validateHTML) {
-    const hasValidContent = content && (
-      /<div/i.test(content) || 
-      /<button/i.test(content) ||
-      /<input/i.test(content) ||
-      /<form/i.test(content) ||
-      /<canvas/i.test(content) ||
-      /<svg/i.test(content)
-    );
-    
-    if (!hasValidContent) {
-      throw new Error("Generated content doesn't contain valid HTML elements");
-    }
-    
-    return ensureResponsive(content);
+  // Strict validation of HTML structure
+  if (!content.startsWith('<!DOCTYPE html>') && !content.includes('<html>')) {
+    throw new Error("Invalid HTML - must start with <!DOCTYPE html> and include complete HTML structure");
   }
-  
-  throw new Error("Invalid HTML structure received from API");
+
+  // Remove any non-HTML content before or after the document
+  const htmlStart = content.indexOf('<!DOCTYPE html>');
+  if (htmlStart > 0) {
+    content = content.slice(htmlStart);
+  }
+
+  const htmlEnd = content.lastIndexOf('</html>');
+  if (htmlEnd > 0 && htmlEnd < content.length - 1) {
+    content = content.slice(0, htmlEnd + 7); // +7 for </html> length
+  }
+
+  // Final cleanup of any remaining non-HTML text
+  content = content.replace(/^[^<]*/, '').replace(/[^>]*$/, '');
+
+  return ensureResponsive(content);
+throw new Error("Invalid HTML structure received from API");
 }
 
 function parseAndInjectHTML(html, container) {
