@@ -322,6 +322,16 @@
             font-style: italic;
         }
 
+        .warning-box {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid var(--warning);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+            color: var(--warning);
+        }
+
         @media (max-width: 768px) {
             body {
                 padding: 12px;
@@ -396,17 +406,21 @@
                 Toggle between Formatted Text, Pretty JSON, and Raw JSON views.
             </div>
 
+            <div class="warning-box" id="ddg-warning" style="display:none;">
+                ⚠️ <strong>DuckDuckGo Note:</strong> Try queries like "Albert Einstein", "Python programming", or "weather" - simple greetings may return empty results.
+            </div>
+
             <div class="form-group">
                 <label for="model-select">Select Model / API</label>
                 <select id="model-select">
                     <optgroup label="AI Coding Models">
-                        <option value="codestral">Codestral-v2 (Mistral AI) - Free</option>
-                        <option value="deepseek">DeepSeek R1 (OpenRouter) - Free</option>
+                        <option value="codestral">Codestral-v2 (Mistral AI) - Requires Key</option>
+                        <option value="deepseek">DeepSeek R1 (OpenRouter) - Requires Key</option>
                     </optgroup>
                     <optgroup label="Search APIs">
-                        <option value="duckduckgo">DuckDuckGo Search (No Key Needed)</option>
-                        <option value="bing">Bing Web Search (Paid)</option>
-                        <option value="google">Google Custom Search (100/day free)</option>
+                        <option value="duckduckgo">DuckDuckGo Instant Answers - No Key</option>
+                        <option value="bing">Bing Web Search - Requires Key</option>
+                        <option value="google">Google Custom Search - Requires Key</option>
                     </optgroup>
                 </select>
             </div>
@@ -436,7 +450,7 @@
 
             <div class="form-group">
                 <label for="query-input">Your Query / Prompt</label>
-                <textarea id="query-input" placeholder="Enter your query or code prompt here...">hello</textarea>
+                <textarea id="query-input" placeholder="Enter your query or code prompt here...">Python programming</textarea>
             </div>
 
             <button class="btn" id="test-btn">
@@ -531,6 +545,7 @@
         const apiHint = document.getElementById('api-hint');
         const apiSource = document.getElementById('api-source');
         const keyRequired = document.getElementById('key-required');
+        const ddgWarning = document.getElementById('ddg-warning');
 
         let currentResponse = null;
         let currentModelType = null;
@@ -540,6 +555,12 @@
             const config = API_CONFIGS[selected];
             
             apiSource.textContent = config.source;
+
+            if (selected === 'duckduckgo') {
+                ddgWarning.style.display = 'block';
+            } else {
+                ddgWarning.style.display = 'none';
+            }
 
             if (config.requiresKey) {
                 apiKeyInput.disabled = false;
@@ -590,26 +611,62 @@ Please provide a comprehensive solution:`;
 
                 if (modelType === 'duckduckgo') {
                     let text = '';
-                    if (data.AbstractText) text += data.AbstractText + '
+                    
+                    if (data.Heading) text += `Topic: ${data.Heading}
 
-';
-                    if (data.Answer) text += 'Answer: ' + data.Answer + '
+`;
+                    if (data.AbstractText) text += `${data.AbstractText}
 
-';
-                    if (data.Definition) text += 'Definition: ' + data.Definition + '
+`;
+                    if (data.Answer) text += `Answer: ${data.Answer}
 
-';
+`;
+                    if (data.Definition) text += `Definition: ${data.Definition}
+
+`;
+                    if (data.AbstractSource) text += `Source: ${data.AbstractSource}
+
+`;
                     
                     if (data.RelatedTopics && data.RelatedTopics.length > 0) {
                         text += 'Related Topics:
 ';
-                        data.RelatedTopics.slice(0, 5).forEach(topic => {
-                            if (topic.Text) text += '• ' + topic.Text + '
-';
+                        let count = 0;
+                        data.RelatedTopics.forEach(topic => {
+                            if (count >= 10) return;
+                            if (topic.Text) {
+                                text += `• ${topic.Text}
+`;
+                                count++;
+                            } else if (topic.Topics) {
+                                topic.Topics.forEach(subTopic => {
+                                    if (count >= 10) return;
+                                    if (subTopic.Text) {
+                                        text += `• ${subTopic.Text}
+`;
+                                        count++;
+                                    }
+                                });
+                            }
                         });
                     }
                     
-                    return text || 'No direct answer found. Try a different query or view JSON for raw data.';
+                    if (!text.trim()) {
+                        text = '📌 DuckDuckGo returned no instant answer for this query.
+
+';
+                        text += 'Tips:
+';
+                        text += '• Try specific topics: "Albert Einstein", "JavaScript", "weather"
+';
+                        text += '• Avoid generic greetings like "hello" or "hi"
+';
+                        text += '• DuckDuckGo Instant Answers work best with factual queries
+';
+                        text += '• Check the Pretty JSON view to see the raw API response';
+                    }
+                    
+                    return text;
                 }
 
                 if (modelType === 'bing') {
@@ -652,6 +709,7 @@ Please provide a comprehensive solution:`;
 
                 return 'Could not extract text. View JSON for full response.';
             } catch (e) {
+                console.error('Extract error:', e);
                 return `Error extracting text: ${e.message}`;
             }
         }
@@ -742,17 +800,37 @@ Please provide a comprehensive solution:`;
         }
 
         async function callDuckDuckGo(query) {
-            const proxyUrl = 'https://api.allorigins.win/raw?url=';
-            const apiUrl = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1&skip_disambig=1`;
-            const url = proxyUrl + encodeURIComponent(apiUrl);
+            // Direct call - DuckDuckGo allows CORS for jsonp callback
+            const url = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1&no_redirect=1&skip_disambig=1`;
             
-            const response = await fetch(url);
+            console.log('Calling DuckDuckGo:', url);
             
-            if (!response.ok) {
-                throw new Error(`API Error ${response.status}`);
+            try {
+                // Try with JSONP instead
+                return await new Promise((resolve, reject) => {
+                    const callbackName = 'ddg_callback_' + Date.now();
+                    const script = document.createElement('script');
+                    
+                    window[callbackName] = function(data) {
+                        delete window[callbackName];
+                        document.body.removeChild(script);
+                        console.log('DuckDuckGo response:', data);
+                        resolve(data);
+                    };
+                    
+                    script.src = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&callback=${callbackName}`;
+                    script.onerror = () => {
+                        delete window[callbackName];
+                        document.body.removeChild(script);
+                        reject(new Error('Failed to load DuckDuckGo API'));
+                    };
+                    
+                    document.body.appendChild(script);
+                });
+            } catch (e) {
+                console.error('DuckDuckGo error:', e);
+                throw e;
             }
-
-            return await response.json();
         }
 
         async function callBing(apiKey, query) {
@@ -791,7 +869,7 @@ Please provide a comprehensive solution:`;
             const shouldEnhance = enhanceCheckbox.checked;
             const config = API_CONFIGS[modelType];
 
-            console.log('Testing API:', modelType);
+            console.log('Testing API:', modelType, 'Query:', query);
 
             if (!query) {
                 alert('Please enter a query or prompt!');
@@ -840,6 +918,8 @@ Please provide a comprehensive solution:`;
 
                 const endTime = performance.now();
                 const duration = (endTime - startTime).toFixed(3);
+
+                console.log('Response received:', response);
 
                 currentResponse = response;
                 currentModelType = modelType;
@@ -896,9 +976,10 @@ Please provide a comprehensive solution:`;
             responseOutput.textContent = `❌ Error: ${errorMsg}
 
 Troubleshooting:
-• Check your API key
+• Check your API key is valid
 • Verify internet connection
-• Try a different service`;
+• Try a different service
+• Check browser console for details`;
             responseOutput.classList.add('formatted');
             responseOutput.classList.remove('raw');
             responseOutput.parentElement.parentElement.classList.add('error');
