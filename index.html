@@ -1,26 +1,773 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Test</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Coder & Search API Tester</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --surface-light: #334155;
+            --text: #e2e8f0;
+            --text-dim: #94a3b8;
+            --border: #475569;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--success));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+        }
+
+        .control-panel {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .debug-box {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--success);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            color: var(--success);
+        }
+
+        .info-box {
+            background: rgba(37, 99, 235, 0.1);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+
+        .info-box strong {
+            color: var(--primary);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text);
+            font-size: 0.9rem;
+        }
+
+        select, input[type="text"], textarea {
+            width: 100%;
+            padding: 12px;
+            background: var(--surface-light);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        select:focus, input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:hover:not(:disabled) {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .results-section {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            margin-top: 24px;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .result-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .timer {
+            background: var(--surface-light);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9rem;
+            color: var(--warning);
+            font-weight: 600;
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .toggle-btn {
+            background: var(--surface-light);
+            color: var(--text-dim);
+            border: 1px solid var(--border);
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .toggle-btn:hover {
+            background: var(--border);
+        }
+
+        .toggle-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .prompt-display {
+            background: var(--surface-light);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .prompt-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .prompt-text {
+            color: var(--text);
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .response-container {
+            background: var(--bg);
+            border-radius: 8px;
+            padding: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+        }
+
+        .response-text {
+            color: var(--text);
+            font-size: 0.95rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            line-height: 1.8;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .response-text.raw {
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.85rem;
+        }
+
+        .api-hint {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-top: 6px;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+            .control-panel, .results-section {
+                padding: 16px;
+            }
+            .toggle-btn {
+                min-width: 90px;
+                font-size: 0.8rem;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--surface);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 5px;
+        }
+    </style>
 </head>
-<body style="background:#000; color:#0f0; font-family:monospace; padding:20px;">
-    <h1>API Tester</h1>
-    <div id="status">LOADING...</div>
-    <br>
-    <button id="btn" style="padding:20px; font-size:20px;">CLICK ME</button>
-    <br><br>
-    <div id="result" style="background:#111; padding:20px; display:none;">Results here</div>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 AI Coder & Search API Tester</h1>
+            <p class="subtitle">Test free AI models and search APIs with toggleable text/JSON views</p>
+        </header>
+
+        <div class="control-panel">
+            <div class="debug-box" id="debugBox">Initializing...</div>
+
+            <div class="info-box">
+                <strong>📌 Quick Start:</strong> DuckDuckGo requires no API key. For Codestral and DeepSeek, you'll need free API keys (links shown below).
+            </div>
+
+            <div class="form-group">
+                <label for="modelSelect">Select Model / API</label>
+                <select id="modelSelect">
+                    <option value="duckduckgo">DuckDuckGo Search (No Key Required - Free)</option>
+                    <option value="codestral">Codestral-v2 AI Coder (Free Tier)</option>
+                    <option value="deepseek">DeepSeek R1 AI Coder (Free via OpenRouter)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="apiKeyInput">
+                    API Key <span id="keyStatus">(Not Required)</span>
+                </label>
+                <input type="text" id="apiKeyInput" placeholder="Enter your API key here">
+                <div class="api-hint" id="apiHint">No API key needed for DuckDuckGo</div>
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="enhanceCheckbox">
+                <label for="enhanceCheckbox">🎯 Auto-enhance prompt with prompt engineering</label>
+            </div>
+
+            <div class="form-group">
+                <label for="queryInput">Your Query / Prompt</label>
+                <textarea id="queryInput" placeholder="Enter your query...">Python programming language</textarea>
+            </div>
+
+            <button class="btn" id="testButton">
+                <span id="buttonText">🚀 Test API</span>
+            </button>
+        </div>
+
+        <div class="results-section" id="resultsSection" style="display:none;">
+            <div class="result-header">
+                <h2 class="result-title">📊 Results</h2>
+                <div class="timer" id="timerDisplay">⏱️ 0ms</div>
+            </div>
+
+            <div class="view-toggle">
+                <button class="toggle-btn active" data-view="formatted">💬 Formatted Text</button>
+                <button class="toggle-btn" data-view="pretty">🎨 Pretty JSON</button>
+                <button class="toggle-btn" data-view="raw">📄 Raw JSON</button>
+            </div>
+
+            <div class="prompt-display" id="promptSection" style="display:none;">
+                <div class="prompt-label">📝 Enhanced Prompt</div>
+                <div class="prompt-text" id="promptText"></div>
+            </div>
+
+            <div class="prompt-display">
+                <div class="prompt-label">🔍 Response</div>
+                <div class="response-container">
+                    <div class="response-text" id="responseOutput">Waiting for response...</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
-        alert('JavaScript is working!');
-        
-        document.getElementById('status').textContent = 'READY!';
-        
-        document.getElementById('btn').onclick = function() {
-            document.getElementById('result').style.display = 'block';
-            document.getElementById('result').textContent = 'IT WORKS!!! You clicked the button!';
-            alert('Button clicked!');
-        };
+        console.log('Script loading...');
+
+        // Wait for page to load
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing app...');
+
+            // Get all elements
+            const elements = {
+                debugBox: document.getElementById('debugBox'),
+                modelSelect: document.getElementById('modelSelect'),
+                apiKeyInput: document.getElementById('apiKeyInput'),
+                keyStatus: document.getElementById('keyStatus'),
+                apiHint: document.getElementById('apiHint'),
+                enhanceCheckbox: document.getElementById('enhanceCheckbox'),
+                queryInput: document.getElementById('queryInput'),
+                testButton: document.getElementById('testButton'),
+                buttonText: document.getElementById('buttonText'),
+                resultsSection: document.getElementById('resultsSection'),
+                timerDisplay: document.getElementById('timerDisplay'),
+                promptSection: document.getElementById('promptSection'),
+                promptText: document.getElementById('promptText'),
+                responseOutput: document.getElementById('responseOutput')
+            };
+
+            let currentResponse = null;
+            let currentModel = null;
+
+            // Debug function
+            function debug(msg) {
+                console.log('DEBUG:', msg);
+                elements.debugBox.textContent = msg;
+            }
+
+            // API configurations
+            const APIs = {
+                duckduckgo: {
+                    name: 'DuckDuckGo',
+                    needsKey: false,
+                    hint: 'No API key needed - completely free'
+                },
+                codestral: {
+                    name: 'Codestral-v2',
+                    needsKey: true,
+                    hint: 'Get free API key from: console.mistral.ai'
+                },
+                deepseek: {
+                    name: 'DeepSeek R1',
+                    needsKey: true,
+                    hint: 'Get free API key from: openrouter.ai/keys'
+                }
+            };
+
+            // Update UI when model changes
+            function updateUI() {
+                const model = elements.modelSelect.value;
+                const config = APIs[model];
+                
+                debug(`Selected: ${config.name}`);
+                
+                if (config.needsKey) {
+                    // Enable API key field
+                    elements.apiKeyInput.disabled = false;
+                    elements.apiKeyInput.value = '';
+                    elements.apiKeyInput.placeholder = 'Enter your API key here';
+                    elements.apiKeyInput.style.background = '#334155';
+                    elements.apiKeyInput.style.color = '#e2e8f0';
+                    elements.apiKeyInput.style.opacity = '1';
+                    elements.apiKeyInput.style.cursor = 'text';
+                    elements.keyStatus.textContent = '(Required)';
+                    elements.keyStatus.style.color = '#f59e0b';
+                    elements.apiHint.textContent = config.hint;
+                    debug('API Key field: ENABLED');
+                } else {
+                    // Disable and grey out API key field
+                    elements.apiKeyInput.disabled = true;
+                    elements.apiKeyInput.value = '';
+                    elements.apiKeyInput.placeholder = '✓ No API key required';
+                    elements.apiKeyInput.style.background = '#0a0e1a';
+                    elements.apiKeyInput.style.color = '#6b7280';
+                    elements.apiKeyInput.style.opacity = '0.5';
+                    elements.apiKeyInput.style.cursor = 'not-allowed';
+                    elements.keyStatus.textContent = '(Not Required)';
+                    elements.keyStatus.style.color = '#10b981';
+                    elements.apiHint.textContent = config.hint;
+                    debug('API Key field: DISABLED (greyed out)');
+                }
+            }
+
+            // Enhance prompt
+            function enhancePrompt(query, model) {
+                if (model === 'duckduckgo') {
+                    return query + ' comprehensive detailed information';
+                } else {
+                    return `You are an expert software engineer.
+
+Task: ${query}
+
+Requirements:
+- Provide clean, well-documented code
+- Follow best practices
+- Include error handling
+- Explain key decisions
+
+Please provide a comprehensive solution:`;
+                }
+            }
+
+            // Extract readable text from response
+            function extractText(data, model) {
+                try {
+                    // AI models
+                    if (model === 'codestral' || model === 'deepseek') {
+                        if (data.choices && data.choices[0] && data.choices[0].message) {
+                            return data.choices[0].message.content;
+                        }
+                        return 'Could not extract text from AI response.';
+                    }
+
+                    // DuckDuckGo
+                    if (model === 'duckduckgo') {
+                        let text = '';
+                        if (data.Heading) text += `📌 ${data.Heading}
+
+`;
+                        if (data.AbstractText) text += `${data.AbstractText}
+
+`;
+                        if (data.Answer) text += `💡 ${data.Answer}
+
+`;
+                        if (data.Definition) text += `📖 ${data.Definition}
+
+`;
+                        
+                        if (data.RelatedTopics && data.RelatedTopics.length > 0) {
+                            text += '🔗 Related Topics:
+';
+                            data.RelatedTopics.slice(0, 5).forEach(topic => {
+                                if (topic.Text) text += `  • ${topic.Text}
+`;
+                            });
+                        }
+                        
+                        if (!text.trim()) {
+                            text = '⚠️ No instant answer found.
+
+Try queries like:
+• "JavaScript"
+• "Albert Einstein"
+• "Python programming"
+
+View Pretty JSON to see the raw API response.';
+                        }
+                        
+                        return text;
+                    }
+
+                    return 'Unknown model type';
+                } catch (e) {
+                    console.error('Extract error:', e);
+                    return `Error extracting text: ${e.message}`;
+                }
+            }
+
+            // Format response
+            function formatResponse(data, view, model) {
+                if (view === 'formatted') {
+                    return extractText(data, model);
+                } else if (view === 'pretty') {
+                    return JSON.stringify(data, null, 2);
+                } else {
+                    return JSON.stringify(data);
+                }
+            }
+
+            // Update view
+            function updateView(viewType) {
+                if (!currentResponse) return;
+                
+                const content = formatResponse(currentResponse, viewType, currentModel);
+                elements.responseOutput.textContent = content;
+                
+                elements.responseOutput.classList.remove('raw');
+                if (viewType !== 'formatted') {
+                    elements.responseOutput.classList.add('raw');
+                }
+            }
+
+            // API Calls
+            async function callDuckDuckGo(query) {
+                debug('Calling DuckDuckGo API...');
+                return new Promise((resolve, reject) => {
+                    const callback = 'ddg' + Date.now();
+                    
+                    window[callback] = function(data) {
+                        delete window[callback];
+                        resolve(data);
+                    };
+                    
+                    const script = document.createElement('script');
+                    script.src = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&callback=${callback}`;
+                    script.onerror = () => reject(new Error('DuckDuckGo API failed'));
+                    document.body.appendChild(script);
+                });
+            }
+
+            async function callCodestral(apiKey, prompt) {
+                debug('Calling Codestral API...');
+                const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: 'codestral-latest',
+                        messages: [{ role: 'user', content: prompt }],
+                        max_tokens: 2000
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Codestral API error: ${response.status}`);
+                }
+
+                return await response.json();
+            }
+
+            async function callDeepSeek(apiKey, prompt) {
+                debug('Calling DeepSeek API...');
+                const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`,
+                        'HTTP-Referer': window.location.origin,
+                        'X-Title': 'AI Coder Tester'
+                    },
+                    body: JSON.stringify({
+                        model: 'deepseek/deepseek-r1:free',
+                        messages: [{ role: 'user', content: prompt }]
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`DeepSeek API error: ${response.status}`);
+                }
+
+                return await response.json();
+            }
+
+            // Main test function
+            async function runTest() {
+                console.log('Test button clicked');
+                debug('🚀 Starting test...');
+
+                const model = elements.modelSelect.value;
+                const apiKey = elements.apiKeyInput.value.trim();
+                const query = elements.queryInput.value.trim();
+                const shouldEnhance = elements.enhanceCheckbox.checked;
+                const config = APIs[model];
+
+                // Validation
+                if (!query) {
+                    alert('Please enter a query!');
+                    return;
+                }
+
+                if (config.needsKey && !apiKey) {
+                    alert(`API key required for ${config.name}!`);
+                    return;
+                }
+
+                // Disable button
+                elements.testButton.disabled = true;
+                elements.buttonText.innerHTML = '<div class="spinner"></div> Testing...';
+
+                try {
+                    const finalQuery = shouldEnhance ? enhancePrompt(query, model) : query;
+                    const startTime = Date.now();
+
+                    let data;
+                    if (model === 'duckduckgo') {
+                        data = await callDuckDuckGo(finalQuery);
+                    } else if (model === 'codestral') {
+                        data = await callCodestral(apiKey, finalQuery);
+                    } else if (model === 'deepseek') {
+                        data = await callDeepSeek(apiKey, finalQuery);
+                    }
+
+                    const duration = Date.now() - startTime;
+
+                    console.log('Got response:', data);
+                    debug('✅ SUCCESS!');
+
+                    currentResponse = data;
+                    currentModel = model;
+
+                    // Show results
+                    elements.resultsSection.style.display = 'block';
+                    elements.timerDisplay.textContent = `⏱️ ${duration}ms`;
+
+                    // Show enhanced prompt if used
+                    if (shouldEnhance) {
+                        elements.promptSection.style.display = 'block';
+                        elements.promptText.textContent = `Original: ${query}
+
+Enhanced: ${finalQuery}`;
+                    } else {
+                        elements.promptSection.style.display = 'none';
+                    }
+
+                    // Reset to formatted view
+                    document.querySelectorAll('.toggle-btn').forEach(btn => {
+                        btn.classList.toggle('active', btn.dataset.view === 'formatted');
+                    });
+
+                    updateView('formatted');
+
+                    // Scroll to results
+                    setTimeout(() => {
+                        elements.resultsSection.scrollIntoView({ behavior: 'smooth' });
+                    }, 100);
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    debug(`❌ Error: ${error.message}`);
+                    
+                    elements.resultsSection.style.display = 'block';
+                    elements.timerDisplay.textContent = '⏱️ Error';
+                    elements.responseOutput.textContent = `❌ Error: ${error.message}
+
+Troubleshooting:
+• Check your API key
+• Verify internet connection
+• Check browser console (F12) for details`;
+                } finally {
+                    elements.testButton.disabled = false;
+                    elements.buttonText.textContent = '🚀 Test API';
+                }
+            }
+
+            // Event listeners
+            elements.modelSelect.addEventListener('change', updateUI);
+            elements.testButton.addEventListener('click', runTest);
+
+            document.querySelectorAll('.toggle-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const view = this.dataset.view;
+                    document.querySelectorAll('.toggle-btn').forEach(b => {
+                        b.classList.toggle('active', b === this);
+                    });
+                    updateView(view);
+                });
+            });
+
+            // Initialize
+            updateUI();
+            debug('✅ Ready! Select an API and click Test');
+            console.log('App initialized successfully');
+        });
     </script>
 </body>
 </html>
