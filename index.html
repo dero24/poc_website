@@ -514,33 +514,33 @@ async function generateInterface() {
     btn.textContent = '✨ Generate Interface';
   }
 }
-
 function checkForReactEnhancement() {
-  if (interactionCount >= 3 && elementsCreated > 25 && currentAppCode.includes('function')) {
-    document.getElementById('reactEnhancement').style.display = 'flex';
+  if (interactionCount >= 1 && currentAppCode) {
+    setTimeout(() => enhanceWithReact(), 500);
   }
 }
-
 async function enhanceWithReact() {
-  document.getElementById('reactEnhancement').style.display = 'none';
   const container = document.getElementById('generatedContent');
   container.innerHTML = '<div class="loading">🚀 Upgrading to React</div>';
   
-  const reactPrompt = `Convert this into a modern React functional component with hooks:
+  const reactPrompt = `Convert this into a modern React functional component with hooks. Ensure you return valid HTML including <!DOCTYPE html> and proper React structure:
 
 ${currentAppCode}`;
   
   try {
     const reactCode = await callGroqAPI(reactPrompt, true);
+    if (!reactCode.includes('React') && !reactCode.includes('react')) {
+      throw new Error("React code not generated");
+    }
     parseAndInjectHTML(reactCode, container);
     adaptations++;
     updateStats();
     logHistory('⚡ Upgraded to React architecture');
   } catch (error) {
-    container.innerHTML = `<div style="color: #d32f2f; padding: 20px;">React upgrade failed: ${error.message}</div>`;
+    parseAndInjectHTML(currentAppCode, container);
+    logHistory('⚠️ React upgrade skipped, using original code');
   }
 }
-
 function keepCurrentVersion() {
   document.getElementById('reactEnhancement').style.display = 'none';
   logHistory('Kept vanilla JavaScript version');
