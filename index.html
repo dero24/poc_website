@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -326,6 +327,7 @@
         <div class="feature-item">🔄 Live Adaptation</div>
         <div class="feature-item">🚀 React Ready</div>
       </div>
+      
       <form id="setupForm">
         <div class="input-group">
           <label for="apiKey">🔑 Groq API Key</label>
@@ -336,9 +338,10 @@
             required
           >
         </div>
-      <button type="button" class="btn" id="launchBtn" onclick="initializeExperience()">🚀 Launch Morphic Web</button>
-</form>
-</div>
+        
+        <button type="submit" class="btn">🚀 Launch Morphic Web</button>
+      </form>
+    </div>
 
     <!-- Main Interaction Zone -->
     <div class="interaction-zone" id="interactionZone">
@@ -380,6 +383,17 @@
     </div>
 
   </div>
+
+  <!-- React Enhancement Modal -->
+  <div class="react-enhancement" id="reactEnhancement">
+    <div class="react-prompt">
+      <h2>🚀 React Upgrade Available!</h2>
+      <p>Your creation has reached the complexity threshold where React architecture would provide better performance and maintainability. Want to upgrade?</p>
+      <button class="primary" onclick="enhanceWithReact()">⚡ Upgrade to React</button>
+      <button class="secondary" onclick="keepCurrentVersion()">Keep Current Version</button>
+    </div>
+  </div>
+
 <script>
 
 let groqKey="", interactionCount=0, elementsCreated=0, adaptations=0, conversationHistory=[];
@@ -442,24 +456,25 @@ async function fetchAvailableModels() {
     logHistory('⚠️ Could not fetch models, using default');
   }
 }
-function initializeExperience() {
-const apiKeyInput = document.getElementById('apiKey');
-  groqKey = apiKeyInput.value.trim();
+
+function initializeExperience(e) {
+  if(e) e.preventDefault();
+  
+  groqKey = document.getElementById('apiKey').value.trim();
   if(!groqKey) { 
-    apiKeyInput.focus();
     alert('Please paste your Groq API key!'); 
     return false;
   }
+  
   window.groqKey = groqKey;
-  document.getElementById('setupCard').style.display = "none";
-  document.getElementById('interactionZone').style.display = "block";
+  document.getElementById('setupCard').style.display="none";
+  document.getElementById('interactionZone').style.display="block";
   logHistory('🚀 Session initialized - Ready to build!');
   
   fetchAvailableModels();
   
   setTimeout(() => {
     document.getElementById('interactionZone').scrollIntoView({ behavior: 'smooth' });
-    document.getElementById('userIntent').focus();
   }, 100);
   
   return false;
@@ -488,7 +503,10 @@ async function generateInterface() {
     logHistory(`✅ Generated: ${userInput.substring(0, 50)}...`);
     
     conversationHistory.push({ role: 'assistant', content: `Generated interface with ${elementsCreated} elements` });
-} catch (error) {
+    
+    checkForReactEnhancement();
+    
+  } catch (error) {
     container.innerHTML = `<div style="color: #d32f2f; padding: 40px; text-align: center;"><h3>⚠️ Generation Failed</h3><p>${error.message}</p></div>`;
     logHistory(`❌ Error: ${error.message}`);
   } finally {
@@ -496,6 +514,38 @@ async function generateInterface() {
     btn.textContent = '✨ Generate Interface';
   }
 }
+function checkForReactEnhancement() {
+  if (interactionCount >= 1 && currentAppCode) {
+    setTimeout(() => enhanceWithReact(), 500);
+  }
+}
+async function enhanceWithReact() {
+  const container = document.getElementById('generatedContent');
+  container.innerHTML = '<div class="loading">🚀 Upgrading to React</div>';
+  
+  const reactPrompt = `Convert this into a modern React functional component with hooks. Ensure you return valid HTML including <!DOCTYPE html> and proper React structure:
+
+${currentAppCode}`;
+  
+  try {
+    const reactCode = await callGroqAPI(reactPrompt, true);
+    if (!reactCode.includes('React') && !reactCode.includes('react')) {
+      throw new Error("React code not generated");
+    }
+    parseAndInjectHTML(reactCode, container);
+    adaptations++;
+    updateStats();
+    logHistory('⚡ Upgraded to React architecture');
+  } catch (error) {
+    parseAndInjectHTML(currentAppCode, container);
+    logHistory('⚠️ React upgrade skipped, using original code');
+  }
+}
+function keepCurrentVersion() {
+  document.getElementById('reactEnhancement').style.display = 'none';
+  logHistory('Kept vanilla JavaScript version');
+}
+
 function ensureResponsive(html) {
   if (!html.includes('viewport') && !html.includes('@media')) {
     const responsiveCSS = `
@@ -510,133 +560,136 @@ function ensureResponsive(html) {
   }
   return html;
 }
+
 async function callGroqAPI(userPrompt, isReactUpgrade = false) {
-  async function loadPrompt(name) {
+  const systemPrompt = `You are an expert web developer. Create complete, functional, beautiful HTML pages with inline CSS and JavaScript.
+
+REQUIREMENTS:
+- Generate a complete HTML document with <!DOCTYPE html>
+- Include inline CSS in <style> tags for modern, attractive design
+- Include a <script> tag with all JavaScript functionality
+- Make it fully interactive and functional
+- Use modern ES6+ JavaScript
+- Ensure responsive design
+- Add smooth animations and transitions
+- Make it visually impressive with gradients, shadows, and modern UI
+
+Return ONLY the complete HTML code, no explanations or markdown.`;
+
+  const messages = isReactUpgrade 
+    ? [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }]
+    : [{ role: 'system', content: systemPrompt }, ...conversationHistory.slice(-5), { role: 'user', content: userPrompt }];
+
+  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${groqKey}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      model: document.getElementById('modelSelector').value,
+messages: messages,
+      temperature: 0.85,
+      max_tokens: 4096,
+      top_p: 0.95
+    })
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(`API Error ${response.status}: ${errorData.error?.message || response.statusText}`);
+  }
+
+  const data = await response.json();
+  let content = data.choices[0].message.content.trim();
+  
+  const validateHTML = content.includes('<!DOCTYPE') || content.includes('<html');
+  
+  if (!validateHTML) {
     try {
-      const response = await fetch(`/prompts/${name}.txt`);
-      if (!response.ok) throw new Error(`Failed to load prompt: ${name}`);
-      return await response.text();
-    } catch (error) {
-      console.error(`Error loading prompt ${name}:`, error);
-      return "";
+      const decodedAttempt = atob(
+        content.replace(/[^A-Za-z0-9+\/=]/g, '')
+      );
+      if (decodedAttempt.includes('<!DOCTYPE') || decodedAttempt.includes('<html')) {
+        content = decodedAttempt;
+      }
+    } catch(e) {
+      console.error("Encoding error:", e);
+      content = data.choices[0].message.content.trim();
     }
   }
-  let systemPrompt = await loadPrompt('system');
-  const messages = [
-    { role: 'system', content: systemPrompt },
-    { role: 'user', content: `Create a complete React application for: ${userPrompt}. Include all necessary imports, state management, and styling.` }
-  ];
-const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${groqKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: document.getElementById('modelSelector').value,
-        messages: messages,
-        temperature: 0.85,
-        max_tokens: 4096,
-        top_p: 0.95
-      })
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(`API Error ${response.status}: ${errorData.error?.message || response.statusText}`);
-    }
-
-    const data = await response.json();
-    let content = data.choices[0].message.content.trim();
+  
+  const bt = '`' + '`' + '`'; content = content.replace(new RegExp(bt + 'javascript|' + bt + 'html|' + bt, 'g'), '');
+  
+  if (validateHTML) {
+    const hasValidContent = content && (
+      /<div/i.test(content) || 
+      /<button/i.test(content) ||
+      /<input/i.test(content) ||
+      /<form/i.test(content) ||
+      /<canvas/i.test(content) ||
+      /<svg/i.test(content)
+    );
     
-    const validateHTML = content.includes('<!DOCTYPE') || content.includes('<html');
+    if (!hasValidContent) {
+      throw new Error("Generated content doesn't contain valid HTML elements");
+    }
     
-    if (!validateHTML) {
-      try {
-        const decodedAttempt = atob(
-          content.replace(/[^A-Za-z0-9+\/=]/g, '')
-        );
-        if (decodedAttempt.includes('<!DOCTYPE') || decodedAttempt.includes('<html')) {
-          content = decodedAttempt;
-        }
-      } catch(e) {
-        console.error("Encoding error:", e);
-        content = data.choices[0].message.content.trim();
-      }
-    }
-    const bt = '`' + '`' + '`';
-    // Extract just the React code between ```javascript ```
-    const reactCodeMatch = content.match(new RegExp(`${bt}javascript([\\s\\S]*?)${bt}`, 'i'));
-    if (reactCodeMatch) {
-      content = reactCodeMatch[1].trim();
-    } else {
-      throw new Error('No React component found in response. The AI must return a complete React component.');
-    }
-// Ensure proper HTML structure exists
-    const htmlStart = content.indexOf('<!DOCTYPE html>');
-    const htmlEnd = content.lastIndexOf('</html>');
-    
-    if (htmlStart >= 0 && htmlEnd >= 0) {
-      // Extract just the HTML part if it's embedded in other text
-      content = content.slice(htmlStart, htmlEnd + 7); // +7 for </html> length
-    } else if (htmlStart < 0 && htmlEnd >= 0) {
-      // Missing DOCTYPE but has closing </html>
-      content = `<!DOCTYPE html>\n${content}`;
-    } else if (htmlStart >= 0 && htmlEnd < 0) {
-      // Missing closing </html> but has DOCTYPE
-      content = `${content}\n</html>`;
-    }
-// Final cleanup of any remaining non-HTML text
-    content = content.replace(/^[^<]*/, '').replace(/[^>]*$/, '');
-
     return ensureResponsive(content);
   }
-function parseAndInjectHTML(reactCode, container) {
-  // Create a root div
-  container.innerHTML = `<div id="react-root"></div>`;
-
-  // Load scripts programmatically
-  ['react@18/umd/react.development.js', 
-   'react-dom@18/umd/react-dom.development.js', 
-   '@babel/standalone/babel.min.js']
-    .forEach(src => {
-      const script = document.createElement('script');
-      script.src = `https://unpkg.com/${src}`;
-      container.appendChild(script);
-    });
-
-  // Add the babel/JSX code as an inline script
-  const script = document.createElement('script');
-  script.type = "text/babel";
-  script.innerHTML = `
-    ${reactCode}
-    ReactDOM.createRoot(document.getElementById('react-root')).render(<GeneratedApp />);
-  `;
-  container.appendChild(script);
-
-  // Count elements/components created
-  elementsCreated = countElements(reactCode);
-}
-
-function countElements(reactCode) {
-  const componentMatches = reactCode.match(/function\s+\w+/g);
-  const elementMatches = reactCode.match(/<\w+/g);
-  return (componentMatches ? componentMatches.length : 0) +
-         (elementMatches ? elementMatches.length : 0);
-}
-document.addEventListener("DOMContentLoaded", ()=>{
-    const launchBtn = document.getElementById('launchBtn');
-    if(launchBtn) {
-      launchBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        initializeExperience();
-      });
-    }
-document.getElementById('userIntent')?.addEventListener('keydown',(e)=>{
-      if(e.key==='Enter'&&e.ctrlKey) generateInterface();
-    });
-  });
   
-  </script>
+  throw new Error("Invalid HTML structure received from API");
+}
+
+function parseAndInjectHTML(html, container) {
+  const styleClosing = '<' + '/' + 'style>';
+  const scriptClosing = '<' + '/' + 'script' + '>';
+  
+  const stylePattern = new RegExp('<style[^>]*>([\\s\\S]*?)' + styleClosing, 'i');
+  const styleMatch = html.match(stylePattern);
+  const styleContent = styleMatch ? styleMatch[1] : "";
+  html = html.replace(new RegExp('<style[^>]*>[\\s\\S]*?' + styleClosing, 'gi'), "");
+  
+  const scriptPattern = new RegExp('<script[^>]*>([\\s\\S]*?)' + scriptClosing, 'i');
+  const scriptMatch = html.match(scriptPattern);
+  const scriptContent = scriptMatch ? scriptMatch[1] : "";
+  html = html.replace(new RegExp('<script[^>]*>[\\s\\S]*?' + scriptClosing, 'gi'), "");
+  
+  html = html.replace(/\\/g, '/');
+  
+  container.innerHTML = html;
+  
+  if (styleContent) {
+    const styleElement = document.createElement('style');
+    styleElement.textContent = styleContent;
+    container.appendChild(styleElement);
+  }
+  
+  if (scriptContent) {
+    const scriptElement = document.createElement('script');
+    scriptElement.textContent = scriptContent;
+    container.appendChild(scriptElement);
+  }
+  
+  elementsCreated = countElements(html);
+}
+
+function countElements(html) {
+  const matches = html.match(/<[a-z][^>]*>/gi);
+  return matches ? matches.length : 0;
+}
+
+document.addEventListener("DOMContentLoaded", ()=>{
+  const setupForm = document.getElementById('setupForm');
+  if(setupForm) {
+    setupForm.addEventListener('submit', initializeExperience);
+  }
+  
+  document.getElementById('userIntent')?.addEventListener('keydown',(e)=>{
+    if(e.key==='Enter'&&e.ctrlKey) generateInterface();
+  });
+});
+
+</script>
 </body>
-</html>  
+</html>
