@@ -542,8 +542,9 @@ Please provide a comprehensive solution:`;
 `;
                         
                         if (data.RelatedTopics && data.RelatedTopics.length > 0) {
-                            text += '🔗 Related Topics:
-';
+                            // FIX: Changed single quotes to backticks for multiline string
+                            text += `🔗 Related Topics:
+`;
                             data.RelatedTopics.slice(0, 5).forEach(topic => {
                                 if (topic.Text) text += `  • ${topic.Text}
 `;
@@ -551,14 +552,15 @@ Please provide a comprehensive solution:`;
                         }
                         
                         if (!text.trim()) {
-                            text = '⚠️ No instant answer found.
+                             // FIX: Changed single quotes to backticks for multiline string
+                            text = `⚠️ No instant answer found.
 
 Try queries like:
 • "JavaScript"
 • "Albert Einstein"
 • "Python programming"
 
-View Pretty JSON to see the raw API response.';
+View Pretty JSON to see the raw API response.`;
                         }
                         
                         return text;
