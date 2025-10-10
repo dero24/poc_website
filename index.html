@@ -583,22 +583,35 @@ const messages = isReactUpgrade
     
     const bt = '`' + '`' + '`'; content = content.replace(new RegExp(bt + 'javascript|' + bt + 'html|' + bt, 'g'), '');
     // Strict validation of HTML structure
-    if (!content.startsWith('<!DOCTYPE html>') && !content.includes('<html>')) {
-      throw new Error("Invalid HTML - must start with <!DOCTYPE html> and include complete HTML structure");
+    // If content doesn't have proper HTML structure, wrap it
+    if (!content.includes('<!DOCTYPE html>') || !content.includes('<html>')) {
+      content = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generated Interface</title>
+</head>
+<body>
+  ${content}
+</body>
+</html>`;
     }
-
-    // Remove any non-HTML content before or after the document
+    // Ensure proper HTML structure exists
     const htmlStart = content.indexOf('<!DOCTYPE html>');
-    if (htmlStart > 0) {
-      content = content.slice(htmlStart);
-    }
-
     const htmlEnd = content.lastIndexOf('</html>');
-    if (htmlEnd > 0 && htmlEnd < content.length - 1) {
-      content = content.slice(0, htmlEnd + 7); // +7 for </html> length
+    
+    if (htmlStart >= 0 && htmlEnd >= 0) {
+      // Extract just the HTML part if it's embedded in other text
+      content = content.slice(htmlStart, htmlEnd + 7); // +7 for </html> length
+    } else if (htmlStart < 0 && htmlEnd >= 0) {
+      // Missing DOCTYPE but has closing </html>
+      content = `<!DOCTYPE html>\n${content}`;
+    } else if (htmlStart >= 0 && htmlEnd < 0) {
+      // Missing closing </html> but has DOCTYPE
+      content = `${content}\n</html>`;
     }
-
-    // Final cleanup of any remaining non-HTML text
+// Final cleanup of any remaining non-HTML text
     content = content.replace(/^[^<]*/, '').replace(/[^>]*$/, '');
 
     return ensureResponsive(content);
@@ -653,6 +666,7 @@ document.getElementById('userIntent')?.addEventListener('keydown',(e)=>{
       if(e.key==='Enter'&&e.ctrlKey) generateInterface();
     });
   });
+  
   </script>
 </body>
 </html>  
