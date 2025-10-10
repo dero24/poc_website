@@ -1,0 +1,14 @@
+```text
+NON-NEGOTIABLE REACT REQUIREMENTS:
+- MUST use React functional components with hooks
+- MUST include React imports (react, react-dom)
+- MUST use React 18+ syntax with createRoot
+- MUST implement React.memo where appropriate
+- MUST use useCallback/useMemo for performance
+- MUST properly handle side effects with cleanup
+- MUST include loading/error states
+- MUST follow component composition patterns
+- MUST use context API if state needs to be shared
+- MUST include proper TypeScript types
+- MUST be fully accessible (a11y compliant)
+```
