@@ -511,20 +511,15 @@ function ensureResponsive(html) {
   return html;
 }
 async function callGroqAPI(userPrompt, isReactUpgrade = false) {
-  async function loadPrompt(name) {
-    try {
-      const response = await fetch(`/prompts/${name}.txt`);
-      if (!response.ok) throw new Error(`Failed to load prompt: ${name}`);
-      return await response.text();
-    } catch (error) {
-      console.error(`Error loading prompt ${name}:`, error);
-      return "";
-    }
-  }
-  let systemPrompt = await loadPrompt('system');
   const messages = [
-    { role: 'system', content: systemPrompt },
-    { role: 'user', content: `Create a complete React application for: ${userPrompt}. Include all necessary imports, state management, and styling.` }
+    { 
+      role: 'system', 
+      content: `You are a React code generator. ALWAYS return a complete, self-contained React component named GeneratedApp that can run in a browser with Babel. Include all required imports and style definitions within the component. Do NOT include HTML/HEAD/BODY tags. The code must work when mounted with: ReactDOM.createRoot(document.getElementById('react-root')).render(<GeneratedApp />);` 
+    },
+    { 
+      role: 'user', 
+      content: `Create a complete React component named GeneratedApp for: ${userPrompt}. Include all necessary imports, state management, and styling within the component. The component must be self-contained and immediately executable in a browser with Babel.` 
+    }
   ];
 const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
@@ -548,76 +543,77 @@ const response = await fetch('https://api.groq.com/openai/v1/chat/completions', 
 
     const data = await response.json();
     let content = data.choices[0].message.content.trim();
-    
-    const validateHTML = content.includes('<!DOCTYPE') || content.includes('<html');
-    
-    if (!validateHTML) {
-      try {
-        const decodedAttempt = atob(
-          content.replace(/[^A-Za-z0-9+\/=]/g, '')
-        );
-        if (decodedAttempt.includes('<!DOCTYPE') || decodedAttempt.includes('<html')) {
-          content = decodedAttempt;
-        }
-      } catch(e) {
-        console.error("Encoding error:", e);
-        content = data.choices[0].message.content.trim();
-      }
-    }
+    let content = data.choices[0].message.content.trim();
     const bt = '`' + '`' + '`';
+    
     // Extract just the React code between ```javascript ```
-    const reactCodeMatch = content.match(new RegExp(`${bt}javascript([\\s\\S]*?)${bt}`, 'i'));
+    const reactCodeMatch = content.match(new RegExp(`${bt}javascript([\\s\\S]*?)${bt}`, 'i')) || 
+                             content.match(new RegExp(`${bt}jsx([\\s\\S]*?)${bt}`, 'i'));
+    
     if (reactCodeMatch) {
       content = reactCodeMatch[1].trim();
-    } else {
-      throw new Error('No React component found in response. The AI must return a complete React component.');
+      // Ensure GeneratedApp exists
+      if (!content.includes('function GeneratedApp') && !content.includes('const GeneratedApp')) {
+        throw new Error('The component must be named GeneratedApp');
+      }
+      return content;
     }
-// Ensure proper HTML structure exists
-    const htmlStart = content.indexOf('<!DOCTYPE html>');
-    const htmlEnd = content.lastIndexOf('</html>');
     
-    if (htmlStart >= 0 && htmlEnd >= 0) {
-      // Extract just the HTML part if it's embedded in other text
-      content = content.slice(htmlStart, htmlEnd + 7); // +7 for </html> length
-    } else if (htmlStart < 0 && htmlEnd >= 0) {
-      // Missing DOCTYPE but has closing </html>
-      content = `<!DOCTYPE html>\n${content}`;
-    } else if (htmlStart >= 0 && htmlEnd < 0) {
-      // Missing closing </html> but has DOCTYPE
-      content = `${content}\n</html>`;
+    // If no code block found, try to find the component directly
+    if (content.includes('function GeneratedApp') || content.includes('const GeneratedApp') || 
+        content.includes('class GeneratedApp')) {
+      return content;
     }
-// Final cleanup of any remaining non-HTML text
-    content = content.replace(/^[^<]*/, '').replace(/[^>]*$/, '');
-
-    return ensureResponsive(content);
-  }
+    
+    throw new Error('No valid React component named GeneratedApp found in response');
+}
 function parseAndInjectHTML(reactCode, container) {
-  // Create a root div
+  // Create a root div and clear previous content
   container.innerHTML = `<div id="react-root"></div>`;
 
-  // Load scripts programmatically
-  ['react@18/umd/react.development.js', 
-   'react-dom@18/umd/react-dom.development.js', 
-   '@babel/standalone/babel.min.js']
-    .forEach(src => {
-      const script = document.createElement('script');
-      script.src = `https://unpkg.com/${src}`;
-      container.appendChild(script);
-    });
+  // Load required scripts if not already loaded
+  if (!window.React) {
+    const reactScript = document.createElement('script');
+    reactScript.src = 'https://unpkg.com/react@18/umd/react.development.js';
+    container.appendChild(reactScript);
+  }
+  
+  if (!window.ReactDOM) {
+    const reactDomScript = document.createElement('script');
+    reactDomScript.src = 'https://unpkg.com/react-dom@18/umd/react-dom.development.js';
+    container.appendChild(reactDomScript);
+  }
+  
+  if (!window.Babel) {
+    const babelScript = document.createElement('script');
+    babelScript.src = 'https://unpkg.com/@babel/standalone/babel.min.js';
+    container.appendChild(babelScript);
+  }
 
-  // Add the babel/JSX code as an inline script
+  // Create script element with the React component
   const script = document.createElement('script');
   script.type = "text/babel";
+  
+  // Ensure the component renders itself
   script.innerHTML = `
     ${reactCode}
-    ReactDOM.createRoot(document.getElementById('react-root')).render(<GeneratedApp />);
+    
+    // Auto-render the component
+    const renderApp = () => {
+      if (window.React && window.ReactDOM) {
+        ReactDOM.createRoot(document.getElementById('react-root')).render(<GeneratedApp />);
+      } else {
+        setTimeout(renderApp, 50);
+      }
+    };
+    renderApp();
   `;
+  
   container.appendChild(script);
 
   // Count elements/components created
   elementsCreated = countElements(reactCode);
 }
-
 function countElements(reactCode) {
   const componentMatches = reactCode.match(/function\s+\w+/g);
   const elementMatches = reactCode.match(/<\w+/g);
