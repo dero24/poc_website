@@ -336,7 +336,7 @@
             required
           >
         </div>
-      <button type="submit" class="btn" id="launchBtn">🚀 Launch Morphic Web</button>
+      <button type="button" class="btn" id="launchBtn" onclick="initializeExperience()">🚀 Launch Morphic Web</button>
 </form>
 </div>
 
@@ -443,11 +443,7 @@ async function fetchAvailableModels() {
   }
 }
 function initializeExperience() {
-if(e) {
-    e.preventDefault();
-    e.stopPropagation();
-  }
-  const apiKeyInput = document.getElementById('apiKey');
+const apiKeyInput = document.getElementById('apiKey');
   groqKey = apiKeyInput.value.trim();
   if(!groqKey) { 
     apiKeyInput.focus();
@@ -657,6 +653,6 @@ document.getElementById('userIntent')?.addEventListener('keydown',(e)=>{
       if(e.key==='Enter'&&e.ctrlKey) generateInterface();
     });
   });
-</script>
+  </script>
 </body>
 </html>  
