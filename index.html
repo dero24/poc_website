@@ -326,7 +326,6 @@
         <div class="feature-item">🔄 Live Adaptation</div>
         <div class="feature-item">🚀 React Ready</div>
       </div>
-      
       <form id="setupForm">
         <div class="input-group">
           <label for="apiKey">🔑 Groq API Key</label>
@@ -337,10 +336,9 @@
             required
           >
         </div>
-        
-        <button type="submit" class="btn">🚀 Launch Morphic Web</button>
-      </form>
-    </div>
+      <button type="submit" class="btn" id="launchBtn">🚀 Launch Morphic Web</button>
+</form>
+</div>
 
     <!-- Main Interaction Zone -->
     <div class="interaction-zone" id="interactionZone">
@@ -444,25 +442,28 @@ async function fetchAvailableModels() {
     logHistory('⚠️ Could not fetch models, using default');
   }
 }
-
-function initializeExperience(e) {
-  if(e) e.preventDefault();
-  
-  groqKey = document.getElementById('apiKey').value.trim();
+function initializeExperience() {
+if(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+  const apiKeyInput = document.getElementById('apiKey');
+  groqKey = apiKeyInput.value.trim();
   if(!groqKey) { 
+    apiKeyInput.focus();
     alert('Please paste your Groq API key!'); 
     return false;
   }
-  
   window.groqKey = groqKey;
-  document.getElementById('setupCard').style.display="none";
-  document.getElementById('interactionZone').style.display="block";
+  document.getElementById('setupCard').style.display = "none";
+  document.getElementById('interactionZone').style.display = "block";
   logHistory('🚀 Session initialized - Ready to build!');
   
   fetchAvailableModels();
   
   setTimeout(() => {
     document.getElementById('interactionZone').scrollIntoView({ behavior: 'smooth' });
+    document.getElementById('userIntent').focus();
   }, 100);
   
   return false;
@@ -526,7 +527,7 @@ function ensureResponsive(html) {
 async function callGroqAPI(userPrompt, isReactUpgrade = false) {
   async function loadPrompt(name) {
     try {
-      const response = await fetch(`prompts/${name}.txt`);
+      const response = await fetch(`/prompts/${name}.txt`);
       if (!response.ok) throw new Error(`Failed to load prompt: ${name}`);
       return await response.text();
     } catch (error) {
@@ -538,7 +539,8 @@ async function callGroqAPI(userPrompt, isReactUpgrade = false) {
   const systemPrompt = await loadPrompt('system');
   // Always enforce React best practices
   if (isReactUpgrade) {
-    systemPrompt += await loadPrompt('react_upgrade');
+    const reactPrompt = await loadPrompt('react_upgrade');
+    systemPrompt += reactPrompt;
   }
 const messages = isReactUpgrade 
       ? [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }]
@@ -643,16 +645,17 @@ const messages = isReactUpgrade
     const matches = html.match(/<[a-z][^>]*>/gi);
     return matches ? matches.length : 0;
   }
-
   document.addEventListener("DOMContentLoaded", ()=>{
-    const setupForm = document.getElementById('setupForm');
-    if(setupForm) {
-      setupForm.addEventListener('submit', initializeExperience);
+    const launchBtn = document.getElementById('launchBtn');
+    if(launchBtn) {
+      launchBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        initializeExperience();
+      });
     }
-    
-    document.getElementById('userIntent')?.addEventListener('keydown',(e)=>{
+document.getElementById('userIntent')?.addEventListener('keydown',(e)=>{
       if(e.key==='Enter'&&e.ctrlKey) generateInterface();
     });
   });
 </body>
-</html>
+</html>  
