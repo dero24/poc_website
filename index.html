@@ -92,6 +92,15 @@
             transition: all 0.3s ease;
         }
 
+        /* Greyed out disabled inputs */
+        input[type="text"]:disabled {
+            background: var(--surface);
+            color: var(--text-dim);
+            opacity: 0.5;
+            cursor: not-allowed;
+            border-color: var(--border);
+        }
+
         select:focus, input[type="text"]:focus, textarea:focus {
             outline: none;
             border-color: var(--primary);
@@ -215,12 +224,15 @@
             background: var(--surface-light);
             color: var(--text-dim);
             border: 1px solid var(--border);
-            padding: 8px 16px;
+            padding: 10px 16px;
             border-radius: 6px;
             cursor: pointer;
             font-size: 0.85rem;
             font-weight: 600;
             transition: all 0.3s ease;
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
         }
 
         .toggle-btn:hover {
@@ -356,6 +368,26 @@
             .result-header {
                 flex-direction: column;
                 align-items: flex-start;
+            }
+
+            .view-toggle {
+                width: 100%;
+            }
+
+            .toggle-btn {
+                flex: 1;
+                min-width: 90px;
+                padding: 10px 12px;
+                font-size: 0.8rem;
+            }
+
+            .response-container {
+                max-height: 400px;
+                padding: 15px;
+            }
+
+            .response-text {
+                font-size: 0.9rem;
             }
         }
 
@@ -550,8 +582,10 @@
                 keyRequired.style.display = 'inline';
                 apiHint.style.display = 'block';
             } else {
+                // Grey out the API key field for DuckDuckGo
                 apiKeyInput.disabled = true;
                 apiKeyInput.value = '';
+                apiKeyInput.placeholder = 'No API key required for this service';
                 keyRequired.style.display = 'none';
                 apiHint.style.display = 'block';
             }
@@ -875,7 +909,7 @@ Please provide a comprehensive solution:`;
                 currentModelType = modelType;
 
                 // Display results
-                displayResults(originalQuery, finalQuery, shouldEnhance, response, duration, modelType);
+                displayResults(originalQuery, finalQuery, shouldEnhanced, response, duration, modelType);
 
             } catch (error) {
                 displayError(error.message);
@@ -903,11 +937,13 @@ Please provide a comprehensive solution:`;
                 enhancedPromptSection.style.display = 'none';
             }
 
-            // Get active view
-            const activeView = document.querySelector('.toggle-btn.active').getAttribute('data-view');
+            // Reset to formatted view
+            const toggleBtns = document.querySelectorAll('.toggle-btn');
+            toggleBtns.forEach(b => b.classList.remove('active'));
+            toggleBtns[0].classList.add('active');
             
-            // Display response
-            updateResponseView(activeView);
+            // Display response in formatted view
+            updateResponseView('formatted');
             responseOutput.parentElement.parentElement.classList.remove('error');
 
             // Scroll to results
@@ -923,6 +959,8 @@ Please provide a comprehensive solution:`;
             enhancedPromptSection.style.display = 'none';
             
             responseOutput.textContent = `❌ Error: ${errorMsg}`;
+            responseOutput.classList.add('formatted');
+            responseOutput.classList.remove('raw');
             responseOutput.parentElement.parentElement.classList.add('error');
 
             resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
