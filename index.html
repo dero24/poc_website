@@ -1,695 +1,294 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>⚡ Morphic Web - Instant AI App Builder</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      padding: 20px;
-      color: #333;
-    }
-    
-    .container {
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-    
-    .setup-card, .interaction-zone {
-      background: white;
-      border-radius: 24px;
-      padding: 48px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-      margin-bottom: 24px;
-    }
-    
-    .interaction-zone { display: none; }
-    
-    h1 {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      font-size: 3em;
-      font-weight: 800;
-      text-align: center;
-      margin-bottom: 12px;
-    }
-    
-    .tagline {
-      text-align: center;
-      font-size: 1.3em;
-      color: #666;
-      margin-bottom: 32px;
-      font-weight: 500;
-    }
-    
-    .feature-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-      margin-bottom: 32px;
-    }
-    
-    .feature-item {
-      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-      padding: 20px;
-      border-radius: 16px;
-      text-align: center;
-      font-weight: 600;
-      color: #667eea;
-    }
-    
-    .input-group {
-      margin-bottom: 24px;
-    }
-    
-    label {
-      display: block;
-      margin-bottom: 10px;
-      font-weight: 700;
-      font-size: 1.1em;
-      color: #333;
-    }
-    
-    input[type="text"], input[type="password"], textarea {
-      width: 100%;
-      padding: 16px 20px;
-      border: 3px solid #e0e0e0;
-      border-radius: 12px;
-      font-size: 16px;
-      font-family: inherit;
-      transition: all 0.3s ease;
-      background: #fafafa;
-    }
-    
-    input:focus, textarea:focus {
-      outline: none;
-      border-color: #667eea;
-      background: white;
-      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-    }
-    
-    textarea {
-      min-height: 140px;
-      resize: vertical;
-      line-height: 1.6;
-    }
-    
-    .btn {
-      width: 100%;
-      padding: 18px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border: none;
-      border-radius: 12px;
-      font-size: 18px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-    
-    .btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 40px rgba(102, 126, 234, 0.5);
-    }
-    .btn:active {
-      transform: translateY(-1px);
-    }
-    
-    .btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-    }
-    
-    .model-select {
-      width: 100%;
-      padding: 16px 20px;
-      border: 3px solid #e0e0e0;
-      border-radius: 12px;
-      font-size: 16px;
-      font-family: inherit;
-      transition: all 0.3s ease;
-      background: #fafafa;
-      cursor: pointer;
-    }
-
-    .model-select:focus {
-      outline: none;
-      border-color: #667eea;
-      background: white;
-      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-    }
-.stats-bar {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 16px;
-      margin-bottom: 32px;
-    }
-    
-    .stat-card {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-      padding: 20px;
-      border-radius: 16px;
-      text-align: center;
-      color: white;
-      box-shadow: 0 8px 24px rgba(240, 147, 251, 0.4);
-    }
-    
-    .stat-label {
-      font-size: 0.9em;
-      opacity: 0.9;
-      margin-bottom: 8px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      font-weight: 600;
-    }
-    
-    .stat-value {
-      font-size: 2.2em;
-      font-weight: 800;
-    }
-    
-    #generatedContent {
-      background: white;
-      border: 3px solid #e0e0e0;
-      border-radius: 16px;
-      min-height: 500px;
-      margin-top: 24px;
-      overflow: hidden;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-    }
-    
-    .history-log {
-      margin-top: 24px;
-      padding: 24px;
-      background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-      border-radius: 16px;
-      max-height: 300px;
-      overflow-y: auto;
-      box-shadow: 0 8px 24px rgba(252, 182, 159, 0.4);
-    }
-    
-    .history-item {
-      padding: 12px 16px;
-      margin-bottom: 10px;
-      background: white;
-      border-left: 5px solid #667eea;
-      border-radius: 8px;
-      font-size: 0.95em;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    
-    .loading {
-      text-align: center;
-      padding: 80px 20px;
-      font-size: 1.5em;
-      color: #667eea;
-      font-weight: 600;
-    }
-    
-    .loading::after {
-      content: '';
-      animation: dots 1.5s infinite;
-    }
-    
-    @keyframes dots {
-      0%, 20% { content: '.'; }
-      40% { content: '..'; }
-      60%, 100% { content: '...'; }
-    }
-    
-    .react-enhancement {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.85);
-      z-index: 1000;
-      align-items: center;
-      justify-content: center;
-      backdrop-filter: blur(10px);
-    }
-    
-    .react-prompt {
-      background: white;
-      padding: 48px;
-      border-radius: 24px;
-      max-width: 600px;
-      text-align: center;
-      box-shadow: 0 24px 80px rgba(0,0,0,0.6);
-      animation: slideUp 0.4s ease;
-    }
-    
-    @keyframes slideUp {
-      from {
-        opacity: 0;
-        transform: translateY(40px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    .react-prompt h2 {
-      color: #667eea;
-      margin-bottom: 24px;
-      font-size: 2.2em;
-    }
-    
-    .react-prompt p {
-      color: #666;
-      margin-bottom: 32px;
-      font-size: 1.15em;
-      line-height: 1.7;
-    }
-    
-    .react-prompt button {
-      margin: 12px;
-      padding: 16px 40px;
-      border: none;
-      border-radius: 12px;
-      font-size: 17px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    
-    .react-prompt .primary {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
-    }
-    
-    .react-prompt .secondary {
-      background: #f0f0f0;
-      color: #333;
-    }
-    
-    .react-prompt button:hover {
-      transform: translateY(-3px);
-    }
-    
-    @media (max-width: 768px) {
-      .setup-card, .interaction-zone { padding: 32px 24px; }
-      h1 { font-size: 2.2em; }
-      .tagline { font-size: 1.1em; }
-      .stats-bar { grid-template-columns: 1fr; }
-      .react-prompt { margin: 20px; padding: 32px 24px; }
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Search API Playground — DuckDuckGo / Bing / Google</title>
+<style>
+  :root{--bg:#0f1724;--panel:#0b1220;--muted:#94a3b8;--accent:#7c3aed;--card:#071126;--success:#10b981}
+  body{margin:0;font-family:Inter,Segoe UI,system-ui,Roboto,"Helvetica Neue",Arial;background:linear-gradient(180deg,#071029 0%, #071126 50%, #081226 100%);color:#e6eef8;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px}
+  .app{width:980px;max-width:98%;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border:1px solid rgba(255,255,255,0.04);box-shadow:0 10px 30px rgba(2,6,23,0.6);border-radius:12px;overflow:hidden}
+  header{padding:18px 22px;background:linear-gradient(90deg,rgba(124,58,237,0.12),transparent);display:flex;gap:12px;align-items:center}
+  header h1{font-size:16px;margin:0}
+  .grid{display:grid;grid-template-columns:340px 1fr;gap:18px;padding:18px}
+  .panel{background:linear-gradient(180deg,rgba(255,255,255,0.01),transparent);padding:14px;border-radius:10px;border:1px solid rgba(255,255,255,0.02)}
+  label{display:block;font-size:13px;color:var(--muted);margin-bottom:8px}
+  select,input[type="text"],textarea{width:100%;padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:rgba(255,255,255,0.02);color:inherit;font-size:14px}
+  textarea{min-height:110px;resize:vertical}
+  .row{display:flex;gap:8px;align-items:center}
+  .small{font-size:12px;color:var(--muted)}
+  .actions{display:flex;gap:8px;margin-top:10px}
+  button{background:var(--accent);color:white;padding:8px 12px;border-radius:8px;border:0;cursor:pointer;font-weight:600}
+  button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04)}
+  .out{padding:14px;min-height:320px;display:flex;flex-direction:column;gap:12px}
+  .response{white-space:pre-wrap;background:linear-gradient(180deg,rgba(255,255,255,0.01),transparent);padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.02);overflow:auto;max-height:540px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
+  .meta{display:flex;justify-content:space-between;align-items:center}
+  .chip{background:rgba(255,255,255,0.03);padding:6px 8px;border-radius:999px;font-size:13px;color:var(--muted)}
+  .rimer{width:18px;height:18px;border-radius:50%;border:3px solid rgba(255,255,255,0.08);border-top-color:var(--accent);animation:none}
+  .rimer.running{animation:spin 1s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .footerpx;background:rgba(255,255,255,0.01);display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted)}
+  .row-compact{display:flex;gap:8px;align-items:center}
+  .badge{background:rgba(255,255,255,0.03);padding:3px 8px;border-radius:6px;font-size:12px;color:var(--muted)}
+  .example{font-size:13px;color:var(--muted);margin-top:10px}
+  .error{color:#ffb4a2;background:rgba(255,80,80,0.06);padding:8px;border-radius:6px;border:1px solid rgba(255,80,80,0.06)}
+  a.link{color:var(--accent);text-decoration:none}
+</style>
 </head>
 <body>
-  <div class="container">
-    
-    <!-- Setup/Login Card -->
-    <div class="setup-card" id="setupCard">
-      <h1>⚡ Morphic Web</h1>
-      <p class="tagline">Instant AI-Powered App Builder</p>
-      
-      <div class="feature-grid">
-        <div class="feature-item">🎨 Any Design</div>
-        <div class="feature-item">⚡ Instant Generation</div>
-        <div class="feature-item">🔄 Live Adaptation</div>
-        <div class="feature-item">🚀 React Ready</div>
-      </div>
-      
-      <form id="setupForm">
-        <div class="input-group">
-          <label for="apiKey">🔑 Groq API Key</label>
-          <input 
-            type="password" 
-            id="apiKey" 
-            placeholder="Paste your Groq API key here..."
-            required
-          >
-        </div>
-        
-        <button type="submit" class="btn">🚀 Launch Morphic Web</button>
-      </form>
-    </div>
+  <div class="app" role="application">
+    <header>
+      <h1>Search API Playground — DuckDuckGo, Bing, Google, Proxy</h1>
+      <div class="chip">Single-file demo</div>
+    </header>
 
-    <!-- Main Interaction Zone -->
-    <div class="interaction-zone" id="interactionZone">
-      <h1>✨ Create Anything</h1>
-      <div class="stats-bar">
-        <div class="stat-card">
-          <div class="stat-label">Interactions</div>
-          <div class="stat-value" id="interactionCount">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Elements</div>
-          <div class="stat-value" id="elementsCreated">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Adaptations</div>
-          <div class="stat-value" id="adaptations">0</div>
-        </div>
-      </div>
-
-      <div class="input-group">
-        <label for="modelSelector">🤖 AI Model</label>
-        <select id="modelSelector" class="model-select">
-          <option value="llama-3.3-70b-versatile">Loading models...</option>
+    <div class="grid">
+      <div class="panel">
+        <label for="source">Choose source</label>
+        <select id="source" aria-label="source selector">
+          <option value="duckduckgo">DuckDuckGo Instant Answer (free)</option>
+          <option value="bing">Bing Web Search (requires key / proxy)</option>
+          <option value="google">Google Programmable Search (requires key)</option>
+          <option value="proxy">Generic Proxy Endpoint (your fetch proxy)</option>
         </select>
+
+        <div style="height:12px"></div>
+
+        <label for="apikey">API Key or Proxy Endpoint (paste full URL for proxy)</label>
+        <input id="apikey" type="text" placeholder="Bing subscription key OR proxy URL (https://...)" />
+
+        <label for="cx" style="margin-top:10px">Google CX / Search Engine ID (optional)</label>
+        <input id="cx" type="text" placeholder="Google Programmable Search engine ID (cx)" />
+
+        <label style="margin-top:12px">Prompt (user input)</label>
+        <textarea id="prompt" placeholder="Enter a query or 'react component to fetch data'..."></textarea>
+
+        <div style="height:10px"></div>
+
+        <label class="row-compact"><input id="smartEnhance" type="checkbox" /> <span style="margin-left:8px">Enable Smart prompt enhancement (local)</span></label>
+
+        <div class="actions">
+          <button id="sendBtn">Send</button>
+          <button id="clearBtn" class="ghost">Clear Output</button>
+        </div>
+
+        <div class="example">
+          Example prompts: "react fetch example", "debounce input React", "python open file example"
+        </div>
       </div>
-<div class="input-group">
-        <label for="userIntent">💭 What do you want to build?</label>
-        <textarea 
-          id="userIntent" 
-          placeholder="Describe anything... a calculator, game, dashboard, animation, tool, or creative experiment!"
-        ></textarea>
+
+      <div class="panel out">
+        <div class="meta">
+          <div>
+            <strong>Response</strong>
+            <div class="small">See raw result and code snippets below</div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center">
+            <div id="rimer" class="rimer" title="request activity indicator" aria-hidden="true"></div>
+            <div class="chip" id="statusChip">idle</div>
+          </div>
+        </div>
+
+        <div id="messages" class="response" role="log" aria-live="polite"></div>
+
+        <div id="infoRow" class="row" style="margin-top:6px">
+          <div class="small" id="timing">—</div>
+          <div style="flex:1"></div>
+          <div id="note" class="small">Local smart enhancer: adds concise instruction to the prompt</div>
+        </div>
+
+        <div id="errorBox" style="display:none;margin-top:8px"></div>
       </div>
-
-      <button onclick="generateInterface()" class="btn" id="generateBtn">✨ Generate Interface</button>
-
-      <div id="generatedContent"></div>
-
-      <div class="history-log" id="historyLog"></div>
     </div>
 
-  </div>
-
-  <!-- React Enhancement Modal -->
-  <div class="react-enhancement" id="reactEnhancement">
-    <div class="react-prompt">
-      <h2>🚀 React Upgrade Available!</h2>
-      <p>Your creation has reached the complexity threshold where React architecture would provide better performance and maintainability. Want to upgrade?</p>
-      <button class="primary" onclick="enhanceWithReact()">⚡ Upgrade to React</button>
-      <button class="secondary" onclick="keepCurrentVersion()">Keep Current Version</button>
+    <div class="footer">
+      <div class="small">Deployable single file. For Bing/Google you may need a server-side proxy to avoid CORS and to keep keys secret.</div>
+      <div><span class="badge">Tip</span></div>
     </div>
   </div>
 
 <script>
+/*
+  Single-file Search API Playground
+  - Supports DuckDuckGo (direct JSON), Bing Web Search, Google Programmable Search, and a generic proxy.
+  - For Bing/Google in production: use a server-side proxy to keep API keys secret and to resolve CORS.
+  - The "Smart prompt enhancement" is local and optional; it modifies the prompt before sending.
+*/
 
-let groqKey="", interactionCount=0, elementsCreated=0, adaptations=0, conversationHistory=[];
-let currentAppCode = "";
+const $ = id => document.getElementById(id);
+const sourceEl = $('source');
+const apiKeyEl = $('apikey');
+const promptEl = $('prompt');
+const sendBtn = $('sendBtn');
+const clearBtn = $('clearBtn');
+const messages = $('messages');
+const statusChip = $('statusChip');
+const rimer = $('rimer');
+const timing = $('timing');
+const cxEl = $('cx');
+const errorBox = $('errorBox');
+const smartEnhanceEl = $('smartEnhance');
 
-function updateStats() {
-  document.getElementById('interactionCount').textContent = interactionCount;
-  document.getElementById('elementsCreated').textContent = elementsCreated;
-  document.getElementById('adaptations').textContent = adaptations;
-}
+let requestStart = 0;
 
-function logHistory(msg) {
-  const log = document.getElementById('historyLog'), item = document.createElement('div');
-  item.className = 'history-item'; item.textContent = `${new Date().toLocaleTimeString()} - ${msg}`;
-  log.appendChild(item); log.scrollTop = log.scrollHeight;
-}
-async function fetchAvailableModels() {
-  try {
-    const response = await fetch('https://api.groq.com/openai/v1/models', {
-      headers: {
-        'Authorization': `Bearer ${groqKey}`,
-        'Content-Type': 'application/json'
-      }
-    });
-    
-    if (!response.ok) {
-      console.error('Failed to fetch models');
-      return;
-    }
-    
-    const data = await response.json();
-    const modelSelector = document.getElementById('modelSelector');
-    modelSelector.innerHTML = '';
-    
-    const chatModels = data.data.filter(model => 
-      model.active && 
-      !model.id.includes('whisper') && 
-      !model.id.includes('guard') &&
-      !model.id.includes('llava')
-    ).sort((a, b) => {
-      if (a.id.includes('llama-3.3')) return -1;
-      if (b.id.includes('llama-3.3')) return 1;
-      return a.id.localeCompare(b.id);
-    });
-    
-    chatModels.forEach(model => {
-      const option = document.createElement('option');
-      option.value = model.id;
-      option.textContent = `${model.id} (${model.context_window} tokens)`;
-      if (model.id === 'llama-3.3-70b-versatile') {
-        option.selected = true;
-      }
-      modelSelector.appendChild(option);
-    });
-    
-    logHistory(`✅ Loaded ${chatModels.length} available models`);
-    
-  } catch (error) {
-    console.error('Error fetching models:', error);
-    logHistory('⚠️ Could not fetch models, using default');
+// Utility: set running indicator
+function setRunning(r) {
+  if (r) {
+    rimer.classList.add('running');
+    statusChip.textContent = 'running';
+  } else {
+    rimer.classList.remove('running');
+    statusChip.textContent = 'idle';
   }
 }
 
-function initializeExperience(e) {
-  if(e) e.preventDefault();
-  
-  groqKey = document.getElementById('apiKey').value.trim();
-  if(!groqKey) { 
-    alert('Please paste your Groq API key!'); 
-    return false;
+// Local "smart" enhancer: simple deterministic enhancement for clarity and code requests
+function enhancePrompt(original) {
+  // Keep enhancement short and generic. This runs locally and never sends your keys.
+  const guide = "Provide a concise, well-formatted answer. If code, return a runnable snippet with minimal explanation and no extra commentary.";
+  // If the user is clearly asking for code, hint for a code block
+  const wantsCode = /\b(code|example|snippet|react|python|javascript|js|jsx)\b/i.test(original);
+  if (wantsCode) {
+    return `${original.trim()} ${guide}`;
   }
-  
-  window.groqKey = groqKey;
-  document.getElementById('setupCard').style.display="none";
-  document.getElementById('interactionZone').style.display="block";
-  logHistory('🚀 Session initialized - Ready to build!');
-  
-  fetchAvailableModels();
-  
-  setTimeout(() => {
-    document.getElementById('interactionZone').scrollIntoView({ behavior: 'smooth' });
-  }, 100);
-  
-  return false;
-}
-async function generateInterface() {
-  const userInput = document.getElementById('userIntent').value.trim();
-  if (!userInput) { alert('Please describe what you want to create!'); return; }
-
-  const btn = document.getElementById('generateBtn');
-  btn.disabled = true;
-  btn.textContent = '⏳ Generating...';
-
-  const container = document.getElementById('generatedContent');
-  container.innerHTML = '<div class="loading">Creating your interface</div>';
-
-  interactionCount++;
-  conversationHistory.push({ role: 'user', content: userInput });
-
-  try {
-    const generatedHTML = await callGroqAPI(userInput);
-    currentAppCode = generatedHTML;
-    
-    parseAndInjectHTML(generatedHTML, container);
-    
-    updateStats();
-    logHistory(`✅ Generated: ${userInput.substring(0, 50)}...`);
-    
-    conversationHistory.push({ role: 'assistant', content: `Generated interface with ${elementsCreated} elements` });
-    
-    checkForReactEnhancement();
-    
-  } catch (error) {
-    container.innerHTML = `<div style="color: #d32f2f; padding: 40px; text-align: center;"><h3>⚠️ Generation Failed</h3><p>${error.message}</p></div>`;
-    logHistory(`❌ Error: ${error.message}`);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = '✨ Generate Interface';
-  }
-}
-function checkForReactEnhancement() {
-  if (interactionCount >= 1 && currentAppCode) {
-    setTimeout(() => enhanceWithReact(), 500);
-  }
-}
-async function enhanceWithReact() {
-  const container = document.getElementById('generatedContent');
-  container.innerHTML = '<div class="loading">🚀 Upgrading to React</div>';
-  
-  const reactPrompt = `Convert this into a modern React functional component with hooks. Ensure you return valid HTML including <!DOCTYPE html> and proper React structure:
-
-${currentAppCode}`;
-  
-  try {
-    const reactCode = await callGroqAPI(reactPrompt, true);
-    if (!reactCode.includes('React') && !reactCode.includes('react')) {
-      throw new Error("React code not generated");
-    }
-    parseAndInjectHTML(reactCode, container);
-    adaptations++;
-    updateStats();
-    logHistory('⚡ Upgraded to React architecture');
-  } catch (error) {
-    parseAndInjectHTML(currentAppCode, container);
-    logHistory('⚠️ React upgrade skipped, using original code');
-  }
-}
-function keepCurrentVersion() {
-  document.getElementById('reactEnhancement').style.display = 'none';
-  logHistory('Kept vanilla JavaScript version');
+  return original.trim();
 }
 
-function ensureResponsive(html) {
-  if (!html.includes('viewport') && !html.includes('@media')) {
-    const responsiveCSS = `
-      <style>
-        @media (max-width: 768px) {
-          body { padding: 10px !important; font-size: 14px; }
-          * { max-width: 100%; }
-        }
-      </style>
-    `;
-    return html.replace('</head>', responsiveCSS + '</head>');
-  }
-  return html;
+// Short helper to append text to the response area
+function appendMessage(text, isError=false) {
+  const node = document.createElement('div');
+  node.textContent = text;
+  if (isError) node.style.color = '#ffb4a2';
+  messages.appendChild(node);
+  messages.scrollTop = messages.scrollHeight;
 }
 
-async function callGroqAPI(userPrompt, isReactUpgrade = false) {
-  const systemPrompt = `You are an expert web developer. Create complete, functional, beautiful HTML pages with inline CSS and JavaScript.
-
-REQUIREMENTS:
-- Generate a complete HTML document with <!DOCTYPE html>
-- Include inline CSS in <style> tags for modern, attractive design
-- Include a <script> tag with all JavaScript functionality
-- Make it fully interactive and functional
-- Use modern ES6+ JavaScript
-- Ensure responsive design
-- Add smooth animations and transitions
-- Make it visually impressive with gradients, shadows, and modern UI
-
-Return ONLY the complete HTML code, no explanations or markdown.`;
-
-  const messages = isReactUpgrade 
-    ? [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }]
-    : [{ role: 'system', content: systemPrompt }, ...conversationHistory.slice(-5), { role: 'user', content: userPrompt }];
-
-  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${groqKey}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      model: document.getElementById('modelSelector').value,
-messages: messages,
-      temperature: 0.85,
-      max_tokens: 4096,
-      top_p: 0.95
-    })
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(`API Error ${response.status}: ${errorData.error?.message || response.statusText}`);
-  }
-
-  const data = await response.json();
-  let content = data.choices[0].message.content.trim();
-  
-  const validateHTML = content.includes('<!DOCTYPE') || content.includes('<html');
-  
-  if (!validateHTML) {
-    try {
-      const decodedAttempt = atob(
-        content.replace(/[^A-Za-z0-9+\/=]/g, '')
-      );
-      if (decodedAttempt.includes('<!DOCTYPE') || decodedAttempt.includes('<html')) {
-        content = decodedAttempt;
-      }
-    } catch(e) {
-      console.error("Encoding error:", e);
-      content = data.choices[0].message.content.trim();
-    }
-  }
-  
-  const bt = '`' + '`' + '`'; content = content.replace(new RegExp(bt + 'javascript|' + bt + 'html|' + bt, 'g'), '');
-  
-  if (validateHTML) {
-    const hasValidContent = content && (
-      /<div/i.test(content) || 
-      /<button/i.test(content) ||
-      /<input/i.test(content) ||
-      /<form/i.test(content) ||
-      /<canvas/i.test(content) ||
-      /<svg/i.test(content)
-    );
-    
-    if (!hasValidContent) {
-      throw new Error("Generated content doesn't contain valid HTML elements");
-    }
-    
-    return ensureResponsive(content);
-  }
-  
-  throw new Error("Invalid HTML structure received from API");
-}
-
-function parseAndInjectHTML(html, container) {
-  const styleClosing = '<' + '/' + 'style>';
-  const scriptClosing = '<' + '/' + 'script' + '>';
-  
-  const stylePattern = new RegExp('<style[^>]*>([\\s\\S]*?)' + styleClosing, 'i');
-  const styleMatch = html.match(stylePattern);
-  const styleContent = styleMatch ? styleMatch[1] : "";
-  html = html.replace(new RegExp('<style[^>]*>[\\s\\S]*?' + styleClosing, 'gi'), "");
-  
-  const scriptPattern = new RegExp('<script[^>]*>([\\s\\S]*?)' + scriptClosing, 'i');
-  const scriptMatch = html.match(scriptPattern);
-  const scriptContent = scriptMatch ? scriptMatch[1] : "";
-  html = html.replace(new RegExp('<script[^>]*>[\\s\\S]*?' + scriptClosing, 'gi'), "");
-  
-  html = html.replace(/\\/g, '/');
-  
-  container.innerHTML = html;
-  
-  if (styleContent) {
-    const styleElement = document.createElement('style');
-    styleElement.textContent = styleContent;
-    container.appendChild(styleElement);
-  }
-  
-  if (scriptContent) {
-    const scriptElement = document.createElement('script');
-    scriptElement.textContent = scriptContent;
-    container.appendChild(scriptElement);
-  }
-  
-  elementsCreated = countElements(html);
-}
-
-function countElements(html) {
-  const matches = html.match(/<[a-z][^>]*>/gi);
-  return matches ? matches.length : 0;
-}
-
-document.addEventListener("DOMContentLoaded", ()=>{
-  const setupForm = document.getElementById('setupForm');
-  if(setupForm) {
-    setupForm.addEventListener('submit', initializeExperience);
-  }
-  
-  document.getElementById('userIntent')?.addEventListener('keydown',(e)=>{
-    if(e.key==='Enter'&&e.ctrlKey) generateInterface();
-  });
+// Clear UI
+clearBtn.addEventListener('click', () => {
+  messages.textContent = '';
+  timing.textContent = '—';
+  errorBox.style.display = 'none';
+  errorBox.innerHTML = '';
 });
+
+// Main send action
+sendBtn.addEventListener('click', async () => {
+  errorBox.style.display = 'none';
+  errorBox.innerHTML = '';
+  messages.textContent = '';
+  const rawPrompt = promptEl.value || '';
+  if (!rawPrompt.trim()) {
+    errorBox.style.display = 'block';
+    errorBox.innerHTML = '<div class="error">Please enter a prompt to send.</div>';
+    return;
+  }
+
+  const source = sourceEl.value;
+  const apiKeyOrProxy = apiKeyEl.value.trim();
+  const googleCx = cxEl.value.trim();
+
+  const finalPrompt = smartEnhanceEl.checked ? enhancePrompt(rawPrompt) : rawPrompt.trim();
+
+  setRunning(true);
+  requestStart = performance.now();
+  timing.textContent = 'requesting...';
+
+  try {
+    if (source === 'duckduckgo') {
+      // DuckDuckGo Instant Answer API (free)
+      // Direct call: https://api.duckduckgo.com/?q=...&format=json&no_html=1
+      const url = `https://api.duckduckgo.com/?q=${encodeURIComponent(finalPrompt)}&format=json&no_html=1&skip_disambig=1`;
+      appendMessage(`Requesting DuckDuckGo: ${url}`);
+      const res = await fetch(url, {method:'GET'});
+      if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+      const data = await res.json();
+      // Present the most useful fields
+      const out = [];
+      if (data.AbstractText) out.push(`Abstract:\n${data.AbstractText}`);
+      if (data.RelatedTopics && data.RelatedTopics.length) {
+        const snippets = data.RelatedTopics.slice(0,6).map(t => (t.Text || t.Result || '').replace(/<\/?[^>]+(>|$)/g, ''));
+        out.push(`Related Topics:\n- ${snippets.join('\n- ')}`);
+      }
+      if (data.AbstractURL) out.push(`Source: ${data.AbstractURL}`);
+      if (out.length === 0) out.push(JSON.stringify(data,null,2));
+      appendMessage(out.join('\n\n'));
+    } else if (source === 'bing') {
+      // Bing Web Search: Requires key. Best practice: call via server-side proxy.
+      // Client usage below will succeed only if you supply a proxy endpoint that forwards the request,
+      // or if your environment permits CORS and you provide subscription key in a secure way (not recommended).
+      if (!apiKeyOrProxy) throw new Error('Bing requires a subscription key OR a proxy endpoint. Paste the proxy full URL in the API Key field.');
+      // If user provided a proxy URL, call it; otherwise assume it's a direct Bing key (not recommended from browser)
+      if (apiKeyOrProxy.startsWith('http')) {
+        // Proxy expected to accept ?q=... and forward to Bing
+        const url = `${apiKeyOrProxy}${apiKeyOrProxy.includes('?')? '&' : '?'}q=${encodeURIComponent(finalPrompt)}`;
+        appendMessage(`Requesting via proxy: ${url}`);
+        const res = await fetch(url, {method:'GET'});
+        if (!res.ok) throw new Error(`Proxy HTTP ${res.status} ${res.statusText}`);
+        const payload = await res.json();
+        appendMessage(JSON.stringify(payload, null, 2));
+      } else {
+        // Direct call attempt (will usually fail due to CORS and exposing key)
+        appendMessage('Attempting direct Bing Web Search (not recommended from browser).');
+        const endpoint = `https://api.bing.microsoft.com/v7.0/search?q=${encodeURIComponent(finalPrompt)}`;
+        const res = await fetch(endpoint, {
+          headers: { 'Ocp-Apim-Subscription-Key': apiKeyOrProxy }
+        });
+        if (!res.ok) throw new Error(`Bing HTTP ${res.status} ${res.statusText}`);
+        const payload = await res.json();
+        appendMessage(JSON.stringify(payload, null, 2));
+      }
+    } else if (source === 'google') {
+      // Google Programmable Search (Custom Search JSON API)
+      // Requires API key and cx. Browser calls may hit CORS and will expose the key.
+      if (!apiKeyOrProxy || !googleCx) throw new Error('Google requires an API key (paste in API Key field) and a search engine ID (cx).');
+      // User provided key in apiKeyOrProxy variable
+      const endpoint = `https://www.googleapis.com/customsearch/v1?key=${encodeURIComponent(apiKeyOrProxy)}&cx=${encodeURIComponent(googleCx)}&q=${encodeURIComponent(finalPrompt)}`;
+      appendMessage(`Requesting Google Programmable Search...`);
+      const res = await fetch(endpoint);
+      if (!res.ok) throw new Error(`Google HTTP ${res.status} ${res.statusText}`);
+      const payload = await res.json();
+      // Extract useful parts
+      const items = payload.items || [];
+      if (items.length === 0) {
+        appendMessage('No items returned. Full payload:\n' + JSON.stringify(payload, null, 2));
+      } else {
+        const out = items.slice(0,6).map(it => `Title: ${it.title}\nLink: ${it.link}\nSnippet: ${it.snippet}`).join('\n\n---\n\n');
+        appendMessage(out);
+      }
+    } else if (source === 'proxy') {
+      // Generic proxy: the proxy should accept ?q=... and return JSON.
+      if (!apiKeyOrProxy || !apiKeyOrProxy.startsWith('http')) throw new Error('Provide a full proxy URL in the API Key field, e.g. https://myproxy.example/search');
+      const url = `${apiKeyOrProxy}${apiKeyOrProxy.includes('?')? '&' : '?'}q=${encodeURIComponent(finalPrompt)}`;
+      appendMessage(`Requesting proxy: ${url}`);
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`Proxy HTTP ${res.status} ${res.statusText}`);
+      const payload = await res.json();
+      appendMessage(JSON.stringify(payload, null, 2));
+    } else {
+      throw new Error('Unknown source selection.');
+    }
+
+    const totalMs = Math.round(performance.now() - requestStart);
+    timing.textContent = `completed in ${totalMs} ms`;
+  } catch (err) {
+    const elapsed = Math.round(performance.now() - requestStart);
+    timing.textContent = `error after ${elapsed} ms`;
+    errorBox.style.display = 'block';
+    errorBox.innerHTML = `<div class="error">Error: ${String(err.message || err)}</div>`;
+  } finally {
+    setRunning(false);
+  }
+});
+
+// Small UX: press Ctrl+Enter to send
+promptEl.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+    sendBtn.click();
+  }
+});
+
+// Example: prefill prompt for quick testing
+promptEl.value = "react fetch data example: simple component that fetches JSON and displays list";
 
 </script>
 </body>
