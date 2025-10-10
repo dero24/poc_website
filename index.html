@@ -61,7 +61,7 @@
 <body>
     <div class="box">
         <h1>🚀 API Tester</h1>
-        <div class="debug" id="debug">System Status: Loading...</div>
+        <div class="debug" id="debug">Initializing...</div>
 
         <label>Select API:</label>
         <select id="api">
@@ -75,7 +75,7 @@
         <label>Query:</label>
         <textarea id="query" rows="3">Python programming</textarea>
 
-        <button onclick="runTest()">🚀 TEST NOW</button>
+        <button id="testBtn">🚀 TEST NOW</button>
     </div>
 
     <div class="box" id="results" style="display:none;">
@@ -84,120 +84,146 @@
     </div>
 
     <script>
+        console.log('Script started');
+
         // Debug function
         function debug(msg) {
-            console.log(msg);
-            document.getElementById('debug').textContent = msg;
+            console.log('DEBUG:', msg);
+            const debugBox = document.getElementById('debug');
+            if (debugBox) {
+                debugBox.textContent = msg;
+            }
         }
 
-        // Update UI when API changes
-        document.getElementById('api').addEventListener('change', function() {
-            const api = this.value;
-            const keyInput = document.getElementById('key');
-            
-            debug('Selected: ' + api);
-            
-            if (api === 'ddg') {
-                // GREY OUT for DuckDuckGo
-                keyInput.value = '';
-                keyInput.placeholder = '✓ No key needed';
-                keyInput.disabled = true;
-                keyInput.style.background = '#0a0e1a';
-                keyInput.style.color = '#6b7280';
-                keyInput.style.opacity = '0.5';
-                debug('API Key field: DISABLED (greyed out)');
-            } else {
-                // ENABLE for other APIs
-                keyInput.disabled = false;
-                keyInput.placeholder = 'Enter API key';
-                keyInput.style.background = '#334155';
-                keyInput.style.color = '#e2e8f0';
-                keyInput.style.opacity = '1';
-                debug('API Key field: ENABLED');
-            }
-        });
+        // Wait for page to fully load
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded');
+            debug('✅ Page ready!');
 
-        // Run test
-        async function runTest() {
-            debug('🚀 TEST STARTED');
-            
-            const api = document.getElementById('api').value;
-            const query = document.getElementById('query').value;
+            const apiSelect = document.getElementById('api');
+            const keyInput = document.getElementById('key');
+            const queryInput = document.getElementById('query');
+            const testBtn = document.getElementById('testBtn');
             const resultsDiv = document.getElementById('results');
             const output = document.getElementById('output');
 
-            if (!query) {
-                alert('Please enter a query!');
-                return;
-            }
-
-            debug('Calling DuckDuckGo API...');
-            output.textContent = 'Loading...';
-            resultsDiv.style.display = 'block';
-
-            try {
-                // Call DuckDuckGo using JSONP
-                const data = await new Promise((resolve, reject) => {
-                    const callback = 'ddgCallback' + Date.now();
-                    
-                    window[callback] = function(response) {
-                        delete window[callback];
-                        resolve(response);
-                    };
-                    
-                    const script = document.createElement('script');
-                    script.src = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&callback=${callback}`;
-                    script.onerror = () => reject(new Error('Failed to load'));
-                    document.body.appendChild(script);
-                });
-
-                debug('✅ SUCCESS! Got response');
-
-                // Extract text
-                let text = '';
-                if (data.Heading) text += '📌 ' + data.Heading + '
-
-';
-                if (data.AbstractText) text += data.AbstractText + '
-
-';
-                if (data.Answer) text += '💡 Answer: ' + data.Answer + '
-
-';
+            // Update API key field
+            function updateKeyField() {
+                const api = apiSelect.value;
+                console.log('API changed to:', api);
                 
-                if (data.RelatedTopics && data.RelatedTopics.length > 0) {
-                    text += '🔗 Related Topics:
-';
-                    data.RelatedTopics.slice(0, 5).forEach(topic => {
-                        if (topic.Text) text += '  • ' + topic.Text + '
-';
-                    });
+                if (api === 'ddg') {
+                    keyInput.value = '';
+                    keyInput.placeholder = '✓ No key needed';
+                    keyInput.disabled = true;
+                    keyInput.style.background = '#0a0e1a';
+                    keyInput.style.color = '#6b7280';
+                    keyInput.style.opacity = '0.5';
+                    keyInput.style.cursor = 'not-allowed';
+                    debug('✅ Ready! API Key: DISABLED (greyed out)');
+                } else {
+                    keyInput.disabled = false;
+                    keyInput.placeholder = 'Enter API key';
+                    keyInput.style.background = '#334155';
+                    keyInput.style.color = '#e2e8f0';
+                    keyInput.style.opacity = '1';
+                    keyInput.style.cursor = 'text';
+                    debug('API Key: ENABLED (needs key)');
                 }
-
-                if (!text) {
-                    text = '⚠️ No instant answer found.
-
-Try queries like:
-• "JavaScript"
-• "Albert Einstein"
-• "Python programming"
-
-Raw JSON:
-' + JSON.stringify(data, null, 2);
-                }
-
-                output.textContent = text;
-                resultsDiv.scrollIntoView({ behavior: 'smooth' });
-
-            } catch (error) {
-                debug('❌ ERROR: ' + error.message);
-                output.textContent = '❌ Error: ' + error.message;
             }
-        }
 
-        // Initialize
-        debug('✅ Page loaded. Select DuckDuckGo and click TEST NOW');
-        document.getElementById('api').dispatchEvent(new Event('change'));
+            // Run test
+            async function runTest() {
+                console.log('Test button clicked');
+                debug('🚀 Starting test...');
+                
+                const query = queryInput.value.trim();
+
+                if (!query) {
+                    alert('Please enter a query!');
+                    return;
+                }
+
+                debug('Calling DuckDuckGo...');
+                output.textContent = '⏳ Loading...';
+                resultsDiv.style.display = 'block';
+
+                try {
+                    console.log('Making API call for:', query);
+                    
+                    const data = await new Promise((resolve, reject) => {
+                        const callback = 'ddg' + Date.now();
+                        
+                        window[callback] = function(response) {
+                            console.log('Got response:', response);
+                            delete window[callback];
+                            resolve(response);
+                        };
+                        
+                        const script = document.createElement('script');
+                        script.src = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&callback=${callback}`;
+                        script.onerror = () => reject(new Error('API call failed'));
+                        document.body.appendChild(script);
+                    });
+
+                    console.log('Processing response');
+                    debug('✅ Got response! Formatting...');
+
+                    let text = '';
+                    if (data.Heading) text += '📌 Topic: ' + data.Heading + '
+
+';
+                    if (data.AbstractText) text += data.AbstractText + '
+
+';
+                    if (data.Answer) text += '💡 Answer: ' + data.Answer + '
+
+';
+                    
+                    if (data.RelatedTopics && data.RelatedTopics.length > 0) {
+                        text += '🔗 Related Topics:
+';
+                        data.RelatedTopics.slice(0, 5).forEach(topic => {
+                            if (topic.Text) text += '  • ' + topic.Text + '
+';
+                        });
+                    }
+
+                    if (!text.trim()) {
+                        text = '⚠️ No instant answer found.
+
+Try: "JavaScript", "Albert Einstein", "Python programming"
+
+📄 Raw JSON:
+' + JSON.stringify(data, null, 2);
+                    }
+
+                    output.textContent = text;
+                    debug('✅ SUCCESS! Results shown below');
+                    
+                    setTimeout(() => {
+                        resultsDiv.scrollIntoView({ behavior: 'smooth' });
+                    }, 100);
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    debug('❌ ERROR: ' + error.message);
+                    output.textContent = '❌ Error: ' + error.message + '
+
+Check browser console for details.';
+                }
+            }
+
+            // Event listeners
+            apiSelect.addEventListener('change', updateKeyField);
+            testBtn.addEventListener('click', runTest);
+
+            // Initialize
+            updateKeyField();
+            console.log('Initialization complete');
+        });
+
+        console.log('Script loaded, waiting for DOM...');
     </script>
 </body>
 </html>
