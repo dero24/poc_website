@@ -92,16 +92,17 @@
             transition: all 0.3s ease;
         }
 
-        /* Greyed out disabled inputs */
-        input[type="text"]:disabled {
-            background: var(--surface);
-            color: var(--text-dim);
-            opacity: 0.5;
-            cursor: not-allowed;
-            border-color: var(--border);
+        /* Greyed out disabled inputs - FIXED */
+        input[type="text"]:disabled,
+        input:disabled {
+            background: #1a1f2e !important;
+            color: #4a5568 !important;
+            opacity: 0.6 !important;
+            cursor: not-allowed !important;
+            border-color: #2d3748 !important;
         }
 
-        select:focus, input[type="text"]:focus, textarea:focus {
+        select:focus, input[type="text"]:focus:not(:disabled), textarea:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
@@ -570,7 +571,7 @@
         let currentResponse = null;
         let currentModelType = null;
 
-        // Update UI based on selected model
+        // Update UI based on selected model - FIXED
         function updateUIForModel() {
             const selected = modelSelect.value;
             const config = API_CONFIGS[selected];
@@ -579,10 +580,11 @@
             
             if (config.requiresKey) {
                 apiKeyInput.disabled = false;
+                apiKeyInput.placeholder = 'Enter your API key here';
                 keyRequired.style.display = 'inline';
                 apiHint.style.display = 'block';
             } else {
-                // Grey out the API key field for DuckDuckGo
+                // Grey out the API key field for DuckDuckGo - FIXED
                 apiKeyInput.disabled = true;
                 apiKeyInput.value = '';
                 apiKeyInput.placeholder = 'No API key required for this service';
@@ -798,10 +800,19 @@ Please provide a comprehensive solution:`;
             return await response.json();
         }
 
+        // DuckDuckGo with CORS proxy - FIXED
         async function callDuckDuckGo(query) {
-            const url = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&pretty=1`;
+            // Using CORS proxy for DuckDuckGo
+            const proxyUrl = 'https://corsproxy.io/?';
+            const apiUrl = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1&skip_disambig=1`;
+            const url = proxyUrl + encodeURIComponent(apiUrl);
             
-            const response = await fetch(url);
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
             
             if (!response.ok) {
                 throw new Error(`API Error: ${response.status}`);
@@ -841,7 +852,7 @@ Please provide a comprehensive solution:`;
             return await response.json();
         }
 
-        // Main Test Function
+        // Main Test Function - FIXED
         async function testAPI() {
             const modelType = modelSelect.value;
             const apiKey = apiKeyInput.value.trim();
@@ -868,7 +879,6 @@ Please provide a comprehensive solution:`;
             // Disable button and show loading
             testBtn.disabled = true;
             btnText.innerHTML = '<div class="spinner"></div> Testing...';
-            resultsSection.classList.add('hidden');
 
             try {
                 // Prepare prompts
@@ -908,8 +918,8 @@ Please provide a comprehensive solution:`;
                 currentResponse = response;
                 currentModelType = modelType;
 
-                // Display results
-                displayResults(originalQuery, finalQuery, shouldEnhanced, response, duration, modelType);
+                // Display results - FIXED TYPO
+                displayResults(originalQuery, finalQuery, shouldEnhance, response, duration, modelType);
 
             } catch (error) {
                 displayError(error.message);
@@ -919,8 +929,9 @@ Please provide a comprehensive solution:`;
             }
         }
 
-        // Display Results
+        // Display Results - FIXED
         function displayResults(original, enhanced, wasEnhanced, response, duration, modelType) {
+            // Show results section
             resultsSection.classList.remove('hidden');
             
             // Update timer
@@ -947,7 +958,9 @@ Please provide a comprehensive solution:`;
             responseOutput.parentElement.parentElement.classList.remove('error');
 
             // Scroll to results
-            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            setTimeout(() => {
+                resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
         }
 
         // Display Error
@@ -958,12 +971,16 @@ Please provide a comprehensive solution:`;
             originalPromptSection.style.display = 'none';
             enhancedPromptSection.style.display = 'none';
             
-            responseOutput.textContent = `❌ Error: ${errorMsg}`;
+            responseOutput.textContent = `❌ Error: ${errorMsg}
+
+Note: DuckDuckGo uses a CORS proxy. If it fails, try another service or check your internet connection.`;
             responseOutput.classList.add('formatted');
             responseOutput.classList.remove('raw');
             responseOutput.parentElement.parentElement.classList.add('error');
 
-            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            setTimeout(() => {
+                resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
         }
 
         // Event Listeners
