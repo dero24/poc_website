@@ -121,7 +121,7 @@ async function generateInterface() {
   
   try {
     const code = await callGroq(prompt);
-    renderHTML(code, content);
+    renderHTML(code, content, intent);
     enforceResponsive();
     setTimeout(() => content.scrollIntoView({behavior:'smooth', block:'center'}), 100);
     
@@ -225,8 +225,9 @@ function cleanCodeFromMarkdown(raw) {
   return cleaned.trim();
 }
 
-function renderHTML(raw, container) {
-  let html = raw;
+function renderHTML(raw, container, intent = '') {
+  let code = cleanCodeFromMarkdown(raw || '');
+  let html = code;
   let style = "";
   let script = "";
 
@@ -244,6 +245,19 @@ function renderHTML(raw, container) {
     html = html.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "");
   }
 
+  html = html.trim();
+  const hasAnyDiv = /<div/i.test(html);
+  const hasMainApp = /id\s*=\s*["']?mainapp["']?/i.test(html);
+
+  if (!hasAnyDiv || html.length < 40) {
+    renderFallbackApp(intent, container);
+    return;
+  }
+
+  if (!hasMainApp) {
+    html = `<div id="mainAPP">${html}</div>`;
+  }
+
   container.innerHTML = html;
   
   if (style) {
@@ -259,45 +273,16 @@ function renderHTML(raw, container) {
   }
 }
 
-function oldRenderLogic(raw, container) {
-  // Keep old complex logic for reference but don't use
-  let code = raw;
-  let html = code;
-  let style = "";
-  let script = "";
+function renderFallbackApp(intent, container) {
+  const query = (intent || '').toLowerCase();
 
-  if ((!html.includes('<div') && !html.includes('<button') && !html.includes('<input'))) {
-    // Try to extract content from mixed format
-    const lines = code.split('\n');
-    let htmlContent = '';
-    let cssContent = '';
-    let jsContent = '';
-    let currentSection = '';
-    
-    for (let line of lines) {
-      line = line.trim();
-      if (line.includes('Calculator') && !line.includes('//')) {
-        htmlContent += `<h2>${line}</h2>\n`;
-      } else if (line.match(/^[C0-9+\-x\/=.\s]+$/)) {
-        // Button layout line
-        const buttons = line.split(/\s+/).filter(b => b);
-        htmlContent += '<div class="calculator-grid">\n';
-        buttons.forEach(btn => {
-          htmlContent += `<button onclick="handleButton('${btn}')">${btn}</button>\n`;
-        });
-        htmlContent += '</div>\n';
-      } else if (line.includes('#') || line.includes('{') || line.includes('}') || line.includes(':')) {
-        cssContent += line + '\n';
-      } else if (line.includes('function') || line.includes('const') || line.includes('let') || line.includes('addEventListener')) {
-        jsContent += line + '\n';
-      }
-    }
-    
-    if (containsNodeOnly) {
-      // Fallback: premium AI chat UI using window.morphicGroqChat
-      html = `
-        <div id="mainAPP">
-          <div class="chat-wrap">
+  if (query.includes('finance') || query.includes('budget')) {
+    const html = `
+      <div id="mainAPP">
+        <div class="finance-hero">
+          <div>
+            <h1>WealthFlow Dashboard</h1>
+            <p>Track income, expenses, and monthly cash flow in one beautiful view.</p>
             <div class="chat-header">🤖 AI Assistant</div>
             <div id="chatMessages" class="chat-messages"></div>
             <div class="chat-input">
