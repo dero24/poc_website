@@ -433,6 +433,76 @@
 let groqKey="", interactionCount=0, elementsCreated=0, adaptations=0, conversationHistory=[];
 let currentAppCode = "";
 let currentFramework = 'vanilla'; // Default to vanilla JS
+let promptCache = {}; // Cache loaded prompts
+
+// Utility: Load system prompt by framework
+async function loadSystemPrompt(framework) {
+  // Check cache first
+  if (promptCache[framework]) {
+    return promptCache[framework];
+  }
+
+  let promptPath = '';
+  switch (framework) {
+    case 'react':
+      promptPath = 'prompts/react.txt';
+      break;
+    case 'vanilla':
+    default:
+      promptPath = 'prompts/vanilla.txt';
+      break;
+  }
+  
+  try {
+    const response = await fetch(promptPath);
+    if (!response.ok) {
+      throw new Error(`Failed to load prompt: ${response.status}`);
+    }
+    const promptText = await response.text();
+    
+    // Cache the loaded prompt
+    promptCache[framework] = promptText;
+    logHistory(`📁 Loaded ${framework} prompt template`);
+    
+    return promptText;
+  } catch (error) {
+    console.error('Error loading prompt:', error);
+    logHistory(`⚠️ Using fallback prompt for ${framework}`);
+    
+    // Fallback prompts if files can't be loaded
+    const fallbackPrompts = {
+      vanilla: `You are an expert web developer. Create complete, functional, beautiful HTML pages with inline CSS and JavaScript.
+
+REQUIREMENTS:
+- Generate a complete HTML document with <!DOCTYPE html>
+- Include inline CSS in <style> tags for modern, attractive design
+- Include a <script> tag with all JavaScript functionality
+- Make it fully interactive and functional
+- Use modern ES6+ JavaScript
+- Ensure responsive design
+- Add smooth animations and transitions
+- Make it visually impressive with gradients, shadows, and modern UI
+
+Return ONLY the complete HTML code, no explanations or markdown.`,
+      
+      react: `You are an expert web developer. Create a complete, functional, beautiful React app.
+
+REQUIREMENTS:
+- Use React 18+ with functional components and hooks (useState, useEffect)
+- Render the app using ReactDOM.createRoot or ReactDOM.render
+- Include CDN React scripts: 
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+- Return the full HTML file (<!DOCTYPE html>...) with all scripts/styles needed
+- Ensure styling is beautiful, responsive, and modern
+- Optimize for interactivity, user experience, and accessibility
+
+Return ONLY the complete HTML code, no explanations or markdown.`
+    };
+    
+    return fallbackPrompts[framework] || fallbackPrompts.vanilla;
+  }
+}
 
 function setFramework(framework) {
   currentFramework = framework;
@@ -606,21 +676,9 @@ function ensureResponsive(html) {
   return html;
 }
 
-async function callGroqAPI(userPrompt, isReactUpgrade = false) {
-  let systemPrompt = `You are an expert web developer. Create complete, functional, beautiful ${currentFramework === 'react' ? 'React ' : ''}apps with inline styles and functionality.
-
-REQUIREMENTS:
-- Generate a complete HTML document with <!DOCTYPE html>
-- Include inline CSS in <style> tags for modern, attractive design
-${currentFramework === 'react' ? '- Use React 18+ with functional components, hooks (useState, useEffect), and JSX embedded in JS\n- Include React script tags: <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script> and <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>\n- Render with ReactDOM.render or createRoot\n- Make it fully interactive with state management' : '- Include a <script> tag with all JavaScript functionality\n- Use modern ES6+ JavaScript'}
-- Ensure responsive design with media queries
-- Add smooth animations and transitions
-- Use gradients, shadows, and modern UI elements
-- Make it fully interactive and functional
-- Optimize for performance and accessibility
-
-Return ONLY the complete HTML code, no explanations or markdown. Wrap code in <pre> if needed, but ensure it's valid HTML.`;
-
+async function callGroqAPI(userPrompt) {
+  const systemPrompt = await loadSystemPrompt(currentFramework);
+  
   const messages = [{ role: 'system', content: systemPrompt }, ...conversationHistory.slice(-5), { role: 'user', content: userPrompt }];
 
   const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -676,6 +734,7 @@ Return ONLY the complete HTML code, no explanations or markdown. Wrap code in <p
 }
 
 function parseAndInjectHTML(html, container) {
+  // Tag pieces to avoid IDE/formatter confusion
   const styClose1 = '</sty';
   const styClose2 = 'le>';
   const scriptClose1 = '</sc';
@@ -683,11 +742,13 @@ function parseAndInjectHTML(html, container) {
   const styleClosing = styClose1 + styClose2;
   const scriptClosing = scriptClose1 + scriptClose2;
   
+  // Grab first style block
   const stylePattern = new RegExp('<style[^>]*>([\\s\\S]*?)' + styleClosing, 'i');
   const styleMatch = html.match(stylePattern);
   const styleContent = styleMatch ? styleMatch : "";[1]
   html = html.replace(new RegExp('<style[^>]*>[\\s\\S]*?' + styleClosing, 'gi'), "");
 
+  // Grab first script block
   const scriptPattern = new RegExp('<script[^>]*>([\\s\\S]*?)' + scriptClosing, 'i');
   const scriptMatch = html.match(scriptPattern);
   const scriptContent = scriptMatch ? scriptMatch : "";[1]
@@ -704,7 +765,6 @@ function parseAndInjectHTML(html, container) {
   }
 
   if (scriptContent) {
-    // Delay script execution to ensure DOM is ready
     setTimeout(() => {
       const scriptElement = document.createElement('script');
       scriptElement.textContent = scriptContent;
