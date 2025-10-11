@@ -676,8 +676,12 @@ Return ONLY the complete HTML code, no explanations or markdown. Wrap code in <p
 }
 
 function parseAndInjectHTML(html, container) {
-  const styleClosing = '</style>';
-  const scriptClosing = '</script>';
+  const styClose1 = '</sty';
+  const styClose2 = 'le>';
+  const scriptClose1 = '</sc';
+  const scriptClose2 = 'ript>';
+  const styleClosing = styClose1 + styClose2;
+  const scriptClosing = scriptClose1 + scriptClose2;
   
   const stylePattern = new RegExp('<style[^>]*>([\\s\\S]*?)' + styleClosing, 'i');
   const styleMatch = html.match(stylePattern);
