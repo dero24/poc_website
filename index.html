@@ -1,273 +1,46 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>⚡ Morphic Web - Autonomous AI App Builder</title>
-  <style>
-    :root {
-      --primary: #667eea;
-      --secondary: #764ba2;
-      --bg: #f0f4f8;
-      --surface: #ffffff;
-      --text: #1e293b;
-      --text-dim: #64748b;
-      --border: #e2e8f0;
-      --success: #10b981;
-      --error: #ef4444;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      padding: 20px;
-    }
-    .container {
-      max-width: 900px;
-      margin: 20px auto;
-      background: var(--surface);
-      border-radius: 24px;
-      padding: 24px 48px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.1);
-    }
-    h1 {
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      font-size: 2.5em;
-      font-weight: 800;
-      text-align: center;
-      margin-bottom: 12px;
-    }
-    .tagline {
-      text-align: center;
-      font-size: 1.1em;
-      color: var(--text-dim);
-      margin-bottom: 32px;
-      font-weight: 500;
-    }
-    .input-group {
-      margin-bottom: 24px;
-    }
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 700;
-      font-size: 1em;
-    }
-    input[type="password"], select, textarea {
-      width: 100%;
-      padding: 14px;
-      border: 2px solid var(--border);
-      border-radius: 10px;
-      font-size: 1rem;
-      font-family: inherit;
-      transition: all 0.3s ease;
-      background: #fafafa;
-    }
-    input:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-    }
-    textarea {
-      min-height: 120px;
-      resize: vertical;
-      line-height: 1.6;
-    }
-    .btn {
-      width: 100%;
-      padding: 16px;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 1.1rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-    .btn:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
-    }
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-    #generatedContent {
-      border: 2px solid var(--border);
-      border-radius: 16px;
-      min-height: 500px;
-      margin-top: 24px;
-      overflow: hidden;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.05);
-      position: relative;
-    }
-    .loading-overlay {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(255,255,255,0.9);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 16px;
-      z-index: 10;
-    }
-    .spinner {
-      border: 4px solid rgba(0, 0, 0, 0.1);
-      border-left-color: var(--primary);
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      animation: spin 1s linear infinite;
-    }
-    .loading-text {
-      font-weight: 600;
-      color: var(--text);
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    @media (max-width: 768px) {
-      .container { padding: 24px; }
-      h1 { font-size: 2em; }
-    }
-  </style>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+  <title>Morphic Web — Instant AI Apps</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="container">
-    <h1>⚡ Morphic Web</h1>
-    <p class="tagline">Your idea, autonomously engineered into a brilliant app.</p>
-    
-    <div class="input-group">
-      <label for="apiKey">🔑 Groq API Key</label>
-      <input type="password" id="apiKey" placeholder="Paste your Groq API key to begin..." required>
-    </div>
-
-    <div class="input-group">
-      <label for="modelSelector">🤖 AI Model</label>
-      <select id="modelSelector">
-        <option value="llama-3.1-70b-versatile">Llama 3.1 70B (Recommended)</option>
-        <option value="gemma2-9b-it">Gemma 2 9B</option>
-        <option value="llama3-8b-8192">Llama 3 8B</option>
-      </select>
-    </div>
-
-    <div class="input-group">
-      <label for="userIntent">💭 Describe the App You Want to Build</label>
-      <textarea id="userIntent" placeholder="e.g., A beautiful pomodoro timer with a circular progress bar and sound alerts."></textarea>
-    </div>
-
-    <button onclick="generateInterface()" class="btn" id="generateBtn">✨ Build My App</button>
-
-    <div id="generatedContent">
-      <div class="loading-overlay" style="display: none;">
-        <div class="spinner"></div>
-        <div class="loading-text">Engineering your app...</div>
-      </div>
-      <iframe id="appFrame" style="width: 100%; height: 500px; border: none;"></iframe>
-    </div>
+<div class="container">
+  <div class="header">
+    <div class="logo">Morphic Web</div>
+    <div class="slogan">Instant AI Apps - Built to perfection!</div>
   </div>
-
-<script>
-// -- AI SYSTEM PROMPT --
-// This powerful prompt instructs the AI to act as an expert engineer,
-// autonomously choosing the best framework (React or Vanilla JS)
-// and prioritizing user satisfaction, design, and functionality.
-const AUTO_SYSTEM_PROMPT = `
-You are Morphic Web, an elite AI web developer and product designer. Your primary directive is to create the most satisfying, beautiful, and functional web application based on the user's request. You have complete autonomy to choose the best technology for the job.
-
-**== PRIMARY ANALYSIS ==**
-1.  **Analyze the User's Intent:** Carefully evaluate the user's prompt. Is it a simple tool (calculator, converter), a content page, an interactive game, or a complex data dashboard?
-2.  **Choose the Optimal Framework:**
-    *   **IF the request is simple, static, or requires minimal state management** (e.g., a landing page, a simple calculator, a text-based game), choose **Vanilla JavaScript**. This prioritizes speed, lightness, and zero dependencies.
-    *   **IF the request is complex, requires significant state management, dynamic updates, or component-based architecture** (e.g., a to-do list, a data dashboard with filters, a multi-step form), choose **React**. This prioritizes maintainability and powerful state handling.
-
-**== CORE REQUIREMENTS (APPLY TO ALL OUTPUT) ==**
-
-1.  **Output Format:** ALWAYS return a **single, complete HTML file**. Start with `<!DOCTYPE html>` and end with `</html>`. Do NOT include any explanations, markdown backticks (```), or any text outside the HTML code.
-2.  **Visual Excellence:**
-    *   **Design:** Implement a modern, visually stunning design. Use gradients, subtle shadows, excellent typography, and a professional color palette. The UI must look polished and high-end.
-    *   **Interactivity & Animation:** Incorporate smooth CSS transitions and animations to make the app feel alive and responsive. User actions should have clear visual feedback.
-    *   **Responsiveness:** The app MUST be fully responsive and look perfect on both desktop and mobile devices. Use media queries extensively.
-3.  **Functionality:**
-    *   The app must be **fully functional and interactive** as described.
-    *   Code must be clean, efficient, and well-structured.
-    *   Include error handling where appropriate.
-4.  **Scripts & Styles:**
-    *   **CSS:** All CSS must be included within `<style>` tags in the `<head>`.
-    *   **JavaScript:** All JavaScript must be included within `<script>` tags at the end of the `<body>`.
-    *   **React-Specific:** If you choose React, you MUST include the React and ReactDOM CDN script tags in the `<head>` and use modern hooks.
-
-Your goal is to "wow" the user with the final product. Think like a lead product engineer at a top tech company. Create the best possible version of their idea.
-`;
-
-async function generateInterface() {
-  const groqKey = document.getElementById('apiKey').value.trim();
-  const model = document.getElementById('modelSelector').value;
-  const userIntent = document.getElementById('userIntent').value.trim();
-  const generateBtn = document.getElementById('generateBtn');
-  const loadingOverlay = document.querySelector('.loading-overlay');
-  const appFrame = document.getElementById('appFrame');
-
-  if (!groqKey) {
-    alert('Please enter your Groq API key to begin.');
-    return;
-  }
-  if (!userIntent) {
-    alert('Please describe the app you want to build.');
-    return;
-  }
-
-  generateBtn.disabled = true;
-  loadingOverlay.style.display = 'flex';
-  appFrame.src = 'about:blank'; // Clear previous content
-
-  const messages = [
-    { role: 'system', content: AUTO_SYSTEM_PROMPT },
-    { role: 'user', content: userIntent }
-  ];
-
-  try {
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${groqKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ model, messages, temperature: 0.7, max_tokens: 4096 })
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(`API Error ${response.status}: ${errorData.error?.message || 'Failed to fetch response'}`);
-    }
-
-    const data = await response.json();
-    let content = data.choices[0].message.content.trim();
-    
-    // Clean the response: remove markdown code blocks
-    content = content.replace(/``````/g, '$1').trim();
-
-    if (!content.toLowerCase().startsWith('<!doctype html>')) {
-        throw new Error("Generated response was not a valid HTML document.");
-    }
-    
-    // Inject the generated HTML into the iframe for sandboxed execution
-    appFrame.srcdoc = content;
-
-  } catch (error) {
-    console.error('Generation failed:', error);
-    alert('An error occurred during generation: ' + error.message);
-  } finally {
-    generateBtn.disabled = false;
-    loadingOverlay.style.display = 'none';
-  }
-}
-</script>
+  <div class="setup-card" id="setupCard">
+    <form onsubmit="event.preventDefault(); initializeExperience();">
+      <div class="api-input-group">
+        <label for="apiKey">Groq API Key</label>
+        <input type="password" id="apiKey" required autocomplete="off" placeholder="Paste your Groq API key">
+        <small>Get free key: <a href="https://console.groq.com/" target="_blank">console.groq.com</a></small>
+      </div>
+      <button type="submit" class="start-btn">🚀 Start Building</button>
+    </form>
+  </div>
+  <div style="display:none" class="interaction-zone" id="interactionZone">
+    <div class="stats">
+      <div class="stat-card"><h3 id="interactionCount">0</h3><p>Apps Built</p></div>
+      <div class="stat-card"><h3 id="elementsCreated">0</h3><p>Components</p></div>
+      <div class="stat-card"><h3 id="adaptations">0</h3><p>Live Apps</p></div>
+    </div>
+    <div class="user-input-area">
+      <textarea id="userIntent" placeholder="Describe any app: game, calculator, todo list, AI assistant... I'll build it instantly!"></textarea>
+      <button type="button" onclick="generateInterface()" class="generate-btn">✨ Build App</button>
+    </div>
+    <div class="generated-content" id="generatedContent">
+      <p style="color:#68a;text-align:center;">Your app appears here instantly!</p>
+    </div>
+    <div class="history-log" id="historyLog"></div>
+  </div>
+  <div class="branding">Morphic Web &copy; 2026</div>
+</div>
+<script type="module" src="app.js"></script>
 </body>
 </html>
