@@ -92,6 +92,20 @@ body {
   margin-bottom:16px;
 }
 
+.examples { margin-bottom: 10px; }
+.examples-title { font-weight: 800; color: #5b60ea; margin-bottom: 6px; }
+.examples-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.example-btn {
+  border: 1px solid #dce2ff;
+  background: #ffffff;
+  color: #4b59d6;
+  padding: 8px 12px;
+  border-radius: 9px;
+  cursor: pointer;
+  box-shadow: 0 1px 3px #0000000d;
+}
+.example-btn:hover { background: #f4f6ff; }
+
 .model-select {
   margin-bottom:10px;
 }

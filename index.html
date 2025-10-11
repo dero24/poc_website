@@ -25,6 +25,19 @@
     </form>
   </div>
   <div style="display:none" class="interaction-zone" id="interactionZone">
+    <div class="examples">
+      <div class="examples-title">Try these:</div>
+      <div class="examples-list">
+        <button type="button" class="example-btn" onclick="useExamplePrompt('AI assistant chatbot with message history, typing indicator, and error handling')">AI Assistant Chatbot</button>
+        <button type="button" class="example-btn" onclick="useExamplePrompt('Premium calculator with history, memory (M+, M-, MR, MC), keyboard support, and dark mode toggle')">Premium Calculator</button>
+        <button type="button" class="example-btn" onclick="useExamplePrompt('Todo app with drag-and-drop, priorities, search, filters, and local storage persistence')">Todo Pro</button>
+        <button type="button" class="example-btn" onclick="useExamplePrompt('Real-time Markdown editor with live preview, autosave, and export to HTML/Markdown')">Markdown Editor</button>
+        <button type="button" class="example-btn" onclick="useExamplePrompt('Personal finance dashboard with budgets, charts, and monthly summaries (no backend)')">Finance Dashboard</button>
+        <button type="button" class="example-btn" onclick="useExamplePrompt('Flashcard trainer with spaced repetition scheduling and progress stats')">Flashcard Trainer</button>
+        <button type="button" class="example-btn" onclick="useExamplePrompt('Recipe finder UI that fetches from an API proxy, with filters and favorites (stub fetch if needed)')">Recipe Finder</button>
+        <button type="button" class="example-btn" onclick="useExamplePrompt('AI code reviewer that takes pasted code and returns annotated suggestions using the selected model')">AI Code Reviewer</button>
+      </div>
+    </div>
     <div class="model-select">
       <label for="modelSelect">Groq Model</label>
       <select id="modelSelect" disabled>

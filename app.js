@@ -581,7 +581,17 @@ window.morphicGroqChat = async function(messages, opts = {}) {
   return data.choices?.[0]?.message?.content || '';
 }
 
+// Populate textarea with an example prompt
+function useExamplePrompt(text) {
+  const input = document.getElementById('userIntent');
+  if (input) {
+    input.value = text;
+    input.focus();
+  }
+}
+
 // Expose functions to global scope for HTML onclick handlers
 window.initializeExperience = initializeExperience;
 window.generateInterface = generateInterface;
 window.getModelMaxTokens = getModelMaxTokens;
+window.useExamplePrompt = useExamplePrompt;
