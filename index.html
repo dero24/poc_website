@@ -348,37 +348,32 @@
   <div class="setup-card" id="setupCard">
     <h1>⚡ Morphic Web</h1>
     <p class="tagline">Instant AI-Powered App Builder</p>
-
     <div class="feature-grid">
       <div class="feature-item">🎨 Any Design</div>
       <div class="feature-item">⚡ Instant Generation</div>
       <div class="feature-item">🔄 Live Adaptation</div>
       <div class="feature-item">🚀 Framework Ready</div>
     </div>
-
     <form id="setupForm">
       <div class="input-group">
         <label for="apiKey">🔑 Groq API Key</label>
-        <input type="password" id="apiKey" placeholder="Paste your Groq API key here..." required >
+        <input type="password" id="apiKey" placeholder="Paste your Groq API key here..." required>
       </div>
-      <button type="submit" class="btn">🚀 Launch Morphic Web</button>
+      <button type="submit" class="btn" id="launchBtn">🚀 Launch Morphic Web</button>
     </form>
   </div>
 
-  <!-- Main Interaction Zone -->
-  <div class="interaction-zone" id="interactionZone">
+  <!-- Main Interaction Zone (initially hidden) -->
+  <div class="interaction-zone" id="interactionZone" style="display:none;">
     <h1>✨ Create Anything</h1>
     <div class="stats-bar">
-      <div class="stat-card">
-        <div class="stat-label">Interactions</div>
+      <div class="stat-card"><div class="stat-label">Interactions</div>
         <div class="stat-value" id="interactionCount">0</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-label">Elements</div>
+      <div class="stat-card"><div class="stat-label">Elements</div>
         <div class="stat-value" id="elementsCreated">0</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-label">Adaptations</div>
+      <div class="stat-card"><div class="stat-label">Adaptations</div>
         <div class="stat-value" id="adaptations">0</div>
       </div>
     </div>
@@ -391,8 +386,8 @@
     </div>
 
     <div class="option-row">
-      <button class="option-btn active" onclick="setFramework('vanilla')">Vanilla JS</button>
-      <button class="option-btn" onclick="setFramework('react')">React</button>
+      <button type="button" class="option-btn active" onclick="setFramework('vanilla')">Vanilla JS</button>
+      <button type="button" class="option-btn" onclick="setFramework('react')">React</button>
     </div>
 
     <div class="input-group">
@@ -400,16 +395,14 @@
       <textarea id="userIntent" placeholder="Describe anything... a calculator, game, dashboard, animation, tool, or creative experiment!"></textarea>
     </div>
 
-    <button onclick="generateInterface()" class="btn" id="generateBtn">✨ Generate Interface</button>
-
+    <button type="button" onclick="generateInterface()" class="btn" id="generateBtn">✨ Generate Interface</button>
     <div id="generatedContent"></div>
     <div class="history-log" id="historyLog"></div>
   </div>
 
 </div>
 
-<!-- React Enhancement Modal -->
-<div class="react-enhancement" id="reactEnhancement">
+<div class="react-enhancement" id="reactEnhancement" style="display:none;">
   <div class="react-prompt">
     <h2>🚀 Framework Upgrade Available!</h2>
     <p>Your creation can be enhanced with a modern framework for better performance. Switch now?</p>
@@ -423,25 +416,26 @@ let groqKey = "", interactionCount = 0, elementsCreated = 0, adaptations = 0, co
 let currentAppCode = "", currentFramework = 'vanilla';
 let promptCache = {};
 
+// Load a system prompt from /prompts/vanilla.txt or /prompts/react.txt
 async function loadSystemPrompt(framework) {
   if (promptCache[framework]) return promptCache[framework];
   let promptPath = `prompts/${framework}.txt`;
-  try {
-    const response = await fetch(promptPath);
-    if (!response.ok) throw new Error(`Prompt file missing: ${promptPath}`);
-    const promptText = await response.text();
-    promptCache[framework] = promptText;
-    logHistory(`📁 Loaded "${framework}" prompt template`);
-    return promptText;
-  } catch (error) {
-    errorPrompt(`Could not load required prompt: ${promptPath}. The operation is halted.`);
-    throw error;
+  const response = await fetch(promptPath);
+  if (!response.ok) {
+    errorPrompt(`Could not load prompt file: ${promptPath}`);
+    throw new Error("Prompt missing: " + promptPath);
   }
+  let promptText = await response.text();
+  promptCache[framework] = promptText;
+  logHistory(`📁 Loaded "${framework}" prompt template`);
+  return promptText;
 }
 
 function errorPrompt(msg) {
   const container = document.getElementById('generatedContent');
-  if (container) container.innerHTML = `<div style="color:#d32f2f;text-align:center;margin:60px 0;font-size:1.5em">${msg || 'Prompt missing. Please add prompt file.'}</div>`;
+  if (container) {
+    container.innerHTML = `<div style="color:#d32f2f;text-align:center;margin:60px 0;font-size:1.5em">${msg || 'Prompt missing. Please add prompt file.'}</div>`;
+  }
   throw new Error(msg || 'Prompt missing.');
 }
 
@@ -495,8 +489,8 @@ async function fetchAvailableModels() {
   }
 }
 
-function initializeExperience(e) {
-  if(e) e.preventDefault();
+document.getElementById('setupForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
   groqKey = document.getElementById('apiKey').value.trim();
   if(!groqKey) { alert('Please paste your Groq API key!'); return false; }
   window.groqKey = groqKey;
@@ -508,7 +502,7 @@ function initializeExperience(e) {
     document.getElementById('interactionZone').scrollIntoView({ behavior: 'smooth' });
   }, 100);
   return false;
-}
+});
 
 async function generateInterface() {
   const userInput = document.getElementById('userIntent').value.trim();
@@ -532,7 +526,6 @@ async function generateInterface() {
       }, 500);
     }
   } catch (error) {
-    // errorPrompt handles display; nothing to do.
     logHistory(`❌ Error: ${error.message}`);
   } finally {
     btn.disabled = false; btn.textContent = '✨ Generate Interface';
@@ -546,7 +539,7 @@ async function enhanceWithFramework() {
   container.innerHTML = '<div class="loading">🚀 Upgrading to React</div>';
   const userInput = document.getElementById('userIntent').value.trim();
   try {
-    const reactCode = await callGroqAPI(userInput); // Regenerate with React prompt
+    const reactCode = await callGroqAPI(userInput);
     currentAppCode = reactCode;
     parseAndInjectHTML(reactCode, container);
     adaptations++;
@@ -557,7 +550,6 @@ async function enhanceWithFramework() {
     logHistory('⚠️ React upgrade skipped, using original code');
   }
 }
-
 function keepCurrentVersion() {
   document.getElementById('reactEnhancement').style.display = 'none';
   logHistory('Kept current version');
@@ -648,14 +640,8 @@ function countElements(html) {
   return matches ? matches.length : 0;
 }
 
-document.addEventListener("DOMContentLoaded", ()=>{
-  const setupForm = document.getElementById('setupForm');
-  if(setupForm) {
-    setupForm.addEventListener('submit', initializeExperience);
-  }
-  document.getElementById('userIntent')?.addEventListener('keydown',(e)=>{
-    if(e.key==='Enter'&&e.ctrlKey) generateInterface();
-  });
+document.getElementById('userIntent')?.addEventListener('keydown',(e)=>{
+  if(e.key==='Enter'&&e.ctrlKey) generateInterface();
 });
 </script>
 </body>
