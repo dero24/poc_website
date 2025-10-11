@@ -241,6 +241,13 @@ function cleanCodeFromMarkdown(raw) {
   cleaned = cleaned.replace(/^\s*[\r\n]/gm, '');
   cleaned = cleaned.replace(/\n\s*\n/g, '\n');
   
+  // Remove duplicate/redundant sections
+  const divMatches = cleaned.match(/<div[^>]*id="mainAPP"[^>]*>[\s\S]*?<\/div>/gi);
+  if (divMatches && divMatches.length > 1) {
+    // Keep only the first mainAPP div
+    cleaned = divMatches[0] + cleaned.substring(cleaned.lastIndexOf('</div>') + 6);
+  }
+  
   return cleaned.trim();
 }
 
@@ -453,30 +460,230 @@ function escapeHTML(text) {
   return div.innerHTML;
 }
 
+function renderPremiumFallback(analysis, container) {
+  const intent = document.getElementById('userIntent')?.value || '';
+  const isCalculator = /calculator/i.test(intent);
+  
+  if (isCalculator) {
+    const html = `
+      <div id="mainAPP" style="padding:20px;">
+        <div class="calc-container">
+          <div class="calc-display" id="calcDisplay">0</div>
+          <div class="calc-buttons">
+            <button onclick="calcClear()">C</button>
+            <button onclick="calcInput('/')">/</button>
+            <button onclick="calcInput('*')">×</button>
+            <button onclick="calcBackspace()">←</button>
+            <button onclick="calcInput('7')">7</button>
+            <button onclick="calcInput('8')">8</button>
+            <button onclick="calcInput('9')">9</button>
+            <button onclick="calcInput('-')">-</button>
+            <button onclick="calcInput('4')">4</button>
+            <button onclick="calcInput('5')">5</button>
+            <button onclick="calcInput('6')">6</button>
+            <button onclick="calcInput('+')">+</button>
+            <button onclick="calcInput('1')">1</button>
+            <button onclick="calcInput('2')">2</button>
+            <button onclick="calcInput('3')">3</button>
+            <button onclick="calcEquals()" class="equals">=</button>
+            <button onclick="calcInput('0')" style="grid-column: span 2;">0</button>
+            <button onclick="calcInput('.')">.</button>
+          </div>
+        </div>
+      </div>
+    `;
+    const style = `
+      .calc-container { max-width: 400px; margin: 0 auto; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 24px; border-radius: 20px; box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4); }
+      .calc-display { background: rgba(255,255,255,0.95); color: #333; font-size: 2.5rem; padding: 24px; border-radius: 12px; text-align: right; margin-bottom: 20px; font-weight: 600; min-height: 70px; word-wrap: break-word; }
+      .calc-buttons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+      .calc-buttons button { padding: 24px; font-size: 1.3rem; border: none; border-radius: 12px; background: rgba(255,255,255,0.9); color: #333; cursor: pointer; transition: all 0.2s; font-weight: 600; }
+      .calc-buttons button:hover { background: #fff; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+      .calc-buttons button:active { transform: translateY(0); }
+      .calc-buttons button.equals { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; grid-row: span 2; }
+      .calc-buttons button.equals:hover { background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%); }
+    `;
+    const script = `
+      let calcValue = '0';
+      let calcOperator = '';
+      let calcPrevious = '';
+      
+      function calcInput(val) {
+        if (calcValue === '0' && val !== '.') {
+          calcValue = val;
+        } else if (['+', '-', '*', '/'].includes(val)) {
+          if (calcPrevious && calcOperator) {
+            calcEquals();
+          }
+          calcOperator = val;
+          calcPrevious = calcValue;
+          calcValue = '0';
+        } else {
+          calcValue += val;
+        }
+        document.getElementById('calcDisplay').textContent = calcValue;
+      }
+      
+      function calcEquals() {
+        if (!calcPrevious || !calcOperator) return;
+        const prev = parseFloat(calcPrevious);
+        const curr = parseFloat(calcValue);
+        let result = 0;
+        switch(calcOperator) {
+          case '+': result = prev + curr; break;
+          case '-': result = prev - curr; break;
+          case '*': result = prev * curr; break;
+          case '/': result = curr !== 0 ? prev / curr : 'Error'; break;
+        }
+        calcValue = result.toString();
+        calcOperator = '';
+        calcPrevious = '';
+        document.getElementById('calcDisplay').textContent = calcValue;
+      }
+      
+      function calcClear() {
+        calcValue = '0';
+        calcOperator = '';
+        calcPrevious = '';
+        document.getElementById('calcDisplay').textContent = calcValue;
+      }
+      
+      function calcBackspace() {
+        calcValue = calcValue.length > 1 ? calcValue.slice(0, -1) : '0';
+        document.getElementById('calcDisplay').textContent = calcValue;
+      }
+    `;
+    container.innerHTML = html;
+    const styleEl = document.createElement('style');
+    styleEl.textContent = style;
+    container.appendChild(styleEl);
+    const scriptEl = document.createElement('script');
+    scriptEl.textContent = script;
+    container.appendChild(scriptEl);
+    return;
+  }
+  
+  if (analysis && analysis.needsAI) {
+    const html = `
+      <div id="mainAPP">
+        <div class="chat-wrap">
+          <div class="chat-header">🤖 AI Assistant</div>
+          <div id="chatMessages" class="chat-messages"></div>
+          <div class="chat-input">
+            <input id="chatText" type="text" placeholder="Type your message..." />
+            <button id="chatSend">Send</button>
+          </div>
+        </div>
+      </div>
+    `;
+    const style = `
+      #mainAPP { padding: 18px; }
+      .chat-wrap { max-width: 680px; margin: 0 auto; background: #fff; border-radius: 12px; box-shadow: 0 8px 24px #00000014; overflow: hidden; }
+      .chat-header { background: linear-gradient(135deg,#6d5dfc,#47caff); color:#fff; padding: 14px 16px; font-weight: 800; }
+      .chat-messages { height: 360px; overflow-y: auto; padding: 12px; background: #f8fafc; }
+      .msg { margin: 8px 0; display: flex; gap: 10px; }
+      .msg.me { justify-content: flex-end; }
+      .bubble { max-width: 78%; padding: 10px 12px; border-radius: 12px; box-shadow: 0 2px 6px #0001; }
+      .me .bubble { background: #e0e7ff; }
+      .ai .bubble { background: #ffffff; }
+      .chat-input { display: flex; gap: 8px; padding: 10px; border-top: 1px solid #eef2ff; background: #f8fafc; }
+      .chat-input input { flex: 1; padding: 10px 12px; border-radius: 10px; border: 1px solid #dbe3ff; font-size: 1rem; }
+      .chat-input button { padding: 10px 16px; border-radius: 10px; border: none; background: linear-gradient(135deg,#6d5dfc,#47caff); color:#fff; font-weight: 800; cursor: pointer; }
+      .chat-input button:hover { filter: brightness(1.05); }
+    `;
+    const script = `
+      const elMsgs = document.getElementById('chatMessages');
+      const elInput = document.getElementById('chatText');
+      const elSend = document.getElementById('chatSend');
+      
+      function addMsg(role, text) {
+        const row = document.createElement('div');
+        row.className = 'msg ' + (role === 'user' ? 'me' : 'ai');
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        bubble.textContent = text;
+        row.appendChild(bubble);
+        elMsgs.appendChild(row);
+        elMsgs.scrollTop = elMsgs.scrollHeight;
+      }
+      
+      async function sendChat() {
+        const text = elInput.value.trim();
+        if (!text) return;
+        addMsg('user', text);
+        elInput.value = '';
+        addMsg('assistant', '…');
+        try {
+          const reply = await window.morphicGroqChat([
+            { role: 'system', content: 'Helpful, concise AI assistant.' },
+            { role: 'user', content: text }
+          ], { temperature: 0.6 });
+          const last = elMsgs.querySelector('.msg.ai:last-child .bubble');
+          if (last) last.textContent = reply || '(no response)';
+        } catch (e) {
+          const last = elMsgs.querySelector('.msg.ai:last-child .bubble');
+          if (last) last.textContent = 'Error: ' + (e.message || e);
+        }
+      }
+      
+      elSend.addEventListener('click', sendChat);
+      elInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendChat(); });
+    `;
+    container.innerHTML = html;
+    const styleEl = document.createElement('style');
+    styleEl.textContent = style;
+    container.appendChild(styleEl);
+    const scriptEl = document.createElement('script');
+    scriptEl.textContent = script;
+    container.appendChild(scriptEl);
+    return;
+  }
+  
+  const html = `
+    <div id="mainAPP" style="padding:20px;">
+      <h2>Instant App</h2>
+      <p>A premium interactive experience is ready.</p>
+      <div class="card">
+        <input id="txt" placeholder="Type here" />
+        <button id="btn">Go</button>
+        <div id="out" class="out"></div>
+      </div>
+    </div>
+  `;
+  const style = `
+    .card { background:#fff; border:1px solid #e6eaff; border-radius:12px; padding:12px; box-shadow:0 8px 24px #0000000d; }
+    #txt { padding:10px 12px; border:1px solid #d8defe; border-radius:10px; width:100%; max-width:420px; }
+    #btn { margin-top:8px; padding:10px 14px; border:none; border-radius:10px; background:linear-gradient(135deg,#6d5dfc,#47caff); color:#fff; font-weight:800; cursor:pointer; }
+    #btn:hover { filter:brightness(1.05); }
+    .out { margin-top:10px; min-height:20px; }
+  `;
+  const script = `
+    const t = document.getElementById('txt');
+    const b = document.getElementById('btn');
+    const o = document.getElementById('out');
+    b.addEventListener('click', () => { o.textContent = 'You typed: ' + (t.value || '(empty)'); });
+  `;
+  container.innerHTML = html;
+  const styleEl = document.createElement('style');
+  styleEl.textContent = style;
+  container.appendChild(styleEl);
+  const scriptEl = document.createElement('script');
+  scriptEl.textContent = script;
+  container.appendChild(scriptEl);
+}
+
 // ============================================================================
 // HELPERS & EVENT LISTENERS
 // ============================================================================
 
 function enforceResponsive() {
   const content = document.getElementById('generatedContent');
-  const elements = content.querySelectorAll('*');
   
-  elements.forEach(el => {
-    if (!el.style.maxWidth) el.style.maxWidth = '100%';
-    if (!el.style.boxSizing) el.style.boxSizing = 'border-box';
-    
-    switch(el.tagName) {
-      case 'TABLE':
-        el.style.width = '100%';
-        el.style.tableLayout = 'fixed';
-        break;
-      case 'INPUT':
-      case 'TEXTAREA':
-        if (!el.style.width) el.style.width = '100%';
-        el.style.maxWidth = '100%';
-        break;
-    }
-  });
+  // Only add responsive wrapper styles, don't touch individual elements
+  const mainApp = content.querySelector('#mainAPP');
+  if (mainApp && !mainApp.style.maxWidth) {
+    mainApp.style.maxWidth = '100%';
+    mainApp.style.boxSizing = 'border-box';
+  }
 }
 
 function countElements(code) {
