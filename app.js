@@ -135,9 +135,11 @@ async function generateInterface() {
   
   try {
     const code = await callGroq(prompt);
-    
-    // Always render as HTML since we're not using build tools
-    renderHTML(code, content);
+    if (!code || code.length < 50) {
+      renderPremiumFallback(analysis, content);
+    } else {
+      renderHTML(code, content);
+    }
     
     enforceResponsive();
     setTimeout(() => content.scrollIntoView({behavior:'smooth', block:'center'}), 100);
@@ -204,8 +206,6 @@ async function callGroq(prompt) {
   code = code.replace(/\/\/.*$/gm, '');
   code = code.replace(/^\s*[\r\n]/gm, '');
   code = code.trim();
-  
-  if (code.length < 20) throw new Error("Generated code too short");
   
   return code;
 }
