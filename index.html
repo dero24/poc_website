@@ -1,695 +1,273 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>⚡ Morphic Web - Instant AI App Builder</title>
+  <title>⚡ Morphic Web - Autonomous AI App Builder</title>
   <style>
+    :root {
+      --primary: #667eea;
+      --secondary: #764ba2;
+      --bg: #f0f4f8;
+      --surface: #ffffff;
+      --text: #1e293b;
+      --text-dim: #64748b;
+      --border: #e2e8f0;
+      --success: #10b981;
+      --error: #ef4444;
+    }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
       padding: 20px;
-      color: #333;
     }
-    
     .container {
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-    
-    .setup-card, .interaction-zone {
-      background: white;
+      max-width: 900px;
+      margin: 20px auto;
+      background: var(--surface);
       border-radius: 24px;
-      padding: 48px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-      margin-bottom: 24px;
+      padding: 24px 48px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.1);
     }
-    
-    .interaction-zone { display: none; }
-    
     h1 {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      font-size: 3em;
+      font-size: 2.5em;
       font-weight: 800;
       text-align: center;
       margin-bottom: 12px;
     }
-    
     .tagline {
       text-align: center;
-      font-size: 1.3em;
-      color: #666;
+      font-size: 1.1em;
+      color: var(--text-dim);
       margin-bottom: 32px;
       font-weight: 500;
     }
-    
-    .feature-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-      margin-bottom: 32px;
-    }
-    
-    .feature-item {
-      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-      padding: 20px;
-      border-radius: 16px;
-      text-align: center;
-      font-weight: 600;
-      color: #667eea;
-    }
-    
     .input-group {
       margin-bottom: 24px;
     }
-    
     label {
       display: block;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       font-weight: 700;
-      font-size: 1.1em;
-      color: #333;
+      font-size: 1em;
     }
-    
-    input[type="text"], input[type="password"], textarea {
+    input[type="password"], select, textarea {
       width: 100%;
-      padding: 16px 20px;
-      border: 3px solid #e0e0e0;
-      border-radius: 12px;
-      font-size: 16px;
+      padding: 14px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      font-size: 1rem;
       font-family: inherit;
       transition: all 0.3s ease;
       background: #fafafa;
     }
-    
-    input:focus, textarea:focus {
+    input:focus, select:focus, textarea:focus {
       outline: none;
-      border-color: #667eea;
-      background: white;
+      border-color: var(--primary);
       box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
     }
-    
     textarea {
-      min-height: 140px;
+      min-height: 120px;
       resize: vertical;
       line-height: 1.6;
     }
-    
     .btn {
       width: 100%;
-      padding: 18px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 16px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
       color: white;
       border: none;
-      border-radius: 12px;
-      font-size: 18px;
+      border-radius: 10px;
+      font-size: 1.1rem;
       font-weight: 700;
       cursor: pointer;
       transition: all 0.3s ease;
       text-transform: uppercase;
       letter-spacing: 1px;
     }
-    
-    .btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 40px rgba(102, 126, 234, 0.5);
+    .btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
     }
-    .btn:active {
-      transform: translateY(-1px);
-    }
-    
     .btn:disabled {
-      opacity: 0.5;
+      opacity: 0.6;
       cursor: not-allowed;
-      transform: none;
     }
-    
-    .model-select {
-      width: 100%;
-      padding: 16px 20px;
-      border: 3px solid #e0e0e0;
-      border-radius: 12px;
-      font-size: 16px;
-      font-family: inherit;
-      transition: all 0.3s ease;
-      background: #fafafa;
-      cursor: pointer;
-    }
-
-    .model-select:focus {
-      outline: none;
-      border-color: #667eea;
-      background: white;
-      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-    }
-.stats-bar {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 16px;
-      margin-bottom: 32px;
-    }
-    
-    .stat-card {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-      padding: 20px;
-      border-radius: 16px;
-      text-align: center;
-      color: white;
-      box-shadow: 0 8px 24px rgba(240, 147, 251, 0.4);
-    }
-    
-    .stat-label {
-      font-size: 0.9em;
-      opacity: 0.9;
-      margin-bottom: 8px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      font-weight: 600;
-    }
-    
-    .stat-value {
-      font-size: 2.2em;
-      font-weight: 800;
-    }
-    
     #generatedContent {
-      background: white;
-      border: 3px solid #e0e0e0;
+      border: 2px solid var(--border);
       border-radius: 16px;
       min-height: 500px;
       margin-top: 24px;
       overflow: hidden;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.05);
+      position: relative;
     }
-    
-    .history-log {
-      margin-top: 24px;
-      padding: 24px;
-      background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-      border-radius: 16px;
-      max-height: 300px;
-      overflow-y: auto;
-      box-shadow: 0 8px 24px rgba(252, 182, 159, 0.4);
-    }
-    
-    .history-item {
-      padding: 12px 16px;
-      margin-bottom: 10px;
-      background: white;
-      border-left: 5px solid #667eea;
-      border-radius: 8px;
-      font-size: 0.95em;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    
-    .loading {
-      text-align: center;
-      padding: 80px 20px;
-      font-size: 1.5em;
-      color: #667eea;
-      font-weight: 600;
-    }
-    
-    .loading::after {
-      content: '';
-      animation: dots 1.5s infinite;
-    }
-    
-    @keyframes dots {
-      0%, 20% { content: '.'; }
-      40% { content: '..'; }
-      60%, 100% { content: '...'; }
-    }
-    
-    .react-enhancement {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.85);
-      z-index: 1000;
+    .loading-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(255,255,255,0.9);
+      display: flex;
       align-items: center;
       justify-content: center;
-      backdrop-filter: blur(10px);
+      flex-direction: column;
+      gap: 16px;
+      z-index: 10;
     }
-    
-    .react-prompt {
-      background: white;
-      padding: 48px;
-      border-radius: 24px;
-      max-width: 600px;
-      text-align: center;
-      box-shadow: 0 24px 80px rgba(0,0,0,0.6);
-      animation: slideUp 0.4s ease;
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-left-color: var(--primary);
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
     }
-    
-    @keyframes slideUp {
-      from {
-        opacity: 0;
-        transform: translateY(40px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    .loading-text {
+      font-weight: 600;
+      color: var(--text);
     }
-    
-    .react-prompt h2 {
-      color: #667eea;
-      margin-bottom: 24px;
-      font-size: 2.2em;
-    }
-    
-    .react-prompt p {
-      color: #666;
-      margin-bottom: 32px;
-      font-size: 1.15em;
-      line-height: 1.7;
-    }
-    
-    .react-prompt button {
-      margin: 12px;
-      padding: 16px 40px;
-      border: none;
-      border-radius: 12px;
-      font-size: 17px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    
-    .react-prompt .primary {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
-    }
-    
-    .react-prompt .secondary {
-      background: #f0f0f0;
-      color: #333;
-    }
-    
-    .react-prompt button:hover {
-      transform: translateY(-3px);
-    }
-    
+    @keyframes spin { to { transform: rotate(360deg); } }
     @media (max-width: 768px) {
-      .setup-card, .interaction-zone { padding: 32px 24px; }
-      h1 { font-size: 2.2em; }
-      .tagline { font-size: 1.1em; }
-      .stats-bar { grid-template-columns: 1fr; }
-      .react-prompt { margin: 20px; padding: 32px 24px; }
+      .container { padding: 24px; }
+      h1 { font-size: 2em; }
     }
   </style>
 </head>
 <body>
   <div class="container">
+    <h1>⚡ Morphic Web</h1>
+    <p class="tagline">Your idea, autonomously engineered into a brilliant app.</p>
     
-    <!-- Setup/Login Card -->
-    <div class="setup-card" id="setupCard">
-      <h1>⚡ Morphic Web</h1>
-      <p class="tagline">Instant AI-Powered App Builder</p>
-      
-      <div class="feature-grid">
-        <div class="feature-item">🎨 Any Design</div>
-        <div class="feature-item">⚡ Instant Generation</div>
-        <div class="feature-item">🔄 Live Adaptation</div>
-        <div class="feature-item">🚀 React Ready</div>
-      </div>
-      
-      <form id="setupForm">
-        <div class="input-group">
-          <label for="apiKey">🔑 Groq API Key</label>
-          <input 
-            type="password" 
-            id="apiKey" 
-            placeholder="Paste your Groq API key here..."
-            required
-          >
-        </div>
-        
-        <button type="submit" class="btn">🚀 Launch Morphic Web</button>
-      </form>
+    <div class="input-group">
+      <label for="apiKey">🔑 Groq API Key</label>
+      <input type="password" id="apiKey" placeholder="Paste your Groq API key to begin..." required>
     </div>
 
-    <!-- Main Interaction Zone -->
-    <div class="interaction-zone" id="interactionZone">
-      <h1>✨ Create Anything</h1>
-      <div class="stats-bar">
-        <div class="stat-card">
-          <div class="stat-label">Interactions</div>
-          <div class="stat-value" id="interactionCount">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Elements</div>
-          <div class="stat-value" id="elementsCreated">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Adaptations</div>
-          <div class="stat-value" id="adaptations">0</div>
-        </div>
-      </div>
-
-      <div class="input-group">
-        <label for="modelSelector">🤖 AI Model</label>
-        <select id="modelSelector" class="model-select">
-          <option value="llama-3.3-70b-versatile">Loading models...</option>
-        </select>
-      </div>
-<div class="input-group">
-        <label for="userIntent">💭 What do you want to build?</label>
-        <textarea 
-          id="userIntent" 
-          placeholder="Describe anything... a calculator, game, dashboard, animation, tool, or creative experiment!"
-        ></textarea>
-      </div>
-
-      <button onclick="generateInterface()" class="btn" id="generateBtn">✨ Generate Interface</button>
-
-      <div id="generatedContent"></div>
-
-      <div class="history-log" id="historyLog"></div>
+    <div class="input-group">
+      <label for="modelSelector">🤖 AI Model</label>
+      <select id="modelSelector">
+        <option value="llama-3.1-70b-versatile">Llama 3.1 70B (Recommended)</option>
+        <option value="gemma2-9b-it">Gemma 2 9B</option>
+        <option value="llama3-8b-8192">Llama 3 8B</option>
+      </select>
     </div>
 
-  </div>
+    <div class="input-group">
+      <label for="userIntent">💭 Describe the App You Want to Build</label>
+      <textarea id="userIntent" placeholder="e.g., A beautiful pomodoro timer with a circular progress bar and sound alerts."></textarea>
+    </div>
 
-  <!-- React Enhancement Modal -->
-  <div class="react-enhancement" id="reactEnhancement">
-    <div class="react-prompt">
-      <h2>🚀 React Upgrade Available!</h2>
-      <p>Your creation has reached the complexity threshold where React architecture would provide better performance and maintainability. Want to upgrade?</p>
-      <button class="primary" onclick="enhanceWithReact()">⚡ Upgrade to React</button>
-      <button class="secondary" onclick="keepCurrentVersion()">Keep Current Version</button>
+    <button onclick="generateInterface()" class="btn" id="generateBtn">✨ Build My App</button>
+
+    <div id="generatedContent">
+      <div class="loading-overlay" style="display: none;">
+        <div class="spinner"></div>
+        <div class="loading-text">Engineering your app...</div>
+      </div>
+      <iframe id="appFrame" style="width: 100%; height: 500px; border: none;"></iframe>
     </div>
   </div>
 
 <script>
+// -- AI SYSTEM PROMPT --
+// This powerful prompt instructs the AI to act as an expert engineer,
+// autonomously choosing the best framework (React or Vanilla JS)
+// and prioritizing user satisfaction, design, and functionality.
+const AUTO_SYSTEM_PROMPT = `
+You are Morphic Web, an elite AI web developer and product designer. Your primary directive is to create the most satisfying, beautiful, and functional web application based on the user's request. You have complete autonomy to choose the best technology for the job.
 
-let groqKey="", interactionCount=0, elementsCreated=0, adaptations=0, conversationHistory=[];
-let currentAppCode = "";
+**== PRIMARY ANALYSIS ==**
+1.  **Analyze the User's Intent:** Carefully evaluate the user's prompt. Is it a simple tool (calculator, converter), a content page, an interactive game, or a complex data dashboard?
+2.  **Choose the Optimal Framework:**
+    *   **IF the request is simple, static, or requires minimal state management** (e.g., a landing page, a simple calculator, a text-based game), choose **Vanilla JavaScript**. This prioritizes speed, lightness, and zero dependencies.
+    *   **IF the request is complex, requires significant state management, dynamic updates, or component-based architecture** (e.g., a to-do list, a data dashboard with filters, a multi-step form), choose **React**. This prioritizes maintainability and powerful state handling.
 
-function updateStats() {
-  document.getElementById('interactionCount').textContent = interactionCount;
-  document.getElementById('elementsCreated').textContent = elementsCreated;
-  document.getElementById('adaptations').textContent = adaptations;
-}
+**== CORE REQUIREMENTS (APPLY TO ALL OUTPUT) ==**
 
-function logHistory(msg) {
-  const log = document.getElementById('historyLog'), item = document.createElement('div');
-  item.className = 'history-item'; item.textContent = `${new Date().toLocaleTimeString()} - ${msg}`;
-  log.appendChild(item); log.scrollTop = log.scrollHeight;
-}
-async function fetchAvailableModels() {
+1.  **Output Format:** ALWAYS return a **single, complete HTML file**. Start with `<!DOCTYPE html>` and end with `</html>`. Do NOT include any explanations, markdown backticks (```), or any text outside the HTML code.
+2.  **Visual Excellence:**
+    *   **Design:** Implement a modern, visually stunning design. Use gradients, subtle shadows, excellent typography, and a professional color palette. The UI must look polished and high-end.
+    *   **Interactivity & Animation:** Incorporate smooth CSS transitions and animations to make the app feel alive and responsive. User actions should have clear visual feedback.
+    *   **Responsiveness:** The app MUST be fully responsive and look perfect on both desktop and mobile devices. Use media queries extensively.
+3.  **Functionality:**
+    *   The app must be **fully functional and interactive** as described.
+    *   Code must be clean, efficient, and well-structured.
+    *   Include error handling where appropriate.
+4.  **Scripts & Styles:**
+    *   **CSS:** All CSS must be included within `<style>` tags in the `<head>`.
+    *   **JavaScript:** All JavaScript must be included within `<script>` tags at the end of the `<body>`.
+    *   **React-Specific:** If you choose React, you MUST include the React and ReactDOM CDN script tags in the `<head>` and use modern hooks.
+
+Your goal is to "wow" the user with the final product. Think like a lead product engineer at a top tech company. Create the best possible version of their idea.
+`;
+
+async function generateInterface() {
+  const groqKey = document.getElementById('apiKey').value.trim();
+  const model = document.getElementById('modelSelector').value;
+  const userIntent = document.getElementById('userIntent').value.trim();
+  const generateBtn = document.getElementById('generateBtn');
+  const loadingOverlay = document.querySelector('.loading-overlay');
+  const appFrame = document.getElementById('appFrame');
+
+  if (!groqKey) {
+    alert('Please enter your Groq API key to begin.');
+    return;
+  }
+  if (!userIntent) {
+    alert('Please describe the app you want to build.');
+    return;
+  }
+
+  generateBtn.disabled = true;
+  loadingOverlay.style.display = 'flex';
+  appFrame.src = 'about:blank'; // Clear previous content
+
+  const messages = [
+    { role: 'system', content: AUTO_SYSTEM_PROMPT },
+    { role: 'user', content: userIntent }
+  ];
+
   try {
-    const response = await fetch('https://api.groq.com/openai/v1/models', {
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
       headers: {
         'Authorization': `Bearer ${groqKey}`,
         'Content-Type': 'application/json'
-      }
+      },
+      body: JSON.stringify({ model, messages, temperature: 0.7, max_tokens: 4096 })
     });
-    
+
     if (!response.ok) {
-      console.error('Failed to fetch models');
-      return;
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(`API Error ${response.status}: ${errorData.error?.message || 'Failed to fetch response'}`);
     }
-    
+
     const data = await response.json();
-    const modelSelector = document.getElementById('modelSelector');
-    modelSelector.innerHTML = '';
+    let content = data.choices[0].message.content.trim();
     
-    const chatModels = data.data.filter(model => 
-      model.active && 
-      !model.id.includes('whisper') && 
-      !model.id.includes('guard') &&
-      !model.id.includes('llava')
-    ).sort((a, b) => {
-      if (a.id.includes('llama-3.3')) return -1;
-      if (b.id.includes('llama-3.3')) return 1;
-      return a.id.localeCompare(b.id);
-    });
+    // Clean the response: remove markdown code blocks
+    content = content.replace(/``````/g, '$1').trim();
+
+    if (!content.toLowerCase().startsWith('<!doctype html>')) {
+        throw new Error("Generated response was not a valid HTML document.");
+    }
     
-    chatModels.forEach(model => {
-      const option = document.createElement('option');
-      option.value = model.id;
-      option.textContent = `${model.id} (${model.context_window} tokens)`;
-      if (model.id === 'llama-3.3-70b-versatile') {
-        option.selected = true;
-      }
-      modelSelector.appendChild(option);
-    });
-    
-    logHistory(`✅ Loaded ${chatModels.length} available models`);
-    
+    // Inject the generated HTML into the iframe for sandboxed execution
+    appFrame.srcdoc = content;
+
   } catch (error) {
-    console.error('Error fetching models:', error);
-    logHistory('⚠️ Could not fetch models, using default');
-  }
-}
-
-function initializeExperience(e) {
-  if(e) e.preventDefault();
-  
-  groqKey = document.getElementById('apiKey').value.trim();
-  if(!groqKey) { 
-    alert('Please paste your Groq API key!'); 
-    return false;
-  }
-  
-  window.groqKey = groqKey;
-  document.getElementById('setupCard').style.display="none";
-  document.getElementById('interactionZone').style.display="block";
-  logHistory('🚀 Session initialized - Ready to build!');
-  
-  fetchAvailableModels();
-  
-  setTimeout(() => {
-    document.getElementById('interactionZone').scrollIntoView({ behavior: 'smooth' });
-  }, 100);
-  
-  return false;
-}
-async function generateInterface() {
-  const userInput = document.getElementById('userIntent').value.trim();
-  if (!userInput) { alert('Please describe what you want to create!'); return; }
-
-  const btn = document.getElementById('generateBtn');
-  btn.disabled = true;
-  btn.textContent = '⏳ Generating...';
-
-  const container = document.getElementById('generatedContent');
-  container.innerHTML = '<div class="loading">Creating your interface</div>';
-
-  interactionCount++;
-  conversationHistory.push({ role: 'user', content: userInput });
-
-  try {
-    const generatedHTML = await callGroqAPI(userInput);
-    currentAppCode = generatedHTML;
-    
-    parseAndInjectHTML(generatedHTML, container);
-    
-    updateStats();
-    logHistory(`✅ Generated: ${userInput.substring(0, 50)}...`);
-    
-    conversationHistory.push({ role: 'assistant', content: `Generated interface with ${elementsCreated} elements` });
-    
-    checkForReactEnhancement();
-    
-  } catch (error) {
-    container.innerHTML = `<div style="color: #d32f2f; padding: 40px; text-align: center;"><h3>⚠️ Generation Failed</h3><p>${error.message}</p></div>`;
-    logHistory(`❌ Error: ${error.message}`);
+    console.error('Generation failed:', error);
+    alert('An error occurred during generation: ' + error.message);
   } finally {
-    btn.disabled = false;
-    btn.textContent = '✨ Generate Interface';
+    generateBtn.disabled = false;
+    loadingOverlay.style.display = 'none';
   }
 }
-function checkForReactEnhancement() {
-  if (interactionCount >= 1 && currentAppCode) {
-    setTimeout(() => enhanceWithReact(), 500);
-  }
-}
-async function enhanceWithReact() {
-  const container = document.getElementById('generatedContent');
-  container.innerHTML = '<div class="loading">🚀 Upgrading to React</div>';
-  
-  const reactPrompt = `Convert this into a modern React functional component with hooks. Ensure you return valid HTML including <!DOCTYPE html> and proper React structure:
-
-${currentAppCode}`;
-  
-  try {
-    const reactCode = await callGroqAPI(reactPrompt, true);
-    if (!reactCode.includes('React') && !reactCode.includes('react')) {
-      throw new Error("React code not generated");
-    }
-    parseAndInjectHTML(reactCode, container);
-    adaptations++;
-    updateStats();
-    logHistory('⚡ Upgraded to React architecture');
-  } catch (error) {
-    parseAndInjectHTML(currentAppCode, container);
-    logHistory('⚠️ React upgrade skipped, using original code');
-  }
-}
-function keepCurrentVersion() {
-  document.getElementById('reactEnhancement').style.display = 'none';
-  logHistory('Kept vanilla JavaScript version');
-}
-
-function ensureResponsive(html) {
-  if (!html.includes('viewport') && !html.includes('@media')) {
-    const responsiveCSS = `
-      <style>
-        @media (max-width: 768px) {
-          body { padding: 10px !important; font-size: 14px; }
-          * { max-width: 100%; }
-        }
-      </style>
-    `;
-    return html.replace('</head>', responsiveCSS + '</head>');
-  }
-  return html;
-}
-
-async function callGroqAPI(userPrompt, isReactUpgrade = false) {
-  const systemPrompt = `You are an expert web developer. Create complete, functional, beautiful HTML pages with inline CSS and JavaScript.
-
-REQUIREMENTS:
-- Generate a complete HTML document with <!DOCTYPE html>
-- Include inline CSS in <style> tags for modern, attractive design
-- Include a <script> tag with all JavaScript functionality
-- Make it fully interactive and functional
-- Use modern ES6+ JavaScript
-- Ensure responsive design
-- Add smooth animations and transitions
-- Make it visually impressive with gradients, shadows, and modern UI
-
-Return ONLY the complete HTML code, no explanations or markdown.`;
-
-  const messages = isReactUpgrade 
-    ? [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }]
-    : [{ role: 'system', content: systemPrompt }, ...conversationHistory.slice(-5), { role: 'user', content: userPrompt }];
-
-  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${groqKey}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      model: document.getElementById('modelSelector').value,
-messages: messages,
-      temperature: 0.85,
-      max_tokens: 4096,
-      top_p: 0.95
-    })
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(`API Error ${response.status}: ${errorData.error?.message || response.statusText}`);
-  }
-
-  const data = await response.json();
-  let content = data.choices[0].message.content.trim();
-  
-  const validateHTML = content.includes('<!DOCTYPE') || content.includes('<html');
-  
-  if (!validateHTML) {
-    try {
-      const decodedAttempt = atob(
-        content.replace(/[^A-Za-z0-9+\/=]/g, '')
-      );
-      if (decodedAttempt.includes('<!DOCTYPE') || decodedAttempt.includes('<html')) {
-        content = decodedAttempt;
-      }
-    } catch(e) {
-      console.error("Encoding error:", e);
-      content = data.choices[0].message.content.trim();
-    }
-  }
-  
-  const bt = '`' + '`' + '`'; content = content.replace(new RegExp(bt + 'javascript|' + bt + 'html|' + bt, 'g'), '');
-  
-  if (validateHTML) {
-    const hasValidContent = content && (
-      /<div/i.test(content) || 
-      /<button/i.test(content) ||
-      /<input/i.test(content) ||
-      /<form/i.test(content) ||
-      /<canvas/i.test(content) ||
-      /<svg/i.test(content)
-    );
-    
-    if (!hasValidContent) {
-      throw new Error("Generated content doesn't contain valid HTML elements");
-    }
-    
-    return ensureResponsive(content);
-  }
-  
-  throw new Error("Invalid HTML structure received from API");
-}
-
-function parseAndInjectHTML(html, container) {
-  const styleClosing = '<' + '/' + 'style>';
-  const scriptClosing = '<' + '/' + 'script' + '>';
-  
-  const stylePattern = new RegExp('<style[^>]*>([\\s\\S]*?)' + styleClosing, 'i');
-  const styleMatch = html.match(stylePattern);
-  const styleContent = styleMatch ? styleMatch[1] : "";
-  html = html.replace(new RegExp('<style[^>]*>[\\s\\S]*?' + styleClosing, 'gi'), "");
-  
-  const scriptPattern = new RegExp('<script[^>]*>([\\s\\S]*?)' + scriptClosing, 'i');
-  const scriptMatch = html.match(scriptPattern);
-  const scriptContent = scriptMatch ? scriptMatch[1] : "";
-  html = html.replace(new RegExp('<script[^>]*>[\\s\\S]*?' + scriptClosing, 'gi'), "");
-  
-  html = html.replace(/\\/g, '/');
-  
-  container.innerHTML = html;
-  
-  if (styleContent) {
-    const styleElement = document.createElement('style');
-    styleElement.textContent = styleContent;
-    container.appendChild(styleElement);
-  }
-  
-  if (scriptContent) {
-    const scriptElement = document.createElement('script');
-    scriptElement.textContent = scriptContent;
-    container.appendChild(scriptElement);
-  }
-  
-  elementsCreated = countElements(html);
-}
-
-function countElements(html) {
-  const matches = html.match(/<[a-z][^>]*>/gi);
-  return matches ? matches.length : 0;
-}
-
-document.addEventListener("DOMContentLoaded", ()=>{
-  const setupForm = document.getElementById('setupForm');
-  if(setupForm) {
-    setupForm.addEventListener('submit', initializeExperience);
-  }
-  
-  document.getElementById('userIntent')?.addEventListener('keydown',(e)=>{
-    if(e.key==='Enter'&&e.ctrlKey) generateInterface();
-  });
-});
-
 </script>
 </body>
 </html>
