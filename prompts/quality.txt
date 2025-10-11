@@ -1,7 +1,9 @@
-QUALITY:
-- Clean, semantic code
-- Proper error handling
-- Intuitive UX
-- Accessible (ARIA labels)
-- Fast loading
-- No placeholders - full functionality
+QUALITY STANDARDS:
+- Semantic HTML, clean CSS, efficient JS
+- Error handling with user feedback
+- Intuitive UX, accessible (ARIA)
+- Fast, responsive, mobile-friendly
+- Complete functionality, no TODOs/placeholders
+- Production-ready code
+
+CRITICAL: Output ONLY the code structure. NO explanatory text, NO markdown, NO implementation notes.

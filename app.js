@@ -95,7 +95,7 @@ function buildPrompt(userIntent, analysis) {
     ? `\nUSE: React\n${PROMPTS.reactStructure}`
     : `\nCHOOSE: Best tech for task\n${PROMPTS.htmlStructure}`;
   
-  const aiInstruction = analysis.needsAI ? `\n${PROMPTS.aiFeatures}\nCURRENT_MODEL: ${selectedModel}\nREQUIREMENT: Use window.groqKey and window.selectedModel when making AI calls. Prefer calling window.morphicGroqChat(messages, { temperature: 0.7 }) if available.` : '';
+  const aiInstruction = analysis.needsAI ? `\n${PROMPTS.aiFeatures}\nACTIVE_MODEL: ${selectedModel}` : '';
   
   return `${PROMPTS.system}
 
@@ -108,7 +108,8 @@ ${aiInstruction}
 USER REQUEST: "${userIntent}"
 ${context}
 
-BUILD NOW. Code only, no text.`;
+OUTPUT ONLY: <div id="mainAPP">...</div><style>...</style><script>...</script>
+NO markdown blocks, NO explanations, NO "Now you have", NO implementation notes.`;
 }
 
 // ============================================================================
@@ -134,11 +135,8 @@ async function generateInterface() {
   try {
     const code = await callGroq(prompt);
     
-    if (code.includes('import React') || code.includes('from "react"') || code.includes("from 'react'")) {
-      renderReact(code, content);
-    } else {
-      renderHTML(code, content);
-    }
+    // Always render as HTML since we're not using build tools
+    renderHTML(code, content);
     
     enforceResponsive();
     setTimeout(() => content.scrollIntoView({behavior:'smooth', block:'center'}), 100);
@@ -163,7 +161,16 @@ async function generateInterface() {
 // API CALL
 // ============================================================================
 
+function getModelMaxTokens(model) {
+  if (model.includes('gemma')) return 512;
+  if (model.includes('llama-3.3') || model.includes('llama-3.2')) return 2048;
+  if (model.includes('llama-3.1')) return 4096;
+  if (model.includes('mixtral')) return 4096;
+  return 2048;
+}
+
 async function callGroq(prompt) {
+  const maxTokens = getModelMaxTokens(selectedModel);
   const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -172,7 +179,7 @@ async function callGroq(prompt) {
     },
     body: JSON.stringify({
       model: selectedModel,
-      max_tokens: 4096,
+      max_tokens: maxTokens,
       temperature: 0.7,
       messages: [{ role: "user", content: prompt }]
     })
@@ -188,6 +195,12 @@ async function callGroq(prompt) {
   
   code = code.replace(/``````/g, '').trim();
   
+  // Additional cleaning for common LLM output issues
+  code = code.replace(/^(HTML:|CSS:|JavaScript:|JS:).*$/gm, '');
+  code = code.replace(/```[\w]*\n/g, '').replace(/```/g, '');
+  code = code.replace(/^(Now you have|This is|You.*|The.*calculator.*|.*implement.*logic.*|.*add.*features.*|.*improve.*layout.*)$/gm, '');
+  code = code.trim();
+  
   if (code.length < 20) throw new Error("Generated code too short");
   
   return code;
@@ -197,21 +210,134 @@ async function callGroq(prompt) {
 // RENDERING
 // ============================================================================
 
+function cleanCodeFromMarkdown(raw) {
+  let cleaned = raw;
+  
+  // Remove markdown code blocks
+  cleaned = cleaned.replace(/```[\w]*\n([\s\S]*?)\n```/g, '$1');
+  cleaned = cleaned.replace(/```([\s\S]*?)```/g, '$1');
+  
+  // Remove explanatory text patterns
+  cleaned = cleaned.replace(/^(HTML:|CSS:|JavaScript:|JS:).*$/gm, '');
+  cleaned = cleaned.replace(/^Now you have.*$/gm, '');
+  cleaned = cleaned.replace(/^This is.*$/gm, '');
+  cleaned = cleaned.replace(/^You.*$/gm, '');
+  cleaned = cleaned.replace(/^The.*calculator.*$/gm, '');
+  cleaned = cleaned.replace(/\/\/ Import.*$/gm, '');
+  cleaned = cleaned.replace(/\/\/ DOM manipulation.*$/gm, '');
+  cleaned = cleaned.replace(/\/\/ Event listeners.*$/gm, '');
+  cleaned = cleaned.replace(/\/\/ Calculate.*$/gm, '');
+  cleaned = cleaned.replace(/\/\/ Implement.*$/gm, '');
+  cleaned = cleaned.replace(/\/\/ Handle.*$/gm, '');
+  cleaned = cleaned.replace(/\/\/ e\.g\..*$/gm, '');
+  
+  return cleaned.trim();
+}
+
 function renderHTML(raw, container) {
-  let html = raw;
+  let code = cleanCodeFromMarkdown(raw);
+  let html = code;
   let style = "";
   let script = "";
 
+  // Extract styles
   const styleMatch = html.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
   if (styleMatch) {
     style = styleMatch[1];
     html = html.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "");
   }
 
+  // Extract scripts
   const scriptMatch = html.match(/<script[^>]*>([\s\S]*?)<\/script>/i);
   if (scriptMatch) {
     script = scriptMatch[1];
     html = html.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "");
+  }
+
+  // If no proper HTML structure, try to build one
+  if (!html.includes('<div') && !html.includes('<button') && !html.includes('<input')) {
+    // Try to extract content from mixed format
+    const lines = code.split('\n');
+    let htmlContent = '';
+    let cssContent = '';
+    let jsContent = '';
+    let currentSection = '';
+    
+    for (let line of lines) {
+      line = line.trim();
+      if (line.includes('Calculator') && !line.includes('//')) {
+        htmlContent += `<h2>${line}</h2>\n`;
+      } else if (line.match(/^[C0-9+\-x\/=.\s]+$/)) {
+        // Button layout line
+        const buttons = line.split(/\s+/).filter(b => b);
+        htmlContent += '<div class="calculator-grid">\n';
+        buttons.forEach(btn => {
+          htmlContent += `<button onclick="handleButton('${btn}')">${btn}</button>\n`;
+        });
+        htmlContent += '</div>\n';
+      } else if (line.includes('#') || line.includes('{') || line.includes('}') || line.includes(':')) {
+        cssContent += line + '\n';
+      } else if (line.includes('function') || line.includes('const') || line.includes('let') || line.includes('addEventListener')) {
+        jsContent += line + '\n';
+      }
+    }
+    
+    if (htmlContent) {
+      html = `<div id="mainAPP">\n<div id="result">0</div>\n${htmlContent}\n</div>`;
+      style = cssContent || `
+        #mainAPP { padding: 20px; text-align: center; }
+        .calculator-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; max-width: 300px; margin: 20px auto; }
+        button { padding: 20px; font-size: 18px; border: none; background: #f0f0f0; cursor: pointer; border-radius: 5px; }
+        button:hover { background: #e0e0e0; }
+        #result { font-size: 24px; padding: 20px; background: #333; color: white; margin-bottom: 20px; border-radius: 5px; }
+      `;
+      script = jsContent || `
+        let display = '0';
+        let operator = '';
+        let previousValue = '';
+        
+        function handleButton(value) {
+          const resultEl = document.getElementById('result');
+          
+          if (value === 'C') {
+            display = '0';
+            operator = '';
+            previousValue = '';
+          } else if (['+', '-', 'x', '/'].includes(value)) {
+            if (previousValue && operator && display !== '0') {
+              calculate();
+            }
+            operator = value;
+            previousValue = display;
+            display = '0';
+          } else if (value === '=') {
+            calculate();
+            operator = '';
+            previousValue = '';
+          } else if (value === '.') {
+            if (!display.includes('.')) {
+              display += '.';
+            }
+          } else {
+            display = display === '0' ? value : display + value;
+          }
+          
+          resultEl.textContent = display;
+        }
+        
+        function calculate() {
+          const prev = parseFloat(previousValue);
+          const curr = parseFloat(display);
+          
+          switch(operator) {
+            case '+': display = (prev + curr).toString(); break;
+            case '-': display = (prev - curr).toString(); break;
+            case 'x': display = (prev * curr).toString(); break;
+            case '/': display = curr !== 0 ? (prev / curr).toString() : 'Error'; break;
+          }
+        }
+      `;
+    }
   }
   
   container.innerHTML = html;
@@ -357,7 +483,7 @@ window.morphicGroqChat = async function(messages, opts = {}) {
   if (!key) throw new Error('Missing Groq API key');
   const model = opts.model || window.selectedModel || 'llama-3.1-70b-versatile';
   const temperature = typeof opts.temperature === 'number' ? opts.temperature : 0.7;
-  const max_tokens = typeof opts.max_tokens === 'number' ? opts.max_tokens : 1024;
+  const max_tokens = typeof opts.max_tokens === 'number' ? opts.max_tokens : Math.min(1024, getModelMaxTokens(model));
   const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -377,3 +503,4 @@ window.morphicGroqChat = async function(messages, opts = {}) {
 // Expose functions to global scope for HTML onclick handlers
 window.initializeExperience = initializeExperience;
 window.generateInterface = generateInterface;
+window.getModelMaxTokens = getModelMaxTokens;

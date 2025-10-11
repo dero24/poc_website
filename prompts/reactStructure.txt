@@ -1,10 +1,12 @@
-REACT STRUCTURE:
-import React, { useState } from 'react';
+REACT BROWSER-COMPATIBLE (NO BUILD TOOLS):
+<div id="mainAPP" style="max-width:100%;padding:20px;box-sizing:border-box;">
+  [complete functional UI using vanilla JS that mimics React patterns]
+</div>
+<style>
+[complete CSS for modern component styling]
+</style>
+<script>
+[vanilla JavaScript with state management, event handling, DOM updates]
+</script>
 
-export default function App() {
-  return (
-    <div style={{maxWidth:'100%', padding:'20px'}}>
-      {/* JSX */}
-    </div>
-  );
-}
+CRITICAL: NO import statements. NO JSX. Use vanilla JS with React-like patterns for complex apps.

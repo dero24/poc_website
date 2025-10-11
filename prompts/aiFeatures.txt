@@ -1,17 +1,16 @@
 AI INTEGRATION:
-- window.groqKey is already available
-- Endpoint: https://api.groq.com/openai/v1/chat/completions
-- Model: use window.selectedModel (populated from the dropdown)
-- Headers: Authorization: Bearer {window.groqKey}
-- Add loading states & error handling
-- Keep prompts brief but specific. Prefer concise instructions and clear constraints to reduce tokens while maximizing quality.
+- Use window.morphicGroqChat(messages, opts) - handles model/tokens automatically
+- window.groqKey and window.selectedModel available globally
+- Auto-adjusts max_tokens per model (gemma:512, llama-3.3:2048, llama-3.1:4096)
+- Always include loading states, error handling, user feedback
 
-Example:
-await window.morphicGroqChat([
-  { role: 'system', content: systemBrief },
-  { role: 'user', content: userMessage }
-], { temperature: 0.7 })
+USAGE:
+const response = await window.morphicGroqChat([
+  { role: 'system', content: 'Brief system prompt' },
+  { role: 'user', content: userInput }
+], { temperature: 0.7 });
 
-Notes:
-- Apps must be fully functional within the page without external build steps.
-- Always read the current model from window.selectedModel; do not hardcode model IDs.
+REQUIREMENTS:
+- Concise prompts to maximize output quality within token limits
+- Full in-browser functionality, no external dependencies
+- Graceful error handling with user-friendly messages

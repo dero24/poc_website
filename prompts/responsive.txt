@@ -1,6 +1,7 @@
-RESPONSIVE:
-- max-width:100%, box-sizing:border-box on all elements
-- Mobile-first (320px+)
-- Flexbox with flex-wrap
-- Relative units (%, rem, vw)
+RESPONSIVE DESIGN:
+- All elements: max-width:100%, box-sizing:border-box
+- Mobile-first design (320px+)
+- Flexbox layouts with flex-wrap
+- Relative units (%, rem, vw/vh)
 - Tables: width:100%, table-layout:fixed
+- Touch-friendly buttons (44px+ tap targets)

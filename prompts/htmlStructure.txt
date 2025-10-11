@@ -1,11 +1,13 @@
-HTML STRUCTURE:
-<div id="mainAPP" style="max-width:100%;padding:20px;">
-  [content]
+EXACT OUTPUT FORMAT:
+<div id="mainAPP" style="max-width:100%;padding:20px;box-sizing:border-box;">
+  [complete functional UI - buttons, inputs, displays, etc.]
 </div>
 <style>
-  #mainAPP * { box-sizing:border-box; max-width:100%; }
-  [styles]
+#mainAPP * { box-sizing:border-box; max-width:100%; }
+[complete CSS for layout, colors, responsiveness]
 </style>
 <script>
-  [logic]
+[complete JavaScript with all event handlers and logic]
 </script>
+
+MUST: Work immediately when injected. NO placeholders, NO TODOs, NO incomplete functions.
