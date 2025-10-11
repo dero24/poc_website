@@ -11,6 +11,7 @@ let interactionCount = 0;
 let elementsCreated = 0;
 let adaptations = 0;
 let conversationHistory = [];
+let selectedModel = 'llama-3.1-70b-versatile';
 
 // ============================================================================
 // UTILITIES
@@ -47,6 +48,14 @@ async function initializeExperience() {
     await loadPrompts();
     document.getElementById('setupCard').style.display = "none";
     document.getElementById('interactionZone').style.display = "block";
+    fetchGroqModels().catch(err => {
+      console.error('Model fetch failed:', err);
+      const sel = document.getElementById('modelSelect');
+      if (sel) {
+        sel.innerHTML = `<option value="${selectedModel}">${selectedModel}</option>`;
+        sel.disabled = false;
+      }
+    });
     logHistory('🚀 Ready to build apps!');
   } catch (error) {
     console.error('Failed to load prompts:', error);
@@ -161,7 +170,7 @@ async function callGroq(prompt) {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      model: 'llama-3.1-70b-versatile',
+      model: selectedModel,
       max_tokens: 4096,
       temperature: 0.7,
       messages: [{ role: "user", content: prompt }]
@@ -277,7 +286,67 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+  const modelSelect = document.getElementById('modelSelect');
+  if (modelSelect) {
+    modelSelect.addEventListener('change', (e) => {
+      selectedModel = e.target.value;
+      logHistory(`🧠 Model set to: ${selectedModel}`);
+    });
+  }
 });
+
+async function fetchGroqModels() {
+  const sel = document.getElementById('modelSelect');
+  if (!sel) return;
+  sel.disabled = true;
+  sel.innerHTML = '<option>Loading models...</option>';
+
+  const resp = await fetch('https://api.groq.com/openai/v1/models', {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${groqKey}`,
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!resp.ok) {
+    const error = await resp.json().catch(() => ({}));
+    throw new Error(error.error?.message || 'Failed to load models');
+  }
+
+  const data = await resp.json();
+  const models = Array.isArray(data.data) ? data.data : [];
+  const ids = models
+    .map(m => m.id)
+    .filter(Boolean)
+    .sort((a, b) => a.localeCompare(b));
+
+  sel.innerHTML = '';
+  const preferred = selectedModel;
+  let preferredExists = false;
+  ids.forEach(id => {
+    const opt = document.createElement('option');
+    opt.value = id;
+    opt.textContent = id;
+    if (id === preferred) preferredExists = true;
+    sel.appendChild(opt);
+  });
+
+  if (preferredExists) {
+    sel.value = preferred;
+  } else if (ids.length) {
+    sel.value = ids[0];
+    selectedModel = ids[0];
+  } else {
+    // Fallback to default
+    const opt = document.createElement('option');
+    opt.value = preferred;
+    opt.textContent = preferred;
+    sel.appendChild(opt);
+    sel.value = preferred;
+  }
+  sel.disabled = false;
+}
 
 // Expose functions to global scope for HTML onclick handlers
 window.initializeExperience = initializeExperience;

@@ -92,6 +92,29 @@ body {
   margin-bottom:16px;
 }
 
+.model-select {
+  margin-bottom:10px;
+}
+
+.model-select label {
+  font-size:1.02em;
+  font-weight:700;
+  color:#6a5ae0;
+  display:block;
+  margin-bottom:6px;
+}
+
+.model-select select {
+  font-size:1.02em;
+  padding:10px 12px;
+  width:100%;
+  max-width:360px;
+  border:2px solid #e3eafe;
+  border-radius:10px;
+  background:#ffffff;
+  box-shadow:0 2px 9px #b6bffb12 inset;
+}
+
 .api-input-group label {
   font-size:1.07em;
   font-weight:700;
