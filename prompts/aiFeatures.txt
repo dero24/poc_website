@@ -1,13 +1,1 @@
-PREMIUM AI INTEGRATION:
-- Use window.morphicGroqChat(messages, opts) for seamless AI features
-- Beautiful loading animations and smooth error handling
-- Smart conversation memory and context awareness
-- Auto-adjusts tokens per model for optimal responses
-
-ELITE USAGE:
-const response = await window.morphicGroqChat([
-  { role: 'system', content: 'Expert AI assistant with premium capabilities' },
-  { role: 'user', content: userInput }
-], { temperature: 0.7 });
-
-DELIVER: AI-powered apps with stunning UX, smooth interactions, and delightful surprises that exceed user expectations.
+AI FEATURES: Use window.groqKey for Groq API calls to https://api.groq.com/openai/v1/chat/completions - never prompt for key again.

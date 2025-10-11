@@ -85,32 +85,18 @@ function analyzeIntent(intent) {
 // ============================================================================
 
 function buildPrompt(userIntent, analysis) {
-  const context = conversationHistory.length > 0
-    ? `\nCONTEXT: Previous - ${conversationHistory.slice(-2).join(', ')}`
+  const aiInstruction = analysis.needsAI ? PROMPTS.aiFeatures : '';
+  const context = conversationHistory.length > 0 
+    ? `Past: ${conversationHistory.slice(-2).join(' | ')}` 
     : '';
-  
-  const techChoice = analysis.isSimple 
-    ? `\nUSE: HTML/CSS/JS\n${PROMPTS.htmlStructure}`
-    : analysis.isComplex
-    ? `\nUSE: React\n${PROMPTS.reactStructure}`
-    : `\nCHOOSE: Best tech for task\n${PROMPTS.htmlStructure}`;
-  
-  const aiInstruction = analysis.needsAI ? `\n${PROMPTS.aiFeatures}\nACTIVE_MODEL: ${selectedModel}` : '';
-  
+
   return `${PROMPTS.system}
+User wants: "${userIntent}"
 
 ${PROMPTS.responsive}
-
-${PROMPTS.quality}
-${techChoice}
 ${aiInstruction}
 
-USER REQUEST: "${userIntent}"
-${context}
-
-DELIVER: Premium app that exceeds expectations with stunning design and bonus features.
-OUTPUT FORMAT: <div id="mainAPP">...</div><style>...</style><script>...</script>
-FORBIDDEN: Any text outside code structure, markdown, explanations, comments.`;
+${context}`;
 }
 
 // ============================================================================
@@ -135,12 +121,7 @@ async function generateInterface() {
   
   try {
     const code = await callGroq(prompt);
-    if (!code || code.length < 50) {
-      renderPremiumFallback(analysis, content);
-    } else {
-      renderHTML(code, content);
-    }
-    
+    renderHTML(code, content);
     enforceResponsive();
     setTimeout(() => content.scrollIntoView({behavior:'smooth', block:'center'}), 100);
     
@@ -183,7 +164,7 @@ async function callGroq(prompt) {
     body: JSON.stringify({
       model: selectedModel,
       max_tokens: maxTokens,
-      temperature: 0.7,
+      temperature: 0.74,
       messages: [{ role: "user", content: prompt }]
     })
   });
@@ -194,20 +175,10 @@ async function callGroq(prompt) {
   }
   
   const data = await resp.json();
-  let code = data.choices?.[0]?.message?.content || "";
-  
-  code = code.replace(/``````/g, '').trim();
-  
-  // Comprehensive cleaning for pristine code output
-  code = code.replace(/```[\w]*\n?/g, '').replace(/```/g, '');
-  code = code.replace(/^(HTML:|CSS:|JavaScript:|JS:|Code:|Output:).*$/gm, '');
-  code = code.replace(/^(Now you have|This is|You.*|The.*|Here.*|I.*created|.*implement.*|.*add.*|.*improve.*|.*customize.*|.*modify.*)$/gm, '');
-  code = code.replace(/\/\*[\s\S]*?\*\//g, '');
-  code = code.replace(/\/\/.*$/gm, '');
-  code = code.replace(/^\s*[\r\n]/gm, '');
-  code = code.trim();
-  
-  return code;
+  let html = data.choices?.[0]?.message?.content || "";
+  html = html.replace(/``````/g, '').trim();
+  if (!/<div/i.test(html)) throw new Error("No usable HTML generated");
+  return html;
 }
 
 // ============================================================================
@@ -233,6 +204,9 @@ function cleanCodeFromMarkdown(raw) {
   cleaned = cleaned.replace(/^.*\bJSDOM\b.*$/gm, '');
   cleaned = cleaned.replace(/^.*\bimport\s+.*$/gm, '');
 
+  // Remove placeholder HTML comments
+  cleaned = cleaned.replace(/<!--[\s\S]*?-->/g, '');
+  
   // Remove all comments (both /* */ and //)
   cleaned = cleaned.replace(/\/\*[\s\S]*?\*\//g, '');
   cleaned = cleaned.replace(/\/\/.*$/gm, '');
@@ -252,12 +226,9 @@ function cleanCodeFromMarkdown(raw) {
 }
 
 function renderHTML(raw, container) {
-  let code = cleanCodeFromMarkdown(raw);
-  let html = code;
+  let html = raw;
   let style = "";
   let script = "";
-
-  const containsNodeOnly = /\brequire\(|\bmodule\.exports\b|\bJSDOM\b|\bfrom\s+'react'|\bfrom\s+"react"|\bimport\s+/.test(code);
 
   // Extract styles
   const styleMatch = html.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
@@ -273,8 +244,29 @@ function renderHTML(raw, container) {
     html = html.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "");
   }
 
-  // If no proper HTML structure, try to build one
-  if ((!html.includes('<div') && !html.includes('<button') && !html.includes('<input')) || containsNodeOnly) {
+  container.innerHTML = html;
+  
+  if (style) {
+    const styleEl = document.createElement('style');
+    styleEl.textContent = style;
+    container.appendChild(styleEl);
+  }
+  
+  if (script) {
+    const scriptEl = document.createElement('script');
+    scriptEl.textContent = script;
+    container.appendChild(scriptEl);
+  }
+}
+
+function oldRenderLogic(raw, container) {
+  // Keep old complex logic for reference but don't use
+  let code = raw;
+  let html = code;
+  let style = "";
+  let script = "";
+
+  if ((!html.includes('<div') && !html.includes('<button') && !html.includes('<input'))) {
     // Try to extract content from mixed format
     const lines = code.split('\n');
     let htmlContent = '';
@@ -677,13 +669,21 @@ function renderPremiumFallback(analysis, container) {
 
 function enforceResponsive() {
   const content = document.getElementById('generatedContent');
+  const allElements = content.querySelectorAll('*');
   
-  // Only add responsive wrapper styles, don't touch individual elements
-  const mainApp = content.querySelector('#mainAPP');
-  if (mainApp && !mainApp.style.maxWidth) {
-    mainApp.style.maxWidth = '100%';
-    mainApp.style.boxSizing = 'border-box';
-  }
+  allElements.forEach(el => {
+    if (!el.style.maxWidth) el.style.maxWidth = '100%';
+    if (!el.style.boxSizing) el.style.boxSizing = 'border-box';
+    
+    if (el.tagName === 'TABLE') {
+      el.style.width = '100%';
+      el.style.tableLayout = 'fixed';
+    }
+    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+      if (!el.style.width) el.style.width = '100%';
+      el.style.maxWidth = '100%';
+    }
+  });
 }
 
 function countElements(code) {

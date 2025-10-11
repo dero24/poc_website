@@ -1,12 +1,1 @@
-PREMIUM COMPLEX APP (VANILLA JS + REACT PATTERNS):
-<div id="mainAPP" style="max-width:100%;padding:20px;box-sizing:border-box;">
-  [sophisticated UI with component-like structure, beautiful design]
-</div>
-<style>
-[advanced CSS: component styling, state transitions, premium animations]
-</style>
-<script>
-[elegant vanilla JS: state management, component patterns, smooth interactions + bonus features]
-</script>
-
-DELIVER: Enterprise-level functionality with stunning design that rivals top apps.
+COMPLEX APPS: Use vanilla JS with state management patterns, NO build tools required
