@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -150,7 +148,7 @@
       background: white;
       box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
     }
-.stats-bar {
+    .stats-bar {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
       gap: 16px;
@@ -305,12 +303,41 @@
       transform: translateY(-3px);
     }
     
+    .option-row {
+      display: flex;
+      gap: 16px;
+      margin-top: 16px;
+    }
+    
+    .option-btn {
+      flex: 1;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      background: white;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 600;
+    }
+    
+    .option-btn:hover {
+      border-color: #667eea;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    }
+    
+    .option-btn.active {
+      background: #667eea;
+      color: white;
+      border-color: #667eea;
+    }
+
     @media (max-width: 768px) {
       .setup-card, .interaction-zone { padding: 32px 24px; }
       h1 { font-size: 2.2em; }
       .tagline { font-size: 1.1em; }
       .stats-bar { grid-template-columns: 1fr; }
       .react-prompt { margin: 20px; padding: 32px 24px; }
+      .option-row { flex-direction: column; }
     }
   </style>
 </head>
@@ -326,7 +353,7 @@
         <div class="feature-item">🎨 Any Design</div>
         <div class="feature-item">⚡ Instant Generation</div>
         <div class="feature-item">🔄 Live Adaptation</div>
-        <div class="feature-item">🚀 React Ready</div>
+        <div class="feature-item">🚀 Framework Ready</div>
       </div>
       
       <form id="setupForm">
@@ -368,7 +395,13 @@
           <option value="llama-3.3-70b-versatile">Loading models...</option>
         </select>
       </div>
-<div class="input-group">
+
+      <div class="option-row">
+        <button class="option-btn active" onclick="setFramework('vanilla')">Vanilla JS</button>
+        <button class="option-btn" onclick="setFramework('react')">React</button>
+      </div>
+
+      <div class="input-group">
         <label for="userIntent">💭 What do you want to build?</label>
         <textarea 
           id="userIntent" 
@@ -388,10 +421,10 @@
   <!-- React Enhancement Modal -->
   <div class="react-enhancement" id="reactEnhancement">
     <div class="react-prompt">
-      <h2>🚀 React Upgrade Available!</h2>
-      <p>Your creation has reached the complexity threshold where React architecture would provide better performance and maintainability. Want to upgrade?</p>
-      <button class="primary" onclick="enhanceWithReact()">⚡ Upgrade to React</button>
-      <button class="secondary" onclick="keepCurrentVersion()">Keep Current Version</button>
+      <h2>🚀 Framework Upgrade Available!</h2>
+      <p>Your creation can be enhanced with a modern framework for better performance. Switch now?</p>
+      <button class="primary" onclick="enhanceWithFramework()">⚡ Upgrade to React</button>
+      <button class="secondary" onclick="keepCurrentVersion()">Keep Current</button>
     </div>
   </div>
 
@@ -399,6 +432,15 @@
 
 let groqKey="", interactionCount=0, elementsCreated=0, adaptations=0, conversationHistory=[];
 let currentAppCode = "";
+let currentFramework = 'vanilla'; // Default to vanilla JS
+
+function setFramework(framework) {
+  currentFramework = framework;
+  document.querySelectorAll('.option-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.onclick.toString().includes(framework));
+  });
+  logHistory(`Selected framework: ${framework.toUpperCase()}`);
+}
 
 function updateStats() {
   document.getElementById('interactionCount').textContent = interactionCount;
@@ -411,6 +453,7 @@ function logHistory(msg) {
   item.className = 'history-item'; item.textContent = `${new Date().toLocaleTimeString()} - ${msg}`;
   log.appendChild(item); log.scrollTop = log.scrollHeight;
 }
+
 async function fetchAvailableModels() {
   try {
     const response = await fetch('https://api.groq.com/openai/v1/models', {
@@ -480,6 +523,7 @@ function initializeExperience(e) {
   
   return false;
 }
+
 async function generateInterface() {
   const userInput = document.getElementById('userIntent').value.trim();
   if (!userInput) { alert('Please describe what you want to create!'); return; }
@@ -501,11 +545,15 @@ async function generateInterface() {
     parseAndInjectHTML(generatedHTML, container);
     
     updateStats();
-    logHistory(`✅ Generated: ${userInput.substring(0, 50)}...`);
+    logHistory(`✅ Generated: ${userInput.substring(0, 50)}... (Framework: ${currentFramework.toUpperCase()})`);
+
+    conversationHistory.push({ role: 'assistant', content: `Generated interface with ${elementsCreated} elements using ${currentFramework}` });
     
-    conversationHistory.push({ role: 'assistant', content: `Generated interface with ${elementsCreated} elements` });
-    
-    checkForReactEnhancement();
+    if (currentFramework === 'vanilla' && interactionCount >= 3) { // Optional prompt after multiple interactions
+      setTimeout(() => {
+        document.getElementById('reactEnhancement').style.display = 'flex';
+      }, 500);
+    }
     
   } catch (error) {
     container.innerHTML = `<div style="color: #d32f2f; padding: 40px; text-align: center;"><h3>⚠️ Generation Failed</h3><p>${error.message}</p></div>`;
@@ -515,24 +563,19 @@ async function generateInterface() {
     btn.textContent = '✨ Generate Interface';
   }
 }
-function checkForReactEnhancement() {
-  if (interactionCount >= 1 && currentAppCode) {
-    setTimeout(() => enhanceWithReact(), 500);
-  }
-}
-async function enhanceWithReact() {
+
+async function enhanceWithFramework() {
+  document.getElementById('reactEnhancement').style.display = 'none';
+  setFramework('react');
+  
   const container = document.getElementById('generatedContent');
   container.innerHTML = '<div class="loading">🚀 Upgrading to React</div>';
   
-  const reactPrompt = `Convert this into a modern React functional component with hooks. Ensure you return valid HTML including <!DOCTYPE html> and proper React structure:
-
-${currentAppCode}`;
+  const userInput = document.getElementById('userIntent').value.trim(); // Reuse latest prompt for context
   
   try {
-    const reactCode = await callGroqAPI(reactPrompt, true);
-    if (!reactCode.includes('React') && !reactCode.includes('react')) {
-      throw new Error("React code not generated");
-    }
+    const reactCode = await callGroqAPI(userInput); // Regenerate with React prompt
+    currentAppCode = reactCode;
     parseAndInjectHTML(reactCode, container);
     adaptations++;
     updateStats();
@@ -542,9 +585,10 @@ ${currentAppCode}`;
     logHistory('⚠️ React upgrade skipped, using original code');
   }
 }
+
 function keepCurrentVersion() {
   document.getElementById('reactEnhancement').style.display = 'none';
-  logHistory('Kept vanilla JavaScript version');
+  logHistory('Kept current version');
 }
 
 function ensureResponsive(html) {
@@ -563,23 +607,21 @@ function ensureResponsive(html) {
 }
 
 async function callGroqAPI(userPrompt, isReactUpgrade = false) {
-  const systemPrompt = `You are an expert web developer. Create complete, functional, beautiful HTML pages with inline CSS and JavaScript.
+  let systemPrompt = `You are an expert web developer. Create complete, functional, beautiful ${currentFramework === 'react' ? 'React ' : ''}apps with inline styles and functionality.
 
 REQUIREMENTS:
 - Generate a complete HTML document with <!DOCTYPE html>
 - Include inline CSS in <style> tags for modern, attractive design
-- Include a <script> tag with all JavaScript functionality
-- Make it fully interactive and functional
-- Use modern ES6+ JavaScript
-- Ensure responsive design
+${currentFramework === 'react' ? '- Use React 18+ with functional components, hooks (useState, useEffect), and JSX embedded in JS\n- Include React script tags: <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script> and <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>\n- Render with ReactDOM.render or createRoot\n- Make it fully interactive with state management' : '- Include a <script> tag with all JavaScript functionality\n- Use modern ES6+ JavaScript'}
+- Ensure responsive design with media queries
 - Add smooth animations and transitions
-- Make it visually impressive with gradients, shadows, and modern UI
+- Use gradients, shadows, and modern UI elements
+- Make it fully interactive and functional
+- Optimize for performance and accessibility
 
-Return ONLY the complete HTML code, no explanations or markdown.`;
+Return ONLY the complete HTML code, no explanations or markdown. Wrap code in <pre> if needed, but ensure it's valid HTML.`;
 
-  const messages = isReactUpgrade 
-    ? [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }]
-    : [{ role: 'system', content: systemPrompt }, ...conversationHistory.slice(-5), { role: 'user', content: userPrompt }];
+  const messages = [{ role: 'system', content: systemPrompt }, ...conversationHistory.slice(-5), { role: 'user', content: userPrompt }];
 
   const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
@@ -589,7 +631,7 @@ Return ONLY the complete HTML code, no explanations or markdown.`;
     },
     body: JSON.stringify({
       model: document.getElementById('modelSelector').value,
-messages: messages,
+      messages: messages,
       temperature: 0.85,
       max_tokens: 4096,
       top_p: 0.95
@@ -603,75 +645,69 @@ messages: messages,
 
   const data = await response.json();
   let content = data.choices[0].message.content.trim();
-  
+
+  // Improved response cleaning: Remove markdown code blocks cleanly
+  content = content.replace(/``````/g, '$1').trim();
+  content = content.replace(/^\s*```
+
+  // Skip base64 decoding as it's unreliable; assume direct output
   const validateHTML = content.includes('<!DOCTYPE') || content.includes('<html');
   
   if (!validateHTML) {
-    try {
-      const decodedAttempt = atob(
-        content.replace(/[^A-Za-z0-9+\/=]/g, '')
-      );
-      if (decodedAttempt.includes('<!DOCTYPE') || decodedAttempt.includes('<html')) {
-        content = decodedAttempt;
-      }
-    } catch(e) {
-      console.error("Encoding error:", e);
-      content = data.choices[0].message.content.trim();
-    }
+    throw new Error("Invalid HTML structure received from API - no DOCTYPE or html tag found");
   }
+
+  // Basic validation for content
+  const hasValidContent = content && (
+    /<div/i.test(content) || 
+    /<button/i.test(content) ||
+    /<input/i.test(content) || 
+    /<form/i.test(content) || 
+    /<canvas/i.test(content) || 
+    /<svg/i.test(content) ||
+    (currentFramework === 'react' && /React/i.test(content))
+  );
   
-  const bt = '`' + '`' + '`'; content = content.replace(new RegExp(bt + 'javascript|' + bt + 'html|' + bt, 'g'), '');
-  
-  if (validateHTML) {
-    const hasValidContent = content && (
-      /<div/i.test(content) || 
-      /<button/i.test(content) ||
-      /<input/i.test(content) ||
-      /<form/i.test(content) ||
-      /<canvas/i.test(content) ||
-      /<svg/i.test(content)
-    );
-    
-    if (!hasValidContent) {
-      throw new Error("Generated content doesn't contain valid HTML elements");
-    }
-    
-    return ensureResponsive(content);
+  if (!hasValidContent) {
+    throw new Error("Generated content doesn't contain sufficient interactive elements");
   }
-  
-  throw new Error("Invalid HTML structure received from API");
+
+  return ensureResponsive(content);
 }
 
 function parseAndInjectHTML(html, container) {
-  const styleClosing = '<' + '/' + 'style>';
-  const scriptClosing = '<' + '/' + 'script' + '>';
+  const styleClosing = '</style>';
+  const scriptClosing = '</script>';
   
   const stylePattern = new RegExp('<style[^>]*>([\\s\\S]*?)' + styleClosing, 'i');
   const styleMatch = html.match(stylePattern);
-  const styleContent = styleMatch ? styleMatch[1] : "";
+  const styleContent = styleMatch ? styleMatch : "";[1]
   html = html.replace(new RegExp('<style[^>]*>[\\s\\S]*?' + styleClosing, 'gi'), "");
-  
+
   const scriptPattern = new RegExp('<script[^>]*>([\\s\\S]*?)' + scriptClosing, 'i');
   const scriptMatch = html.match(scriptPattern);
-  const scriptContent = scriptMatch ? scriptMatch[1] : "";
+  const scriptContent = scriptMatch ? scriptMatch : "";[1]
   html = html.replace(new RegExp('<script[^>]*>[\\s\\S]*?' + scriptClosing, 'gi'), "");
-  
+
   html = html.replace(/\\/g, '/');
-  
+
   container.innerHTML = html;
-  
+
   if (styleContent) {
     const styleElement = document.createElement('style');
     styleElement.textContent = styleContent;
     container.appendChild(styleElement);
   }
-  
+
   if (scriptContent) {
-    const scriptElement = document.createElement('script');
-    scriptElement.textContent = scriptContent;
-    container.appendChild(scriptElement);
+    // Delay script execution to ensure DOM is ready
+    setTimeout(() => {
+      const scriptElement = document.createElement('script');
+      scriptElement.textContent = scriptContent;
+      container.appendChild(scriptElement);
+    }, 100);
   }
-  
+
   elementsCreated = countElements(html);
 }
 
