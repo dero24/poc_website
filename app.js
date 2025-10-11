@@ -222,11 +222,17 @@ function cleanCodeFromMarkdown(raw) {
   cleaned = cleaned.replace(/```([\s\S]*?)```/g, '$1');
   
   // Remove section headers and explanatory text
-  cleaned = cleaned.replace(/^(HTML:|CSS:|JavaScript:|JS:|Code:|Output:|Result:).*$/gm, '');
+  cleaned = cleaned.replace(/^(HTML:|CSS:|JavaScript:|JS:|Code:|Output:|Result:|HTML TEMPLATE:|JS CODE:).*$/gm, '');
   cleaned = cleaned.replace(/^(Now you have|This is|You can|Here's|I've created|The above|This creates).*$/gm, '');
   cleaned = cleaned.replace(/^(Feel free|You can customize|To use|Simply|Just).*$/gm, '');
   cleaned = cleaned.replace(/^.*\b(implement|add|customize|modify|improve|enhance)\b.*$/gm, '');
   
+  // Remove server-only and non-browser lines
+  cleaned = cleaned.replace(/^.*\brequire\(.*$/gm, '');
+  cleaned = cleaned.replace(/^.*\bmodule\.exports\b.*$/gm, '');
+  cleaned = cleaned.replace(/^.*\bJSDOM\b.*$/gm, '');
+  cleaned = cleaned.replace(/^.*\bimport\s+.*$/gm, '');
+
   // Remove all comments (both /* */ and //)
   cleaned = cleaned.replace(/\/\*[\s\S]*?\*\//g, '');
   cleaned = cleaned.replace(/\/\/.*$/gm, '');
@@ -244,6 +250,8 @@ function renderHTML(raw, container) {
   let style = "";
   let script = "";
 
+  const containsNodeOnly = /\brequire\(|\bmodule\.exports\b|\bJSDOM\b|\bfrom\s+'react'|\bfrom\s+"react"|\bimport\s+/.test(code);
+
   // Extract styles
   const styleMatch = html.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
   if (styleMatch) {
@@ -259,7 +267,7 @@ function renderHTML(raw, container) {
   }
 
   // If no proper HTML structure, try to build one
-  if (!html.includes('<div') && !html.includes('<button') && !html.includes('<input')) {
+  if ((!html.includes('<div') && !html.includes('<button') && !html.includes('<input')) || containsNodeOnly) {
     // Try to extract content from mixed format
     const lines = code.split('\n');
     let htmlContent = '';
@@ -286,7 +294,76 @@ function renderHTML(raw, container) {
       }
     }
     
-    if (htmlContent) {
+    if (containsNodeOnly) {
+      // Fallback: premium AI chat UI using window.morphicGroqChat
+      html = `
+        <div id="mainAPP">
+          <div class="chat-wrap">
+            <div class="chat-header">🤖 AI Assistant</div>
+            <div id="chatMessages" class="chat-messages"></div>
+            <div class="chat-input">
+              <input id="chatText" type="text" placeholder="Type your message..." />
+              <button id="chatSend">Send</button>
+            </div>
+          </div>
+        </div>
+      `;
+      style = `
+        #mainAPP { padding: 18px; }
+        .chat-wrap { max-width: 680px; margin: 0 auto; background: #fff; border-radius: 12px; box-shadow: 0 8px 24px #00000014; overflow: hidden; }
+        .chat-header { background: linear-gradient(135deg,#6d5dfc,#47caff); color:#fff; padding: 14px 16px; font-weight: 800; }
+        .chat-messages { height: 360px; overflow-y: auto; padding: 12px; background: #f8fafc; }
+        .msg { margin: 8px 0; display: flex; gap: 10px; }
+        .msg.me { justify-content: flex-end; }
+        .bubble { max-width: 78%; padding: 10px 12px; border-radius: 12px; box-shadow: 0 2px 6px #0001; }
+        .me .bubble { background: #e0e7ff; }
+        .ai .bubble { background: #ffffff; }
+        .chat-input { display: flex; gap: 8px; padding: 10px; border-top: 1px solid #eef2ff; background: #f8fafc; }
+        .chat-input input { flex: 1; padding: 10px 12px; border-radius: 10px; border: 1px solid #dbe3ff; font-size: 1rem; }
+        .chat-input button { padding: 10px 16px; border-radius: 10px; border: none; background: linear-gradient(135deg,#6d5dfc,#47caff); color:#fff; font-weight: 800; cursor: pointer; }
+        .chat-input button:hover { filter: brightness(1.05); }
+      `;
+      script = `
+        const elMsgs = document.getElementById('chatMessages');
+        const elInput = document.getElementById('chatText');
+        const elSend = document.getElementById('chatSend');
+        
+        function addMsg(role, text) {
+          const row = document.createElement('div');
+          row.className = 'msg ' + (role === 'user' ? 'me' : 'ai');
+          const bubble = document.createElement('div');
+          bubble.className = 'bubble';
+          bubble.textContent = text;
+          row.appendChild(bubble);
+          elMsgs.appendChild(row);
+          elMsgs.scrollTop = elMsgs.scrollHeight;
+        }
+        
+        async function sendChat() {
+          const text = elInput.value.trim();
+          if (!text) return;
+          addMsg('user', text);
+          elInput.value = '';
+          const loaderId = 'loading-' + Date.now();
+          addMsg('assistant', '…');
+          try {
+            const reply = await window.morphicGroqChat([
+              { role: 'system', content: 'Helpful, concise AI assistant.' },
+              { role: 'user', content: text }
+            ], { temperature: 0.6 });
+            // replace last bubble content
+            const last = elMsgs.querySelector('.msg.ai:last-child .bubble');
+            if (last) last.textContent = reply || '(no response)';
+          } catch (e) {
+            const last = elMsgs.querySelector('.msg.ai:last-child .bubble');
+            if (last) last.textContent = 'Error: ' + (e.message || e);
+          }
+        }
+        
+        elSend.addEventListener('click', sendChat);
+        elInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendChat(); });
+      `;
+    } else if (htmlContent) {
       html = `<div id="mainAPP">\n<div id="result">0</div>\n${htmlContent}\n</div>`;
       style = cssContent || `
         #mainAPP { padding: 20px; text-align: center; }
