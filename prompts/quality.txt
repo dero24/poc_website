@@ -1,9 +1,12 @@
-QUALITY STANDARDS:
-- Semantic HTML, clean CSS, efficient JS
-- Error handling with user feedback
-- Intuitive UX, accessible (ARIA)
-- Fast, responsive, mobile-friendly
-- Complete functionality, no TODOs/placeholders
-- Production-ready code
+PREMIUM QUALITY STANDARDS:
+- Beautiful modern design with subtle animations
+- Smooth hover effects and micro-interactions
+- Perfect responsive layout (mobile-first)
+- Intuitive UX with delightful surprises
+- Complete functionality + bonus features user didn't ask for
+- Professional color schemes and typography
+- Accessible (ARIA labels, keyboard navigation)
+- Error handling with elegant user feedback
+- Loading states and smooth transitions
 
-CRITICAL: Output ONLY the code structure. NO explanatory text, NO markdown, NO implementation notes.
+EXCEED USER EXPECTATIONS: Add polish, features, and wow-factor beyond the basic request.

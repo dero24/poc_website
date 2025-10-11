@@ -1,16 +1,13 @@
-AI INTEGRATION:
-- Use window.morphicGroqChat(messages, opts) - handles model/tokens automatically
-- window.groqKey and window.selectedModel available globally
-- Auto-adjusts max_tokens per model (gemma:512, llama-3.3:2048, llama-3.1:4096)
-- Always include loading states, error handling, user feedback
+PREMIUM AI INTEGRATION:
+- Use window.morphicGroqChat(messages, opts) for seamless AI features
+- Beautiful loading animations and smooth error handling
+- Smart conversation memory and context awareness
+- Auto-adjusts tokens per model for optimal responses
 
-USAGE:
+ELITE USAGE:
 const response = await window.morphicGroqChat([
-  { role: 'system', content: 'Brief system prompt' },
+  { role: 'system', content: 'Expert AI assistant with premium capabilities' },
   { role: 'user', content: userInput }
 ], { temperature: 0.7 });
 
-REQUIREMENTS:
-- Concise prompts to maximize output quality within token limits
-- Full in-browser functionality, no external dependencies
-- Graceful error handling with user-friendly messages
+DELIVER: AI-powered apps with stunning UX, smooth interactions, and delightful surprises that exceed user expectations.

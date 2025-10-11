@@ -1,12 +1,12 @@
-REACT BROWSER-COMPATIBLE (NO BUILD TOOLS):
+PREMIUM COMPLEX APP (VANILLA JS + REACT PATTERNS):
 <div id="mainAPP" style="max-width:100%;padding:20px;box-sizing:border-box;">
-  [complete functional UI using vanilla JS that mimics React patterns]
+  [sophisticated UI with component-like structure, beautiful design]
 </div>
 <style>
-[complete CSS for modern component styling]
+[advanced CSS: component styling, state transitions, premium animations]
 </style>
 <script>
-[vanilla JavaScript with state management, event handling, DOM updates]
+[elegant vanilla JS: state management, component patterns, smooth interactions + bonus features]
 </script>
 
-CRITICAL: NO import statements. NO JSX. Use vanilla JS with React-like patterns for complex apps.
+DELIVER: Enterprise-level functionality with stunning design that rivals top apps.

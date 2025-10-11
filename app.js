@@ -108,8 +108,9 @@ ${aiInstruction}
 USER REQUEST: "${userIntent}"
 ${context}
 
-OUTPUT ONLY: <div id="mainAPP">...</div><style>...</style><script>...</script>
-NO markdown blocks, NO explanations, NO "Now you have", NO implementation notes.`;
+DELIVER: Premium app that exceeds expectations with stunning design and bonus features.
+OUTPUT FORMAT: <div id="mainAPP">...</div><style>...</style><script>...</script>
+FORBIDDEN: Any text outside code structure, markdown, explanations, comments.`;
 }
 
 // ============================================================================
@@ -195,10 +196,13 @@ async function callGroq(prompt) {
   
   code = code.replace(/``````/g, '').trim();
   
-  // Additional cleaning for common LLM output issues
-  code = code.replace(/^(HTML:|CSS:|JavaScript:|JS:).*$/gm, '');
-  code = code.replace(/```[\w]*\n/g, '').replace(/```/g, '');
-  code = code.replace(/^(Now you have|This is|You.*|The.*calculator.*|.*implement.*logic.*|.*add.*features.*|.*improve.*layout.*)$/gm, '');
+  // Comprehensive cleaning for pristine code output
+  code = code.replace(/```[\w]*\n?/g, '').replace(/```/g, '');
+  code = code.replace(/^(HTML:|CSS:|JavaScript:|JS:|Code:|Output:).*$/gm, '');
+  code = code.replace(/^(Now you have|This is|You.*|The.*|Here.*|I.*created|.*implement.*|.*add.*|.*improve.*|.*customize.*|.*modify.*)$/gm, '');
+  code = code.replace(/\/\*[\s\S]*?\*\//g, '');
+  code = code.replace(/\/\/.*$/gm, '');
+  code = code.replace(/^\s*[\r\n]/gm, '');
   code = code.trim();
   
   if (code.length < 20) throw new Error("Generated code too short");
@@ -213,23 +217,23 @@ async function callGroq(prompt) {
 function cleanCodeFromMarkdown(raw) {
   let cleaned = raw;
   
-  // Remove markdown code blocks
-  cleaned = cleaned.replace(/```[\w]*\n([\s\S]*?)\n```/g, '$1');
+  // Remove all markdown code blocks
+  cleaned = cleaned.replace(/```[\w]*\n?([\s\S]*?)\n?```/g, '$1');
   cleaned = cleaned.replace(/```([\s\S]*?)```/g, '$1');
   
-  // Remove explanatory text patterns
-  cleaned = cleaned.replace(/^(HTML:|CSS:|JavaScript:|JS:).*$/gm, '');
-  cleaned = cleaned.replace(/^Now you have.*$/gm, '');
-  cleaned = cleaned.replace(/^This is.*$/gm, '');
-  cleaned = cleaned.replace(/^You.*$/gm, '');
-  cleaned = cleaned.replace(/^The.*calculator.*$/gm, '');
-  cleaned = cleaned.replace(/\/\/ Import.*$/gm, '');
-  cleaned = cleaned.replace(/\/\/ DOM manipulation.*$/gm, '');
-  cleaned = cleaned.replace(/\/\/ Event listeners.*$/gm, '');
-  cleaned = cleaned.replace(/\/\/ Calculate.*$/gm, '');
-  cleaned = cleaned.replace(/\/\/ Implement.*$/gm, '');
-  cleaned = cleaned.replace(/\/\/ Handle.*$/gm, '');
-  cleaned = cleaned.replace(/\/\/ e\.g\..*$/gm, '');
+  // Remove section headers and explanatory text
+  cleaned = cleaned.replace(/^(HTML:|CSS:|JavaScript:|JS:|Code:|Output:|Result:).*$/gm, '');
+  cleaned = cleaned.replace(/^(Now you have|This is|You can|Here's|I've created|The above|This creates).*$/gm, '');
+  cleaned = cleaned.replace(/^(Feel free|You can customize|To use|Simply|Just).*$/gm, '');
+  cleaned = cleaned.replace(/^.*\b(implement|add|customize|modify|improve|enhance)\b.*$/gm, '');
+  
+  // Remove all comments (both /* */ and //)
+  cleaned = cleaned.replace(/\/\*[\s\S]*?\*\//g, '');
+  cleaned = cleaned.replace(/\/\/.*$/gm, '');
+  
+  // Remove empty lines and clean up
+  cleaned = cleaned.replace(/^\s*[\r\n]/gm, '');
+  cleaned = cleaned.replace(/\n\s*\n/g, '\n');
   
   return cleaned.trim();
 }

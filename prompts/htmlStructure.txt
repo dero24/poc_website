@@ -1,13 +1,13 @@
-EXACT OUTPUT FORMAT:
+PREMIUM APP STRUCTURE:
 <div id="mainAPP" style="max-width:100%;padding:20px;box-sizing:border-box;">
-  [complete functional UI - buttons, inputs, displays, etc.]
+  [stunning UI with premium design elements, icons, smooth layouts]
 </div>
 <style>
 #mainAPP * { box-sizing:border-box; max-width:100%; }
-[complete CSS for layout, colors, responsiveness]
+[beautiful CSS: gradients, shadows, animations, hover effects, modern typography]
 </style>
 <script>
-[complete JavaScript with all event handlers and logic]
+[complete JavaScript: full functionality + bonus features + smooth interactions]
 </script>
 
-MUST: Work immediately when injected. NO placeholders, NO TODOs, NO incomplete functions.
+DELIVER: A polished app that exceeds expectations with premium touches and extra features.
