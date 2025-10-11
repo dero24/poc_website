@@ -39,6 +39,7 @@ async function initializeExperience() {
     return;
   }
   window.groqKey = groqKey;
+  window.selectedModel = selectedModel;
 
   const startBtn = document.querySelector('.start-btn');
   startBtn.disabled = true;
@@ -94,7 +95,7 @@ function buildPrompt(userIntent, analysis) {
     ? `\nUSE: React\n${PROMPTS.reactStructure}`
     : `\nCHOOSE: Best tech for task\n${PROMPTS.htmlStructure}`;
   
-  const aiInstruction = analysis.needsAI ? `\n${PROMPTS.aiFeatures}` : '';
+  const aiInstruction = analysis.needsAI ? `\n${PROMPTS.aiFeatures}\nCURRENT_MODEL: ${selectedModel}\nREQUIREMENT: Use window.groqKey and window.selectedModel when making AI calls. Prefer calling window.morphicGroqChat(messages, { temperature: 0.7 }) if available.` : '';
   
   return `${PROMPTS.system}
 
@@ -290,9 +291,11 @@ document.addEventListener("DOMContentLoaded", () => {
   if (modelSelect) {
     modelSelect.addEventListener('change', (e) => {
       selectedModel = e.target.value;
+      window.selectedModel = selectedModel;
       logHistory(`🧠 Model set to: ${selectedModel}`);
     });
   }
+  window.selectedModel = selectedModel;
 });
 
 async function fetchGroqModels() {
@@ -346,6 +349,29 @@ async function fetchGroqModels() {
     sel.value = preferred;
   }
   sel.disabled = false;
+}
+
+// Simple helper for generated apps to call Groq chat with the active model
+window.morphicGroqChat = async function(messages, opts = {}) {
+  const key = window.groqKey;
+  if (!key) throw new Error('Missing Groq API key');
+  const model = opts.model || window.selectedModel || 'llama-3.1-70b-versatile';
+  const temperature = typeof opts.temperature === 'number' ? opts.temperature : 0.7;
+  const max_tokens = typeof opts.max_tokens === 'number' ? opts.max_tokens : 1024;
+  const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${key}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ model, temperature, max_tokens, messages })
+  });
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({}));
+    throw new Error(err.error?.message || 'Groq request failed');
+  }
+  const data = await resp.json();
+  return data.choices?.[0]?.message?.content || '';
 }
 
 // Expose functions to global scope for HTML onclick handlers
