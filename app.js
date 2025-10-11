@@ -1,0 +1,284 @@
+// app.js
+// ============================================================================
+// MORPHIC WEB - MAIN APPLICATION
+// ============================================================================
+
+import { PROMPTS, loadPrompts } from './prompts.js';
+
+// State
+let groqKey = "";
+let interactionCount = 0;
+let elementsCreated = 0;
+let adaptations = 0;
+let conversationHistory = [];
+
+// ============================================================================
+// UTILITIES
+// ============================================================================
+
+function updateStats() {
+  document.getElementById('interactionCount').textContent = interactionCount;
+  document.getElementById('elementsCreated').textContent = elementsCreated;
+  document.getElementById('adaptations').textContent = adaptations;
+}
+
+function logHistory(msg) {
+  const log = document.getElementById('historyLog');
+  const item = document.createElement('div');
+  item.className = 'history-item';
+  item.textContent = `${new Date().toLocaleTimeString()} - ${msg}`;
+  log.appendChild(item);
+  log.scrollTop = log.scrollHeight;
+}
+
+async function initializeExperience() {
+  groqKey = document.getElementById('apiKey').value.trim();
+  if (!groqKey) {
+    alert('Please paste your Groq API key!');
+    return;
+  }
+  window.groqKey = groqKey;
+
+  const startBtn = document.querySelector('.start-btn');
+  startBtn.disabled = true;
+  startBtn.textContent = 'Loading...';
+
+  try {
+    await loadPrompts();
+    document.getElementById('setupCard').style.display = "none";
+    document.getElementById('interactionZone').style.display = "block";
+    logHistory('🚀 Ready to build apps!');
+  } catch (error) {
+    console.error('Failed to load prompts:', error);
+    alert(`Error initializing the application: ${error.message}`);
+    startBtn.disabled = false;
+    startBtn.textContent = '🚀 Start Building';
+  }
+}
+
+// ============================================================================
+// INTENT ANALYSIS
+// ============================================================================
+
+function analyzeIntent(intent) {
+  const lower = intent.toLowerCase();
+  
+  return {
+    needsAI: /(ai|assistant|chatbot|chat|gpt|groq|llm|talk)/i.test(intent),
+    isComplex: /(todo|task|crud|dashboard|multi|state|form|track|manage)/i.test(intent) && intent.length > 30,
+    isSimple: /(calculator|counter|timer|clock|convert|simple)/i.test(intent)
+  };
+}
+
+// ============================================================================
+// PROMPT BUILDER
+// ============================================================================
+
+function buildPrompt(userIntent, analysis) {
+  const context = conversationHistory.length > 0
+    ? `\nCONTEXT: Previous - ${conversationHistory.slice(-2).join(', ')}`
+    : '';
+  
+  const techChoice = analysis.isSimple 
+    ? `\nUSE: HTML/CSS/JS\n${PROMPTS.htmlStructure}`
+    : analysis.isComplex
+    ? `\nUSE: React\n${PROMPTS.reactStructure}`
+    : `\nCHOOSE: Best tech for task\n${PROMPTS.htmlStructure}`;
+  
+  const aiInstruction = analysis.needsAI ? `\n${PROMPTS.aiFeatures}` : '';
+  
+  return `${PROMPTS.system}
+
+${PROMPTS.responsive}
+
+${PROMPTS.quality}
+${techChoice}
+${aiInstruction}
+
+USER REQUEST: "${userIntent}"
+${context}
+
+BUILD NOW. Code only, no text.`;
+}
+
+// ============================================================================
+// MAIN GENERATION
+// ============================================================================
+
+async function generateInterface() {
+  const intent = document.getElementById('userIntent').value.trim();
+  const content = document.getElementById('generatedContent');
+  
+  if (!intent) {
+    alert('Describe what to build!');
+    return;
+  }
+  
+  content.innerHTML = '<div class="loading">✨ Building...</div>';
+  interactionCount++;
+  updateStats();
+  
+  const analysis = analyzeIntent(intent);
+  const prompt = buildPrompt(intent, analysis);
+  
+  try {
+    const code = await callGroq(prompt);
+    
+    if (code.includes('import React') || code.includes('from "react"') || code.includes("from 'react'")) {
+      renderReact(code, content);
+    } else {
+      renderHTML(code, content);
+    }
+    
+    enforceResponsive();
+    setTimeout(() => content.scrollIntoView({behavior:'smooth', block:'center'}), 100);
+    
+    conversationHistory.push(intent.substring(0, 40));
+    if (conversationHistory.length > 5) conversationHistory.shift();
+    
+    elementsCreated += countElements(code);
+    adaptations++;
+    updateStats();
+    
+    logHistory(`✅ ${intent.substring(0, 35)}...`);
+    document.getElementById('userIntent').value = '';
+    
+  } catch(e) {
+    content.innerHTML = `<div class='error-message'><b>Error:</b> ${e.message}</div>`;
+    logHistory(`❌ ${e.message}`);
+  }
+}
+
+// ============================================================================
+// API CALL
+// ============================================================================
+
+async function callGroq(prompt) {
+  const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${groqKey}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      model: 'llama-3.1-70b-versatile',
+      max_tokens: 4096,
+      temperature: 0.7,
+      messages: [{ role: "user", content: prompt }]
+    })
+  });
+  
+  if (!resp.ok) {
+    const error = await resp.json().catch(() => ({}));
+    throw new Error(error.error?.message || 'API error');
+  }
+  
+  const data = await resp.json();
+  let code = data.choices?.[0]?.message?.content || "";
+  
+  code = code.replace(/``````/g, '').trim();
+  
+  if (code.length < 20) throw new Error("Generated code too short");
+  
+  return code;
+}
+
+// ============================================================================
+// RENDERING
+// ============================================================================
+
+function renderHTML(raw, container) {
+  let html = raw;
+  let style = "";
+  let script = "";
+
+  const styleMatch = html.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
+  if (styleMatch) {
+    style = styleMatch[1];
+    html = html.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "");
+  }
+
+  const scriptMatch = html.match(/<script[^>]*>([\s\S]*?)<\/script>/i);
+  if (scriptMatch) {
+    script = scriptMatch[1];
+    html = html.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "");
+  }
+  
+  container.innerHTML = html;
+  
+  if (style) {
+    const styleEl = document.createElement('style');
+    styleEl.textContent = style;
+    container.appendChild(styleEl);
+  }
+  
+  if (script) {
+    const scriptEl = document.createElement('script');
+    scriptEl.textContent = script;
+    container.appendChild(scriptEl);
+  }
+}
+
+function renderReact(code, container) {
+  container.innerHTML = `
+    <div style="padding:20px;text-align:center;">
+      <h3>⚛️ React App Generated</h3>
+      <p>React requires build tools. Copy code below:</p>
+      <pre style="background:#f5f5f5;padding:15px;border-radius:8px;overflow-x:auto;text-align:left;font-size:0.85em;max-height:400px;">${escapeHTML(code)}</pre>
+      <p><small>Use in a React environment with npm/yarn.</small></p>
+    </div>
+  `;
+}
+
+function escapeHTML(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// ============================================================================
+// HELPERS & EVENT LISTENERS
+// ============================================================================
+
+function enforceResponsive() {
+  const content = document.getElementById('generatedContent');
+  const elements = content.querySelectorAll('*');
+  
+  elements.forEach(el => {
+    if (!el.style.maxWidth) el.style.maxWidth = '100%';
+    if (!el.style.boxSizing) el.style.boxSizing = 'border-box';
+    
+    switch(el.tagName) {
+      case 'TABLE':
+        el.style.width = '100%';
+        el.style.tableLayout = 'fixed';
+        break;
+      case 'INPUT':
+      case 'TEXTAREA':
+        if (!el.style.width) el.style.width = '100%';
+        el.style.maxWidth = '100%';
+        break;
+    }
+  });
+}
+
+function countElements(code) {
+  const div = document.createElement('div');
+  div.innerHTML = code;
+  return div.querySelectorAll('*').length;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const input = document.getElementById('userIntent');
+  if (input) {
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+        generateInterface();
+      }
+    });
+  }
+});
+
+// Expose functions to global scope for HTML onclick handlers
+window.initializeExperience = initializeExperience;
+window.generateInterface = generateInterface;

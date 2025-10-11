@@ -1,0 +1,6 @@
+RESPONSIVE:
+- max-width:100%, box-sizing:border-box on all elements
+- Mobile-first (320px+)
+- Flexbox with flex-wrap
+- Relative units (%, rem, vw)
+- Tables: width:100%, table-layout:fixed

@@ -1,0 +1,10 @@
+REACT STRUCTURE:
+import React, { useState } from 'react';
+
+export default function App() {
+  return (
+    <div style={{maxWidth:'100%', padding:'20px'}}>
+      {/* JSX */}
+    </div>
+  );
+}

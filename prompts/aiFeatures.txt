@@ -1,0 +1,20 @@
+AI INTEGRATION:
+- window.groqKey is available
+- Endpoint: https://api.groq.com/openai/v1/chat/completions
+- Model: llama-3.3-70b-versatile
+- Headers: Authorization: Bearer {window.groqKey}
+- Add loading states & error handling
+
+Example:
+fetch('https://api.groq.com/openai/v1/chat/completions', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer ' + window.groqKey,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    model: 'llama-3.3-70b-versatile',
+    messages: [{role:'user', content:msg}],
+    temperature: 0.7
+  })
+})

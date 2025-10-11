@@ -1,0 +1,11 @@
+HTML STRUCTURE:
+<div id="mainAPP" style="max-width:100%;padding:20px;">
+  [content]
+</div>
+<style>
+  #mainAPP * { box-sizing:border-box; max-width:100%; }
+  [styles]
+</style>
+<script>
+  [logic]
+</script>
