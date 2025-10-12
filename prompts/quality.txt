@@ -1,7 +1,11 @@
-PREMIUM QUALITY: Modern design, smooth interactions, complete functionality
-- Professional color schemes and typography
-- Accessible (ARIA labels, keyboard navigation)
-- Error handling with elegant user feedback
-- Loading states and smooth transitions
+PREMIUM QUALITY: Deliver a visually stunning, production-ready experience
+- Curate a cohesive palette, fluid spacing scale, and luxurious typography (import Google Fonts when needed)
+- Use layered gradients, glassmorphism, soft shadows, and tasteful animation to create depth
+- Define CSS variables for colors/spacing and ensure responsive scaling on every breakpoint
+- Ensure accessibility (ARIA labels, focus rings, high contrast, keyboard navigation) without sacrificing style
+- Provide robust error handling, skeleton/loading states, and micro-interactions for feedback
 
-EXCEED USER EXPECTATIONS: Add polish, features, and wow-factor beyond the basic request.
+REVOLUTIONARY UI: Blend best-in-class patterns and trusted CDN resources
+- Leverage lightweight premium CDNs (e.g., Font Awesome icons, Lottie animations) when they elevate the design
+- Keep all markup, styles, and scripts clean, semantic, and performant—no unused code
+- Add delightful extras (tooltips, gradients, animated metrics, responsive cards) that exceed the initial request
