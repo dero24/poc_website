@@ -1,1 +1,7 @@
-COMPLEX APPS: Use vanilla JS with state management patterns, NO build tools required
+REACT DELIVERY: Ship a complete React 18 experience that runs instantly in the browser
+- Always embed React and ReactDOM from unpkg CDN (production builds)
+- Include @babel/standalone and write the app inside a `<script type="text/babel">`
+- Use functional components, hooks, and clear state management patterns
+- Call `ReactDOM.createRoot(document.getElementById('mainAPP')).render(<App />);`
+- Structure files as a single HTML snippet with `<style>` for design and JSX in the Babel script
+- Keep dependencies lightweight, but pull premium icon/animation CDNs when they elevate the UI
