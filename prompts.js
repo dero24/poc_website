@@ -9,21 +9,23 @@ let promptsLoaded = false;
 let promptsLoadingPromise = null;
 
 async function fetchPrompts() {
-  const promptKeys = ['system', 'responsive', 'htmlStructure', 'reactStructure', 'aiFeatures', 'quality'];
-  const fetchPromises = promptKeys.map(key =>
-    fetch(`./prompts/${key}.txt`)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`Failed to load prompt: ${key}.txt`);
-        }
-        return response.text();
-      })
-      .then(text => {
-        PROMPTS[key] = text;
-      })
-  );
+  if (promptsLoaded) return;
 
-  await Promise.all(fetchPromises);
+  const promptKeys = ['system', 'responsive', 'htmlStructure', 'reactStructure', 'aiFeatures', 'quality'];
+
+  await Promise.all(promptKeys.map(async (key) => {
+    try {
+      const response = await fetch(`./prompts/${key}.txt`);
+      if (!response.ok) {
+        throw new Error(`Failed to load prompt: ${key}.txt`);
+      }
+      PROMPTS[key] = await response.text();
+    } catch (error) {
+      console.warn(error);
+      PROMPTS[key] = PROMPTS[key] || '';
+    }
+  }));
+
   promptsLoaded = true;
 }
 
